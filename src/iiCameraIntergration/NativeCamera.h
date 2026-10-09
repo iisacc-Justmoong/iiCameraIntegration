@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iiCameraIntergration/Camera.h>
+#include <iiCameraIntergration/Devices.h>
 #include <iiCameraIntergration/Export.h>
 
 namespace iiCameraIntergration {
@@ -26,6 +27,11 @@ public:
     [[nodiscard]] CameraPermission permissionStatus() const noexcept;
     [[nodiscard]] Result<std::vector<CameraInfo>> cameras() const;
     [[nodiscard]] Result<ControlPort> controls(const std::string &deviceId) const;
+    [[nodiscard]] CameraDeviceSystem devices() const;
+    // Creates and attaches AVCaptureDeviceInput to a stopped session on Apple.
+    // Requires existing permission; does not start capture or perform OS bonding.
+    [[nodiscard]] Result<CameraPairing> pair(const std::string &deviceId,
+        const PairingOptions& options = {}) const;
 };
 
 } // namespace iiCameraIntergration

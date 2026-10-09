@@ -1,4 +1,4 @@
-# Native camera discovery and controls
+# Native camera discovery, pairing, and controls
 
 `NativeCameraSystem` is the AVFoundation adapter on macOS, iOS, and Mac Catalyst.
 Other systems compile the same public interface and return `Unavailable` until
@@ -19,6 +19,35 @@ Neither discovery nor control creation displays a permission prompt or starts a
 capture session. The application is responsible for an appropriate camera privacy
 usage description and requesting access through its own user flow. Applying a
 control requires existing authorization.
+
+`devices()` returns a `CameraDeviceSystem` callback port whose discovery and
+pairing delegate to the native adapter. `pair(id)` resolves the exact connected
+AVFoundation video-device ID again, requires existing camera authorization,
+creates an `AVCaptureDeviceInput`, and attaches it to a stopped
+`AVCaptureSession`. Only after the input is attached does it return a
+`CameraPairing` with `PairingMethod::Session`. It never starts the session,
+adds an output, requests camera permission, or captures media. This prepares
+an application-owned camera input connection; it does not prove that the
+hardware is exclusively reserved or that captured frames are available.
+
+The native adapter supports `Session` only. `DeviceBond` and nonempty
+provider-specific parameters return `Unsupported`: it does not perform
+Bluetooth, Wi-Fi, vendor authentication, or persistent operating system bonding.
+An empty ID, embedded NUL, invalid UTF-8 ID, or unknown method returns
+`InvalidArgument`. A missing or disconnected exact device returns `NotFound`.
+The adapter checks an existing device's permission before creating its input and
+returns `PermissionDenied` when authorization is absent. Native input failures
+retain their OS error code; known device-in-use errors map to `Busy`.
+
+The pairing retains the exact native device, input, and stopped session. Its
+`status()` checks the physical device's current connection and that the input
+still belongs to that session; disconnection reports `Disconnected`. Its
+`controls()` resolves the retained device's exact ID through the existing native
+control bridge. Pairing operations and returned controls are serialized by the
+public pairing handle, and a successful `unpair()` removes the input and releases
+the native resources. Existing pairing control ports are revoked by the handle's
+session gate after unpairing. Pairing information is a discovery-time snapshot,
+whereas `status()` observes the current connection.
 
 Control support comes from the selected device and its current active format.
 macOS AVFoundation exposes focus and exposure modes but does not expose the iOS
@@ -44,12 +73,19 @@ apply focus and exposure changes asynchronously. Query the resulting device stat
 and validate actual captured media in the host application when such proof is
 required. The adapter does not wait for frame synchronization.
 
-The native smoke test enumerates device metadata and verifies permission remains
-unchanged without opening camera input. It does not prove physical capture,
-hardware controls, or runtime behavior on an iPhone or iPad.
+The native smoke test enumerates metadata, checks invalid and missing pairing
+IDs, rejects unsupported bonding/parameters, and verifies permission remains
+unchanged. When permission is absent it also checks that pairing an enumerated
+device returns a permission error without opening an input. On a host with no
+camera, these are error-path and discovery checks; they do not prove successful
+physical input attachment, hot-unplug behavior, captured frames, hardware
+controls, or runtime behavior on an iPhone or iPad.
 
 Primary references: [Apple AVCaptureDevice](https://developer.apple.com/documentation/avfoundation/avcapturedevice),
 [Apple AVCaptureDevice.Format](https://developer.apple.com/documentation/avfoundation/avcapturedevice/format),
 [camera authorization](https://developer.apple.com/documentation/avfoundation/avcapturedevice/authorizationstatus(for:)),
 [lens position](https://developer.apple.com/documentation/avfoundation/avcapturedevice/lensposition),
 and [configuration locking](https://developer.apple.com/documentation/avfoundation/avcapturedevice/lockforconfiguration()).
+The connection contract also uses [device input construction](https://developer.apple.com/documentation/avfoundation/avcapturedeviceinput/init(device:)),
+[input attachment](https://developer.apple.com/documentation/avfoundation/avcapturesession/addinput(_:)),
+and [input removal](https://developer.apple.com/documentation/avfoundation/avcapturesession/removeinput(_:)).

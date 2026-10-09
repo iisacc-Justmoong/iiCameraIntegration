@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <exception>
 #include <iomanip>
 #include <memory>
 #include <mutex>
@@ -256,6 +257,35 @@ struct DeviceState {
     explicit DeviceState(AVCaptureDevice *value) : device(value) {}
     AVCaptureDevice *__strong device;
 };
+
+struct NativePairingState {
+    AVCaptureDevice *__strong device;
+    AVCaptureDeviceInput *__strong input;
+    AVCaptureSession *__strong session;
+};
+
+// Called with nativeMutex held. A stopped session's retained input is the
+// connection contract; discovery alone is not a prepared camera connection.
+PairingState pairingStatus(const NativePairingState &state) {
+    if (!state.device || !state.device.isConnected || !state.input || !state.session ||
+        ![state.session.inputs containsObject:state.input])
+        return PairingState::Disconnected;
+    return PairingState::Ready;
+}
+
+Error inputError(NSError *error) {
+    ErrorCode code = ErrorCode::BackendFailure;
+    if ([error.domain isEqualToString:AVFoundationErrorDomain]) {
+        switch (error.code) {
+        case AVErrorApplicationIsNotAuthorizedToUseDevice: code = ErrorCode::PermissionDenied; break;
+        case AVErrorDeviceNotConnected: code = ErrorCode::NotFound; break;
+        case AVErrorDeviceAlreadyUsedByAnotherSession:
+        case AVErrorDeviceInUseByAnotherApplication: code = ErrorCode::Busy; break;
+        default: break;
+        }
+    }
+    return nativeError(error, code);
+}
 
 Result<ControlValue> applyControl(AVCaptureDevice *device, const ControlCommand &command) {
     if (permission() != CameraPermission::Authorized)
@@ -512,6 +542,109 @@ Result<ControlPort> NativeCameraSystem::controls(const std::string &deviceId) co
             };
             return ControlPort(capabilities(device), std::move(callbacks));
         } @catch (NSException *exception) { return std::unexpected(exceptionError(exception)); }
+    }
+}
+
+Result<CameraPairing> NativeCameraSystem::pair(const std::string &deviceId,
+                                             const PairingOptions &options) const {
+    if (deviceId.empty() || deviceId.find('\0') != std::string::npos)
+        return std::unexpected(Error{ErrorCode::InvalidArgument, "A nonempty camera device ID is required"});
+    @autoreleasepool {
+        try {
+            std::shared_ptr<NativePairingState> state;
+            PairingInfo info;
+            {
+                std::lock_guard guard(nativeMutex());
+                @try {
+                    NSString *identifier = [[NSString alloc] initWithBytes:deviceId.data()
+                        length:deviceId.size() encoding:NSUTF8StringEncoding];
+                    if (!identifier)
+                        return std::unexpected(Error{ErrorCode::InvalidArgument, "The camera device ID must be valid UTF-8"});
+                    if (options.method == PairingMethod::DeviceBond)
+                        return std::unexpected(Error{ErrorCode::Unsupported, "AVFoundation session preparation does not perform hardware bonding"});
+                    if (options.method != PairingMethod::Session)
+                        return std::unexpected(Error{ErrorCode::InvalidArgument, "Unknown camera pairing method"});
+                    if (!options.parameters.empty())
+                        return std::unexpected(Error{ErrorCode::Unsupported, "AVFoundation session pairing does not accept provider parameters"});
+                    AVCaptureDevice *device = [AVCaptureDevice deviceWithUniqueID:identifier];
+                    if (!device || !device.isConnected || ![device hasMediaType:AVMediaTypeVideo])
+                        return std::unexpected(Error{ErrorCode::NotFound, "The requested camera is not connected"});
+                    if (permission() != CameraPermission::Authorized)
+                        return std::unexpected(Error{ErrorCode::PermissionDenied,
+                            "Existing camera authorization is required; the host application must request it"});
+                    NSError *error = nil;
+                    AVCaptureDeviceInput *input = [[AVCaptureDeviceInput alloc] initWithDevice:device error:&error];
+                    if (!input) return std::unexpected(inputError(error));
+                    AVCaptureSession *session = [[AVCaptureSession alloc] init];
+                    if (!session)
+                        return std::unexpected(Error{ErrorCode::BackendFailure, "AVFoundation could not allocate a camera session"});
+                    if (![session canAddInput:input])
+                        return std::unexpected(Error{ErrorCode::Unsupported, "The camera input cannot be attached to this AVFoundation session"});
+                    [session addInput:input];
+                    state = std::make_shared<NativePairingState>();
+                    state->device = device;
+                    state->input = input;
+                    state->session = session;
+                    if (pairingStatus(*state) != PairingState::Ready)
+                        return std::unexpected(Error{ErrorCode::NotFound, "The camera disconnected while preparing its session input"});
+                    info.device = describe(device);
+                    info.method = PairingMethod::Session;
+                    info.additional["AVFoundation.connection"] = "device input attached to a stopped capture session";
+                    info.additional["AVFoundation.captureStarted"] = "false";
+                    info.additional["AVFoundation.hardwareBond"] = "false";
+                } @catch (NSException *exception) {
+                    return std::unexpected(exceptionError(exception));
+                }
+            }
+            PairingCallbacks callbacks;
+            callbacks.status = [state]() -> Result<PairingState> {
+                @autoreleasepool {
+                    std::lock_guard guard(nativeMutex());
+                    @try { return pairingStatus(*state); }
+                    @catch (NSException *exception) { return std::unexpected(exceptionError(exception)); }
+                }
+            };
+            callbacks.controls = [state]() -> Result<ControlPort> {
+                std::string identifier;
+                @autoreleasepool {
+                    std::lock_guard guard(nativeMutex());
+                    @try {
+                        if (pairingStatus(*state) != PairingState::Ready)
+                            return std::unexpected(Error{ErrorCode::NotFound, "The paired camera input is disconnected"});
+                        identifier = utf8(state->device.uniqueID);
+                    } @catch (NSException *exception) {
+                        return std::unexpected(exceptionError(exception));
+                    }
+                }
+                // controls() takes nativeMutex itself. CameraPairing's outer
+                // gate serializes this call with unpair and control use.
+                return NativeCameraSystem{}.controls(identifier);
+            };
+            callbacks.unpair = [state]() -> Result<void> {
+                @autoreleasepool {
+                    std::lock_guard guard(nativeMutex());
+                    @try {
+                        if (state->session && state->input && [state->session.inputs containsObject:state->input])
+                            [state->session removeInput:state->input];
+                        if (state->session && state->input && [state->session.inputs containsObject:state->input])
+                            return std::unexpected(Error{ErrorCode::BackendFailure, "AVFoundation did not remove the paired camera input"});
+                        state->input = nil;
+                        state->session = nil;
+                        state->device = nil;
+                        return {};
+                    } @catch (NSException *exception) {
+                        return std::unexpected(exceptionError(exception));
+                    }
+                }
+            };
+            // Native validation locks have ended before generic handle creation.
+            // No session is started: ownership prepares input resources only.
+            return CameraPairing::create(std::move(info), std::move(callbacks));
+        } catch (const std::exception &error) {
+            return std::unexpected(Error{ErrorCode::BackendFailure, error.what()});
+        } catch (...) {
+            return std::unexpected(Error{ErrorCode::BackendFailure, "Native camera pairing failed with an unknown exception"});
+        }
     }
 }
 } // namespace iiCameraIntergration

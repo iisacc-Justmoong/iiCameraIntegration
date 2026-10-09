@@ -1,6 +1,6 @@
 # iiCameraIntergration
 
-Version **0.2.0**. A C++23 camera integration SDK for camera metadata, capability-aware optical
+Version **0.3.0**. A C++23 camera integration SDK for camera metadata, capability-aware optical
 controls, media capture, and codec/container identification. The package and
 namespace preserve the requested spelling **iiCameraIntergration**.
 The public API uses standard C++ values and `std::expected`; it has no Qt dependency.
@@ -12,6 +12,7 @@ Native platform code is isolated in an optional adapter.
 | Lens, field of view, variable aperture | `ControlPort`, `ControlCapability`, `ControlCommand` | Typed read/write commands with supported units, ranges, steps, modes, and identifiers. Rejects unsupported/read-only controls before dispatch. Includes rectilinear optical conversion functions. |
 | Camera media capture | `PacketCapture`, `decodeRgbFrame`, `recordMedia` | FFmpeg device/file/network input, timestamped stream packets, decoded RGB still frames, and bounded recordings by remuxing compatible streams. |
 | Codec/format recognition | `codecCatalog`, `formatCatalog`, `probeMedia`, `probeMediaBytes` | All codec descriptors and input/output formats registered in the linked FFmpeg build. Content probing identifies container and each stream codec independently of its extension; codec identity is separate from decoder/encoder availability. |
+| Hardware discovery and pairing | `CameraDeviceSystem`, `CameraPairing`, `NativeCameraSystem::devices/pair` | Validated discovery snapshots, exact-ID session pairing, ready/disconnected/unpaired status, revocable controls and explicit/RAII release. Apple pairing attaches actual camera input to a stopped session; hardware authentication requires a separate provider. |
 
 `NativeCameraSystem` provides Apple AVFoundation metadata and controls. macOS
 supports device/format enumeration and the focus/exposure modes exposed by the OS.
@@ -59,7 +60,7 @@ outputs remain in the Workspace. No third-party dependency is downloaded.
 ## Consume
 
 ```cmake
-find_package(iiCameraIntergration 0.2 CONFIG REQUIRED)
+find_package(iiCameraIntergration 0.3 CONFIG REQUIRED)
 target_link_libraries(my_app PRIVATE iiCameraIntergration::iiCameraIntergration)
 ```
 
@@ -86,6 +87,29 @@ usage descriptions. Enumeration does not request permission or start a session.
 See [Native adapter](docs/Native.md) and [Media API](docs/Media.md) for platform,
 threading, and cancellation details.
 
+## Hardware discovery and pairing
+
+```cpp
+auto devices = NativeCameraSystem{}.devices();
+auto found = devices.discover();
+if (found && !found->empty()) {
+    auto paired = devices.pair(found->front().id);
+    if (paired) {
+        auto current = paired->status();
+        auto controls = paired->controls();
+        auto released = paired->unpair();
+        // Check every result. Otherwise destruction attempts resource release.
+    }
+}
+```
+
+Native session pairing requires existing camera authorization and does not start
+capture. Device authentication/bonding is a distinct requested method; AVFoundation
+returns `Unsupported` for it. The move-only owner revokes issued control ports
+when released, and physical disconnection requires a new pairing. Custom hardware
+providers use `DeviceCallbacks`. See [Devices](docs/Devices.md) and the current
+[device verification](docs/DeviceVerification.md).
+
 ## Photograph processing component
 
 An optional `iiCameraIntergration::ImageProcessing` target links to iiGraphicAdjust
@@ -103,7 +127,7 @@ cmake --build build --parallel 3
 ```
 
 ```cmake
-find_package(iiCameraIntergration 0.2 CONFIG REQUIRED COMPONENTS ImageProcessing)
+find_package(iiCameraIntergration 0.3 CONFIG REQUIRED COMPONENTS ImageProcessing)
 target_link_libraries(my_app PRIVATE iiCameraIntergration::ImageProcessing)
 ```
 

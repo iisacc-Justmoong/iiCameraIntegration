@@ -1,6 +1,13 @@
 # Verification — 2026-10-09 (Asia/Seoul)
 
-## Current 0.2.0 photo processing result
+## Current 0.3.0 device discovery and pairing
+
+The current device API and full camera regression evidence are recorded in
+[DeviceVerification](DeviceVerification.md). The current version adds seven
+device cases while retaining the preceding media/processing tests. Physical
+camera and OS authentication evidence remains explicitly separate.
+
+## Historical 0.2.0 photo processing result
 
 Camera 0.2.0 and iiGraphicAdjust 0.5.0 were built and executed on macOS arm64,
 AppleClang 21.0.0. All new output and staging prefixes remain inside Workspace.

@@ -43,7 +43,7 @@ existing file, and demonstrates real capture/decode/development pixels. It assum
 only the explicit color interpretation given in its command arguments.
 
 Build with `-DIICAMERA_WITH_IMAGE_PROCESSING=ON` and a compatible iiGraphicAdjust
-0.5 package. Consume with `find_package(iiCameraIntergration 0.2 CONFIG REQUIRED
+0.5 package. Consume with `find_package(iiCameraIntergration 0.3 CONFIG REQUIRED
 COMPONENTS ImageProcessing)` and link `iiCameraIntergration::ImageProcessing`.
 A package built without the component correctly rejects a required component request.
 Core-only requests do not search for iiGraphicAdjust. With `OPTIONAL_COMPONENTS
