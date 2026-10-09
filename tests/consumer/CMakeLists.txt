@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.25)
+project(iiCameraIntergrationInstalledConsumer LANGUAGES CXX)
+
+find_package(iiCameraIntergration CONFIG REQUIRED)
+add_executable(iiCameraIntergration_consumer main.cpp)
+target_compile_features(iiCameraIntergration_consumer PRIVATE cxx_std_23)
+target_link_libraries(iiCameraIntergration_consumer PRIVATE iiCameraIntergration::iiCameraIntergration)
+enable_testing()
+add_test(NAME iiCameraIntergration.installed_consumer COMMAND iiCameraIntergration_consumer)
