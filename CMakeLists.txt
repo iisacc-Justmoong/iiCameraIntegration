@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(iiCameraIntergration VERSION 0.1.0 LANGUAGES CXX)
+project(iiCameraIntergration VERSION 0.2.0 LANGUAGES CXX)
 set(CMAKE_CXX_EXTENSIONS OFF)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -8,6 +8,7 @@ include(CTest)
 option(BUILD_SHARED_LIBS "Build a shared iiCameraIntergration library" ON)
 option(IICAMERA_WITH_FFMPEG "Enable FFmpeg codec/format recognition and capture" ON)
 option(IICAMERA_WITH_NATIVE "Enable the platform native camera metadata/control adapter" ON)
+option(IICAMERA_WITH_IMAGE_PROCESSING "Enable optional iiGraphicAdjust photo processing component" OFF)
 option(IICAMERA_BUILD_TOOLS "Build the camera/media inspection tool" ON)
 if(PROJECT_IS_TOP_LEVEL AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     if(DEFINED ENV{HOME} AND NOT "$ENV{HOME}" STREQUAL "")
@@ -62,12 +63,50 @@ if(APPLE AND IICAMERA_WITH_NATIVE)
 else()
     target_sources(iiCameraIntergration PRIVATE src/iiCameraIntergration/NativeCameraUnavailable.cpp)
 endif()
+if(IICAMERA_WITH_IMAGE_PROCESSING)
+    find_package(iiGraphicAdjust 0.5 CONFIG REQUIRED)
+    add_library(iiCameraImageProcessing src/iiCameraIntergration/ImageProcessing.cpp)
+    add_library(iiCameraIntergration::ImageProcessing ALIAS iiCameraImageProcessing)
+    target_compile_features(iiCameraImageProcessing PUBLIC cxx_std_23)
+    target_link_libraries(iiCameraImageProcessing PUBLIC iiCameraIntergration::iiCameraIntergration iiGraphicAdjust::iiGraphicAdjust)
+    target_include_directories(iiCameraImageProcessing PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    generate_export_header(iiCameraImageProcessing BASE_NAME IICAMERAIMAGEPROCESSING
+        EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/include/iiCameraIntergration/ImageProcessingExport.h")
+    if(NOT BUILD_SHARED_LIBS)
+        target_compile_definitions(iiCameraImageProcessing PUBLIC IICAMERAIMAGEPROCESSING_STATIC_DEFINE)
+    endif()
+    set_target_properties(iiCameraImageProcessing PROPERTIES EXPORT_NAME ImageProcessing
+        CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN YES VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+        INSTALL_RPATH_USE_LINK_PATH TRUE)
+    if(APPLE)
+        set_target_properties(iiCameraImageProcessing PROPERTIES INSTALL_RPATH "@loader_path")
+    elseif(UNIX)
+        set_target_properties(iiCameraImageProcessing PROPERTIES INSTALL_RPATH "$ORIGIN")
+    endif()
+    if(MSVC)
+        target_compile_options(iiCameraImageProcessing PRIVATE /W4 /permissive-)
+    else()
+        target_compile_options(iiCameraImageProcessing PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+    install(TARGETS iiCameraImageProcessing EXPORT iiCameraImageProcessingTargets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(EXPORT iiCameraImageProcessingTargets NAMESPACE iiCameraIntergration::
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/iiCameraIntergration")
+    install(FILES src/iiCameraIntergration/ImageProcessing.h
+        "${CMAKE_CURRENT_BINARY_DIR}/include/iiCameraIntergration/ImageProcessingExport.h"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iiCameraIntergration)
+endif()
 set(_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/iiCameraIntergration")
 install(TARGETS iiCameraIntergration EXPORT iiCameraIntergrationTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY src/iiCameraIntergration/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iiCameraIntergration FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY src/iiCameraIntergration/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iiCameraIntergration FILES_MATCHING PATTERN "*.h" PATTERN "ImageProcessing.h" EXCLUDE)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/iiCameraIntergration/Export.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iiCameraIntergration)
 install(EXPORT iiCameraIntergrationTargets NAMESPACE iiCameraIntergration:: DESTINATION "${_package_dir}")
 configure_package_config_file(cmake/iiCameraIntergrationConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/iiCameraIntergrationConfig.cmake" INSTALL_DESTINATION "${_package_dir}")
@@ -76,6 +115,18 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/iiCameraIntergrationConfig.cmake" "${
 install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraIntergration)
 install(DIRECTORY docs/ DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraIntergration/docs)
 if(IICAMERA_BUILD_TOOLS)
+    if(IICAMERA_WITH_IMAGE_PROCESSING)
+        add_executable(iiCameraProcess tools/process.cpp)
+        target_link_libraries(iiCameraProcess PRIVATE iiCameraIntergration::ImageProcessing)
+        set_target_properties(iiCameraProcess PROPERTIES OUTPUT_NAME iicamera-process
+            INSTALL_RPATH_USE_LINK_PATH TRUE)
+        if(APPLE)
+            set_target_properties(iiCameraProcess PROPERTIES INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
+        elseif(UNIX)
+            set_target_properties(iiCameraProcess PROPERTIES INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
+        endif()
+        install(TARGETS iiCameraProcess RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    endif()
     add_executable(iiCameraInspect tools/inspect.cpp)
     target_link_libraries(iiCameraInspect PRIVATE iiCameraIntergration::iiCameraIntergration)
     set_target_properties(iiCameraInspect PROPERTIES OUTPUT_NAME iicamera-inspect)
@@ -87,9 +138,30 @@ if(IICAMERA_BUILD_TOOLS)
     install(TARGETS iiCameraInspect RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 if(BUILD_TESTING)
+    if(IICAMERA_WITH_IMAGE_PROCESSING)
+        add_executable(iiCameraPhotoProcessingTests tests/image_processing.cpp)
+        target_link_libraries(iiCameraPhotoProcessingTests PRIVATE iiCameraIntergration::ImageProcessing)
+        foreach(_case import pipeline encoding validation capture)
+            add_test(NAME iiCamera.processing.${_case} COMMAND iiCameraPhotoProcessingTests ${_case})
+            set_tests_properties(iiCamera.processing.${_case} PROPERTIES TIMEOUT 30)
+        endforeach()
+    endif()
     if(IICAMERA_BUILD_TOOLS)
         add_test(NAME iiCamera.cli_help COMMAND iiCameraInspect --help)
         if(IICAMERA_WITH_FFMPEG)
+            if(IICAMERA_WITH_IMAGE_PROCESSING)
+                add_test(NAME iiCamera.processing.cli COMMAND "${CMAKE_COMMAND}"
+                    "-DTOOL=$<TARGET_FILE:iiCameraProcess>" "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/processed"
+                    -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/processing_cli.cmake")
+                set_tests_properties(iiCamera.processing.cli PROPERTIES TIMEOUT 40)
+                add_test(NAME iiCamera.processing.package COMMAND "${CMAKE_COMMAND}"
+                    "-DBUILD=${CMAKE_CURRENT_BINARY_DIR}" "-DSOURCE=${CMAKE_CURRENT_SOURCE_DIR}"
+                    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/processing-package"
+                    "-DLIBDIR=${CMAKE_INSTALL_LIBDIR}" "-DBINDIR=${CMAKE_INSTALL_BINDIR}"
+                    "-DTOOL_NAME=$<TARGET_FILE_NAME:iiCameraProcess>" "-DCONFIG=$<CONFIG>"
+                    -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/processing_package.cmake")
+                set_tests_properties(iiCamera.processing.package PROPERTIES TIMEOUT 60)
+            endif()
             add_test(NAME iiCamera.cli_frame COMMAND "${CMAKE_COMMAND}"
                 "-DTOOL=$<TARGET_FILE:iiCameraInspect>" "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/cli"
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/cli.cmake")
@@ -112,6 +184,10 @@ if(BUILD_TESTING)
         add_test(NAME iiCamera.unavailable COMMAND iiCameraUnavailableTests)
     endif()
     if(IICAMERA_WITH_FFMPEG)
+        add_executable(iiCameraColorDecodeTests tests/color_decode.cpp)
+        target_link_libraries(iiCameraColorDecodeTests PRIVATE iiCameraIntergration::iiCameraIntergration)
+        add_test(NAME iiCamera.color_decode COMMAND iiCameraColorDecodeTests "${CMAKE_CURRENT_BINARY_DIR}/color-decode")
+        set_tests_properties(iiCamera.color_decode PROPERTIES TIMEOUT 30)
         add_executable(iiCameraMediaTests tests/media.cpp)
         target_link_libraries(iiCameraMediaTests PRIVATE iiCameraIntergration::iiCameraIntergration)
         find_program(IICAMERA_FFMPEG_EXECUTABLE ffmpeg)

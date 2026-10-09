@@ -1,5 +1,66 @@
 # Verification — 2026-10-09 (Asia/Seoul)
 
+## Current 0.2.0 photo processing result
+
+Camera 0.2.0 and iiGraphicAdjust 0.5.0 were built and executed on macOS arm64,
+AppleClang 21.0.0. All new output and staging prefixes remain inside Workspace.
+No running product was restarted, and the existing `~/.local` SDK installations
+were not replaced.
+
+| Configuration | Camera CTest | iiGraphicAdjust CTest | Installed consumers |
+| --- | ---: | ---: | --- |
+| Release shared, optional processing enabled | 21/21 | 150/150 | 1/1 each |
+| Release static, optional processing enabled | 21/21 | 150/150 | 1/1 each |
+| Debug shared, ASan + UBSan | 21/21 | 150/150 | 1/1 each |
+| Release static, independent camera core | 9/9 | No dependency | 1/1 |
+
+The added color suite checks 26 analytic color cases. Five bridge cases check
+RGB24 stride/padding, source retention, processing order, transfer conversion,
+tag conflicts, malformed input, subquantization alpha rejection and generated
+capture. CLI tests check actual +1 EV gray pixels and existing-file preservation.
+The package test installs the built artifacts, executes the installed CLI,
+accepts core and optional requests without the image dependency, and rejects a
+required request when that dependency is unavailable. These regressions caught
+and fixed an external dependency runtime-search-path issue and incorrect
+`OPTIONAL_COMPONENTS` handling. Installed-consumer linkage alone would not have
+caught the CLI loader failure.
+
+iiGraphicAdjust adds six independently checked RAW cases and four photographic
+helper cases; its 140 existing rendered-image suites are retained. Tests verify
+all four Bayer patterns/phase offsets, measured-site and bilinear arithmetic,
+calibration matrices/black levels/gains, unclipped linear headroom, all eight EXIF
+orientations, exact crop and alpha-weighted RGB/linear-luminance statistics.
+The original test-first missing-implementation failures and the gray-range
+regression are separate from passing final evidence.
+
+`DYLD_PRINT_LIBRARIES` on the shared consumer confirms the staged camera 0.2.0,
+ImageProcessing 0.2.0 and iiGraphicAdjust 0.5.0 dylibs. The installed CLI is
+also executed directly; shared/static behavior and package dependency tests
+therefore do not rely on a previously installed SDK. ASan/UBSan instrument both
+SDKs, while FFmpeg/system libraries remain external. LeakSanitizer is unavailable
+on this macOS toolchain (`ASAN_OPTIONS=detect_leaks=0`); no leak-proof claim is made.
+
+Run `tools/verify.sh --photo --sanitize` for the repeatable complete workflow;
+`--help` lists the flags. Without `--photo`, the optional component is explicitly
+disabled for every variant. The image SDK is resolved from its sibling source,
+not downloaded. Each variant builds into `build/` and stages independently.
+
+Evidence includes `build/photo-workflow.log`, `build/photo-verification-report.json`,
+the per-variant JUnit files, `build/photo-consumer/runtime.log`, and installed CLI
+artifacts under `build/processing-package/`. The public contracts are documented
+in [ImageProcessing](ImageProcessing.md), [PhotoAudit](PhotoAudit.md), and the
+iiGraphicAdjust RAW/photo-operation documents.
+
+This is numerical/host package proof. The connected host still has no physical
+camera. Native high-quality still capture, physical optical control, encoded RAW
+file decoding, arbitrary ICC/wide-gamut conversion, profile calibration, EXIF/XMP
+serialization, high-bit-depth photo encoding and device-platform runtime remain
+outside the implemented/verified photo scope. The RGB24 bridge is an SDR
+development pipeline; the separate unpacked Bayer API preserves linear headroom
+until rendering. Neither establishes that all photographic features are complete.
+
+## Historical 0.1.0 camera result
+
 The C++23 library was built and executed on macOS arm64 with AppleClang 21.0.0.
 All task outputs and installation staging prefixes remain inside the Workspace.
 The existing SDK aggregate repository had no changes before or after this task.

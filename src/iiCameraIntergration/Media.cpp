@@ -325,6 +325,76 @@ using NativePacket = std::unique_ptr<AVPacket, PacketDeleter>;
 using NativeFrame = std::unique_ptr<AVFrame, FrameDeleter>;
 using NativeCodec = std::unique_ptr<AVCodecContext, CodecDeleter>;
 
+struct DecodedColor {
+    AVColorSpace sourceSpace{AVCOL_SPC_UNSPECIFIED};
+    AVColorRange sourceRange{AVCOL_RANGE_UNSPECIFIED};
+    AVColorTransferCharacteristic transfer{AVCOL_TRC_UNSPECIFIED};
+    AVColorPrimaries primaries{AVCOL_PRI_UNSPECIFIED};
+    int coefficients{SWS_CS_DEFAULT};
+    bool matrixConversion{};
+    bool grayInput{};
+    bool spaceAssumed{};
+    bool rangeAssumed{};
+};
+
+// RGB24 remains in the input transfer/primaries. This only resolves the encoded
+// YUV matrix and code-value range; it is not an ICC, transfer, or gamut transform.
+Result<DecodedColor> decodedColor(const AVFrame* frame, const AVCodecParameters* parameters) {
+    const auto* descriptor = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(frame->format));
+    if (!descriptor) return std::unexpected(error(ErrorCode::Unsupported, "unknown decoded pixel format"));
+    if (descriptor->flags & (AV_PIX_FMT_FLAG_BAYER | AV_PIX_FMT_FLAG_XYZ))
+        return std::unexpected(error(ErrorCode::Unsupported, "RGB24 helper does not implement a sensor RAW or XYZ color transform"));
+    DecodedColor result;
+    result.sourceSpace = frame->colorspace == AVCOL_SPC_UNSPECIFIED ? parameters->color_space : frame->colorspace;
+    result.sourceRange = frame->color_range == AVCOL_RANGE_UNSPECIFIED ? parameters->color_range : frame->color_range;
+    result.transfer = frame->color_trc == AVCOL_TRC_UNSPECIFIED ? parameters->color_trc : frame->color_trc;
+    result.primaries = frame->color_primaries == AVCOL_PRI_UNSPECIFIED ? parameters->color_primaries : frame->color_primaries;
+    const bool rgb = descriptor->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL);
+    const bool gray = !rgb && descriptor->nb_components <= 2;
+    result.matrixConversion = !rgb;
+    result.grayInput = gray;
+    if (result.sourceSpace == AVCOL_SPC_UNSPECIFIED) {
+        result.spaceAssumed = true;
+        result.sourceSpace = rgb ? AVCOL_SPC_RGB : AVCOL_SPC_BT470BG;
+    }
+    if (result.sourceRange == AVCOL_RANGE_UNSPECIFIED) {
+        result.rangeAssumed = true;
+        const bool jpegPixels = std::string_view(descriptor->name).starts_with("yuvj");
+        result.sourceRange = rgb || gray || jpegPixels ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG;
+    }
+    if (result.sourceRange != AVCOL_RANGE_JPEG && result.sourceRange != AVCOL_RANGE_MPEG)
+        return std::unexpected(error(ErrorCode::Unsupported, "unsupported decoded color range"));
+    if (!result.matrixConversion && result.sourceRange != AVCOL_RANGE_JPEG)
+        return std::unexpected(error(ErrorCode::Unsupported, "RGB24 helper does not implement limited-range RGB expansion"));
+    if (result.matrixConversion) {
+        switch (result.sourceSpace) {
+        case AVCOL_SPC_RGB:
+            if (!gray) return std::unexpected(error(ErrorCode::Unsupported, "a YUV frame cannot use RGB matrix coefficients"));
+            break;
+        case AVCOL_SPC_BT709: result.coefficients = SWS_CS_ITU709; break;
+        case AVCOL_SPC_FCC: result.coefficients = SWS_CS_FCC; break;
+        case AVCOL_SPC_BT470BG:
+        case AVCOL_SPC_SMPTE170M: result.coefficients = SWS_CS_ITU601; break;
+        case AVCOL_SPC_SMPTE240M: result.coefficients = SWS_CS_SMPTE240M; break;
+        case AVCOL_SPC_BT2020_NCL: result.coefficients = SWS_CS_BT2020; break;
+        default:
+            return std::unexpected(error(ErrorCode::Unsupported,
+                "RGB24 helper does not implement the decoded YUV color matrix: " + text(av_color_space_name(result.sourceSpace))));
+        }
+    }
+    return result;
+}
+
+bool streamHasIccProfile(const AVStream* stream) {
+#if LIBAVCODEC_VERSION_MAJOR >= 61
+    return av_packet_side_data_get(stream->codecpar->coded_side_data,
+        stream->codecpar->nb_coded_side_data, AV_PKT_DATA_ICC_PROFILE) != nullptr;
+#else
+    std::size_t size{};
+    return av_stream_get_side_data(stream, AV_PKT_DATA_ICC_PROFILE, &size) != nullptr;
+#endif
+}
+
 Result<void> readNative(Input& input, AVPacket* packet,
                         Clock::time_point readDeadline = Clock::time_point::max()) {
     input.interrupt.arm(input.timeout);
@@ -612,6 +682,8 @@ Result<RgbFrame> decodeRgbFrame(const MediaSource& source, const DecodeOptions& 
         static_cast<std::uint64_t>(frame->width) * frame->height > std::numeric_limits<std::size_t>::max() / 3 ||
         frame->width > std::numeric_limits<int>::max() / 3)
         return std::unexpected(error(ErrorCode::InvalidMedia, "decoded frame dimensions exceed limits"));
+    auto color = decodedColor(frame.get(), stream->codecpar);
+    if (!color) return std::unexpected(color.error());
     RgbFrame result;
     result.dimensions = Size{static_cast<std::uint32_t>(frame->width), static_cast<std::uint32_t>(frame->height)};
     result.rowStride = static_cast<std::size_t>(frame->width) * 3;
@@ -620,14 +692,42 @@ Result<RgbFrame> decodeRgbFrame(const MediaSource& source, const DecodeOptions& 
         static_cast<AVPixelFormat>(frame->format), frame->width, frame->height, AV_PIX_FMT_RGB24,
         SWS_BILINEAR, nullptr, nullptr, nullptr)};
     if (!scaler) return std::unexpected(error(ErrorCode::Unsupported, "pixel format cannot be converted to RGB24"));
+    if (color->matrixConversion) {
+        const auto* coefficients = sws_getCoefficients(color->coefficients);
+        // Gray-to-RGB fast paths ignore limited-range expansion in some FFmpeg
+        // versions. Normalize their full-range 8-bit code values explicitly below.
+        const bool scalerFullRange = color->grayInput || color->sourceRange == AVCOL_RANGE_JPEG;
+        status = sws_setColorspaceDetails(scaler.get(), coefficients, scalerFullRange,
+            coefficients, 1, 0, 1 << 16, 1 << 16);
+        if (status < 0) return std::unexpected(backendError(status, "configure decoded color matrix and range"));
+    }
     std::uint8_t* planes[]{result.pixels.data(), nullptr, nullptr, nullptr};
     int strides[]{static_cast<int>(result.rowStride), 0, 0, 0};
     status = sws_scale(scaler.get(), frame->data, frame->linesize, 0, frame->height, planes, strides);
     if (status != frame->height) return std::unexpected(error(ErrorCode::BackendFailure, "incomplete RGB conversion", status));
+    if (color->grayInput && color->sourceRange == AVCOL_RANGE_MPEG) {
+        for (auto& value : result.pixels)
+            value = value <= 16 ? 0 : value >= 235 ? 255 :
+                static_cast<std::uint8_t>(((static_cast<int>(value) - 16) * 255 + 109) / 219);
+    }
     if (InterruptState::check(&input.interrupt)) return std::unexpected(backendError(AVERROR_EXIT, "convert video frame", &input.interrupt));
     result.presentationTimestamp = timestamp(frame->best_effort_timestamp);
     result.timeBase = rational(stream->time_base);
     result.metadata = metadata(frame->metadata);
+    result.colorSpace = text(av_color_space_name(AVCOL_SPC_RGB));
+    result.colorRange = text(av_color_range_name(AVCOL_RANGE_JPEG));
+    result.colorTransfer = text(av_color_transfer_name(color->transfer));
+    result.colorPrimaries = text(av_color_primaries_name(color->primaries));
+    result.metadata["iiCamera.color.sourceSpace"] = text(av_color_space_name(color->sourceSpace));
+    result.metadata["iiCamera.color.sourceRange"] = text(av_color_range_name(color->sourceRange));
+    result.metadata["iiCamera.color.sourceSpaceAssumed"] = color->spaceAssumed ? "true" : "false";
+    result.metadata["iiCamera.color.sourceRangeAssumed"] = color->rangeAssumed ? "true" : "false";
+    result.metadata["iiCamera.color.transferConverted"] = "false";
+    result.metadata["iiCamera.color.primariesConverted"] = "false";
+    result.metadata["iiCamera.color.precision"] = "8-bit";
+    result.metadata["iiCamera.color.hdrPreserved"] = "false";
+    result.metadata["iiCamera.color.iccProfilePresent"] =
+        av_frame_get_side_data(frame.get(), AV_FRAME_DATA_ICC_PROFILE) || streamHasIccProfile(stream) ? "true" : "false";
     return result;
 }
 

@@ -146,6 +146,13 @@ struct RgbFrame {
     std::optional<std::int64_t> presentationTimestamp;
     Rational timeBase;
     Metadata metadata;
+    // Output is full-range RGB24. YUV matrix/range conversion preserves the source
+    // transfer and primaries; these fields do not imply sRGB or HDR preservation.
+    // FFmpeg names are used ("gbr", "pc", "iec61966-2-1", "bt709", "unknown").
+    std::string colorSpace;
+    std::string colorRange;
+    std::string colorTransfer;
+    std::string colorPrimaries;
 };
 
 struct RecordingOptions {

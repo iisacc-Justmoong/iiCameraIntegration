@@ -89,6 +89,14 @@ select a stream and bound pixel count, packet count and total elapsed time.
 Hardware decoding, exposure correction, rotation application and color-managed
 HDR display are outside this helper's contract. RGB conversion does not promise
 bit-identical output across different FFmpeg versions or pixel-conversion builds.
+The returned `RgbFrame` is full-range RGB24 (`gbr`, `pc`), with source transfer and
+primaries retained. YUV matrices/ranges are resolved from the decoded frame, then
+codec parameters; absent matrix/range information uses documented assumptions.
+Unsupported transforms are rejected. ICC presence is reported without retaining
+or applying the profile. Eight-bit conversion does not preserve HDR precision.
+See [the decoded-color contract and numeric tests](PhotoAudit.md) and the optional
+[photo processing component](ImageProcessing.md) before interpreting pixels as
+sRGB.
 
 The move-only `PacketCapture` session owns its input. Serialize `read()`,
 `metadata()`, destruction and move operations on the caller side. `cancel()` can

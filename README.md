@@ -1,6 +1,6 @@
 # iiCameraIntergration
 
-A C++23 camera integration SDK for camera metadata, capability-aware optical
+Version **0.2.0**. A C++23 camera integration SDK for camera metadata, capability-aware optical
 controls, media capture, and codec/container identification. The package and
 namespace preserve the requested spelling **iiCameraIntergration**.
 The public API uses standard C++ values and `std::expected`; it has no Qt dependency.
@@ -42,6 +42,9 @@ cmake --install build --prefix "$PWD/build/install"
 For the repeatable shared/static/core package-consumer verification, run
 `tools/verify.sh`. Use `tools/verify.sh --sanitize` to also run an ASan/UBSan
 configuration with a compatible Clang compiler.
+Use `tools/verify.sh --photo --sanitize` to build the sibling `iiGraphicAdjust`
+source and verify the optional photo component, both SDKs and their installed
+consumers. Every generated file and staging prefix stays under `build/`.
 
 For a standard-library-only build, use
 `-DIICAMERA_WITH_FFMPEG=OFF -DIICAMERA_WITH_NATIVE=OFF`; metadata, validation,
@@ -56,7 +59,7 @@ outputs remain in the Workspace. No third-party dependency is downloaded.
 ## Consume
 
 ```cmake
-find_package(iiCameraIntergration 0.1 CONFIG REQUIRED)
+find_package(iiCameraIntergration 0.2 CONFIG REQUIRED)
 target_link_libraries(my_app PRIVATE iiCameraIntergration::iiCameraIntergration)
 ```
 
@@ -82,6 +85,41 @@ The host application owns privacy prompts and must supply its platform camera
 usage descriptions. Enumeration does not request permission or start a session.
 See [Native adapter](docs/Native.md) and [Media API](docs/Media.md) for platform,
 threading, and cancellation details.
+
+## Photograph processing component
+
+An optional `iiCameraIntergration::ImageProcessing` target links to iiGraphicAdjust
+0.5. It imports RGB24 with a verified color interpretation, applies EXIF orientation,
+integer crop, existing development stages, existing resamplers, and histograms.
+Unknown color tags require an explicit source interpretation. Known conflicting
+transfer/primary tags, ICC input, wide-gamut and HDR transfers are rejected.
+The FFmpeg decoder now applies supported YUV matrices and full/limited ranges;
+it retains transfer/primary tags rather than silently interpreting every frame as sRGB.
+
+```sh
+cmake -S . -B build -DIICAMERA_WITH_IMAGE_PROCESSING=ON \
+  -DiiGraphicAdjust_DIR=/path/to/iiGraphicAdjust/lib/cmake/iiGraphicAdjust
+cmake --build build --parallel 3
+```
+
+```cmake
+find_package(iiCameraIntergration 0.2 CONFIG REQUIRED COMPONENTS ImageProcessing)
+target_link_libraries(my_app PRIVATE iiCameraIntergration::ImageProcessing)
+```
+
+For a synthetic photo processing example with an explicit sRGB interpretation:
+
+```sh
+build/iicamera-process lavfi 'color=c=0x404040:size=16x16:rate=10:duration=0.2' \
+  build/developed.ppm srgb 1
+```
+
+The output is a real processed PPM frame; it is not evidence of physical photography.
+`iiGraphicAdjust::developRaw()` supplies the separate caller-decoded Bayer sensor
+path with linear-light headroom. See [Image processing](docs/ImageProcessing.md)
+and [photo prerequisite audit](docs/PhotoAudit.md). RAW container decoding,
+physical RAW capture, ICC conversion and general still-image encoding remain outside
+this component. The example writes PPM; it does not add a photo encoder to the SDK.
 
 ## Inspection tool
 
