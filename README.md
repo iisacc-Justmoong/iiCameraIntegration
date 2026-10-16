@@ -1,6 +1,6 @@
 # iiCameraIntergration
 
-Version **0.3.0**. A C++23 camera integration SDK for camera metadata, capability-aware optical
+Version **0.4.0**. A C++23 camera integration SDK for camera metadata, capability-aware optical
 controls, media capture, and codec/container identification. The package and
 namespace preserve the requested spelling **iiCameraIntergration**.
 The public API uses standard C++ values and `std::expected`; it has no Qt dependency.
@@ -9,17 +9,28 @@ Native platform code is isolated in an optional adapter.
 | Requirement | API | Implemented behavior |
 | --- | --- | --- |
 | Camera metadata | `CameraInfo`, `SensorInfo`, `LensInfo`, `CameraFormat` | Device identity, sensor/lens fields, format/frame-rate capabilities, active format, controls, and provider extension metadata. Unknown measurements remain optional. |
+| Bulk feature inspection | `ControlPort::queryAll`, `CameraDeviceSystem::features`, `NativeCameraSystem::features`, `CameraPairing::features` | Single-device or all-device reports with capabilities, current values, native/vendor features and per-item errors; metadata-only mode avoids current-value reads. |
 | Lens, field of view, variable aperture | `ControlPort`, `ControlCapability`, `ControlCommand` | Typed read/write commands with supported units, ranges, steps, modes, and identifiers. Rejects unsupported/read-only controls before dispatch. Includes rectilinear optical conversion functions. |
 | Camera media capture | `PacketCapture`, `decodeRgbFrame`, `recordMedia` | FFmpeg device/file/network input, timestamped stream packets, decoded RGB still frames, and bounded recordings by remuxing compatible streams. |
 | Codec/format recognition | `codecCatalog`, `formatCatalog`, `probeMedia`, `probeMediaBytes` | All codec descriptors and input/output formats registered in the linked FFmpeg build. Content probing identifies container and each stream codec independently of its extension; codec identity is separate from decoder/encoder availability. |
 | Hardware discovery and pairing | `CameraDeviceSystem`, `CameraPairing`, `NativeCameraSystem::devices/pair` | Validated discovery snapshots, exact-ID session pairing, ready/disconnected/unpaired status, revocable controls and explicit/RAII release. Apple pairing attaches actual camera input to a stopped session; hardware authentication requires a separate provider. |
 
-`NativeCameraSystem` provides Apple AVFoundation metadata and controls. macOS
-supports device/format enumeration and the focus/exposure modes exposed by the OS.
-iOS supports additional optical controls when the device and OS provide them.
-Other native control providers use `ControlPort` callbacks without depending on
-Apple or FFmpeg types. FFmpeg supplies capture input formats such as `avfoundation`,
-`dshow`, `v4l2`, and `lavfi` only when enabled in its build.
+`NativeCameraSystem` selects AVFoundation on Apple platforms, V4L2 on Linux,
+Media Foundation on Windows and Camera2 NDK on Android API 24+. This covers
+OS-visible built-in, USB/UVC, capture-card, external and virtual cameras where
+the platform driver exposes them. Android reports every static metadata tag;
+its live request/result controls remain owned by the host capture session.
+See [compatibility and complete inspection](docs/Features.md).
+Vendor providers use the same callback APIs without leaking native types.
+FFmpeg supplies device/network capture independently, including RTSP/HTTP
+sources and `avfoundation`, `dshow`, `v4l2`, and `lavfi` when enabled in its build.
+Network URLs are explicit `MediaSource` inputs; PTP-only cameras and proprietary
+authentication require a corresponding provider.
+
+The new callback fields change public object layouts. Consumers must rebuild
+against 0.4; CMake same-minor compatibility prevents linking 0.3 consumers to
+this ABI. Existing aggregate callback source usage remains valid because the
+new fields are optional and appended.
 
 No API promises access to metadata that firmware or the OS hides. Unknown,
 proprietary, future, and disabled codecs are not universally recognizable.
@@ -60,7 +71,7 @@ outputs remain in the Workspace. No third-party dependency is downloaded.
 ## Consume
 
 ```cmake
-find_package(iiCameraIntergration 0.3 CONFIG REQUIRED)
+find_package(iiCameraIntergration 0.4 CONFIG REQUIRED)
 target_link_libraries(my_app PRIVATE iiCameraIntergration::iiCameraIntergration)
 ```
 
@@ -127,7 +138,7 @@ cmake --build build --parallel 3
 ```
 
 ```cmake
-find_package(iiCameraIntergration 0.3 CONFIG REQUIRED COMPONENTS ImageProcessing)
+find_package(iiCameraIntergration 0.4 CONFIG REQUIRED COMPONENTS ImageProcessing)
 target_link_libraries(my_app PRIVATE iiCameraIntergration::ImageProcessing)
 ```
 

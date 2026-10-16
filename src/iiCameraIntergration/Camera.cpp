@@ -63,6 +63,20 @@ Result<ControlValue> ControlPort::apply(const ControlCommand& command) const {
     catch (const std::exception& e) { return std::unexpected(Error{ErrorCode::BackendFailure,e.what()}); }
     catch (...) { return std::unexpected(Error{ErrorCode::BackendFailure,"Command provider threw an unknown exception"}); }
 }
+std::vector<ControlReading> ControlPort::queryAll() const {
+    std::vector<ControlReading> result;
+    result.reserve(capabilities_.size());
+    for (const auto& capability : capabilities_) {
+        auto value=query(capability.id);
+        if (value) {
+            if (auto valid=validateValue(capability,*value); !valid)
+                value=std::unexpected(Error{ErrorCode::BackendFailure,
+                    "Invalid queried control value: "+valid.error().message});
+        }
+        result.push_back({capability,std::move(value)});
+    }
+    return result;
+}
 Result<FieldOfView> rectilinearFieldOfView(double w, double h, double f) {
     if (!positive(w) || !positive(h) || !positive(f)) return std::unexpected(invalid("Sensor dimensions and focal length must be finite and positive"));
     const auto angle = [f](double d) { return 2*std::atan((d/f)/2)*180/std::numbers::pi; };

@@ -1,5 +1,6 @@
 #include <iiCameraIntergration/Devices.h>
 #include <iiCameraIntergration/NativeCamera.h>
+#include "detail/Identifiers.h"
 
 #include <algorithm>
 #include <exception>
@@ -14,27 +15,7 @@ Error closed() { return {ErrorCode::Cancelled, "The camera pairing has been rele
 bool methodValid(PairingMethod method) {
     return method == PairingMethod::Session || method == PairingMethod::DeviceBond;
 }
-bool idValid(const std::string& id) {
-    if (id.empty()) return false;
-    for (std::size_t i = 0; i < id.size();) {
-        const auto first = static_cast<unsigned char>(id[i++]);
-        if (!first) return false;
-        if (first < 0x80) continue;
-        unsigned count{}, code{}, minimum{};
-        if (first >= 0xc2 && first <= 0xdf) { count=1; code=first&0x1f; minimum=0x80; }
-        else if (first >= 0xe0 && first <= 0xef) { count=2; code=first&0xf; minimum=0x800; }
-        else if (first >= 0xf0 && first <= 0xf4) { count=3; code=first&7; minimum=0x10000; }
-        else return false;
-        if (count > id.size()-i) return false;
-        while (count--) {
-            const auto next=static_cast<unsigned char>(id[i++]);
-            if ((next&0xc0)!=0x80) return false;
-            code=(code<<6)|(next&0x3f);
-        }
-        if (code<minimum || code>0x10ffff || (code>=0xd800 && code<=0xdfff)) return false;
-    }
-    return true;
-}
+using detail::validDeviceId;
 template<class Function> auto invokeProvider(Function&& function) -> decltype(function()) {
     try { return function(); }
     catch (const std::exception& error) { return std::unexpected(backend(error.what())); }
@@ -100,7 +81,7 @@ struct CameraPairing::State {
 
 Result<CameraPairing> CameraPairing::create(PairingInfo info, PairingCallbacks callbacks) {
     return invokeProvider([&]() -> Result<CameraPairing> {
-        if (!idValid(info.device.id) || !methodValid(info.method))
+        if (!validDeviceId(info.device.id) || !methodValid(info.method))
             return std::unexpected(invalid("Pairing requires a nonempty UTF-8 device ID and a valid method"));
         if (auto valid=validateCameraInfo(info.device); !valid) return std::unexpected(valid.error());
         if (!info.device.connected) return std::unexpected(Error{ErrorCode::NotFound, "The camera is not connected"});
@@ -170,6 +151,42 @@ Result<ControlPort> CameraPairing::controls() const {
     });
 }
 
+namespace {
+Result<CameraFeatures> validateFeatures(Result<CameraFeatures> result, const std::string& id) {
+    if (!result) return result;
+    if (result->camera.id!=id)
+        return std::unexpected(backend("The feature provider returned a different camera"));
+    if (auto valid=validateCameraInfo(result->camera); !valid)
+        return std::unexpected(backend("Invalid feature metadata: "+valid.error().message));
+    std::set<std::string> identifiers;
+    for (const auto& feature : result->nativeFeatures) {
+        if (!validDeviceId(feature.id) || !validDeviceId(feature.name) || !identifiers.insert(feature.id).second)
+            return std::unexpected(backend("Native feature identifiers/names must be valid and unique"));
+    }
+    std::set<ControlId> controls;
+    for (const auto& control : result->controls) {
+        if (!controls.insert(control.capability.id).second ||
+            std::none_of(result->camera.controls.begin(),result->camera.controls.end(),[&](const auto& cap) {
+                return cap.id==control.capability.id;
+            })) return std::unexpected(backend("Control readings must match unique advertised controls"));
+    }
+    return result;
+}
+}
+Result<CameraFeatures> CameraPairing::features(const FeatureQueryOptions& options) const {
+    if (!state_) return std::unexpected(invalid("The camera pairing was moved from"));
+    return invokeProvider([&]() -> Result<CameraFeatures> {
+        std::lock_guard lock(state_->mutex);
+        if (auto ready=state_->readyLocked(); !ready) return std::unexpected(ready.error());
+        if (state_->callbacks.features)
+            return validateFeatures(invokeProvider([&] {return state_->callbacks.features(options);}),state_->info.device.id);
+        // Use the provider port under the gate, without constructing a wrapper
+        // that would reenter this mutex. Release cannot race a batch query.
+        auto port=invokeProvider([&] {return state_->callbacks.controls();});
+        return validateFeatures(queryCameraFeatures(state_->info.device,port,options),state_->info.device.id);
+    });
+}
+
 CameraDeviceSystem::CameraDeviceSystem(DeviceCallbacks callbacks) : callbacks_(std::move(callbacks)) {}
 Result<std::vector<CameraInfo>> CameraDeviceSystem::discover() const {
     if (!callbacks_.discover) return std::unexpected(Error{ErrorCode::Unavailable, "No camera discovery provider"});
@@ -178,7 +195,7 @@ Result<std::vector<CameraInfo>> CameraDeviceSystem::discover() const {
         if (!devices) return std::unexpected(devices.error());
         std::set<std::string> identifiers;
         for (const auto& device : *devices) {
-            if (!idValid(device.id) || !identifiers.insert(device.id).second)
+            if (!validDeviceId(device.id) || !identifiers.insert(device.id).second)
                 return std::unexpected(backend("Camera discovery returned duplicate or invalid UTF-8 identifiers"));
             if (auto valid=validateCameraInfo(device); !valid)
                 return std::unexpected(backend("Invalid discovered camera metadata: "+valid.error().message));
@@ -187,7 +204,7 @@ Result<std::vector<CameraInfo>> CameraDeviceSystem::discover() const {
     });
 }
 Result<CameraPairing> CameraDeviceSystem::pair(const std::string& id, const PairingOptions& options) const {
-    if (!idValid(id) || !methodValid(options.method))
+    if (!validDeviceId(id) || !methodValid(options.method))
         return std::unexpected(invalid("Pairing requires a nonempty UTF-8 device ID and a valid method"));
     if (!callbacks_.pair) return std::unexpected(Error{ErrorCode::Unavailable, "No camera pairing provider"});
     return invokeProvider([&]() -> Result<CameraPairing> {
@@ -207,10 +224,44 @@ Result<CameraPairing> CameraDeviceSystem::pair(const std::string& id, const Pair
         return paired;
     });
 }
+Result<CameraFeatures> CameraDeviceSystem::featuresFor(const CameraInfo& camera,
+                                                     const FeatureQueryOptions& options) const {
+    return invokeProvider([&]() -> Result<CameraFeatures> {
+        if (!camera.connected) return std::unexpected(Error{ErrorCode::NotFound,"The camera is disconnected"});
+        if (callbacks_.features)
+            return validateFeatures(callbacks_.features(camera.id,options),camera.id);
+        Result<ControlPort> port=std::unexpected(Error{ErrorCode::Unavailable,"No camera control query provider"});
+        if (options.includeCurrentValues && callbacks_.controls)
+            port=invokeProvider([&] {return callbacks_.controls(camera.id);});
+        return validateFeatures(queryCameraFeatures(camera,port,options),camera.id);
+    });
+}
+Result<CameraFeatures> CameraDeviceSystem::features(const std::string& id,
+                                                  const FeatureQueryOptions& options) const {
+    if (!validDeviceId(id)) return std::unexpected(invalid("Feature queries require a nonempty UTF-8 device ID"));
+    auto cameras=discover();
+    if (!cameras) return std::unexpected(cameras.error());
+    const auto camera=std::find_if(cameras->begin(),cameras->end(),[&](const auto& value) {return value.id==id;});
+    if (camera==cameras->end()) return std::unexpected(Error{ErrorCode::NotFound,"The requested camera is not connected"});
+    return featuresFor(*camera,options);
+}
+Result<std::vector<CameraFeatureResult>> CameraDeviceSystem::features(const FeatureQueryOptions& options) const {
+    auto cameras=discover();
+    if (!cameras) return std::unexpected(cameras.error());
+    std::vector<CameraFeatureResult> results;
+    results.reserve(cameras->size());
+    for (const auto& camera : *cameras) results.push_back({camera.id,featuresFor(camera,options)});
+    return results;
+}
+Result<std::vector<CameraFeatureResult>> NativeCameraSystem::features(const FeatureQueryOptions& options) const {
+    return devices().features(options);
+}
 CameraDeviceSystem NativeCameraSystem::devices() const {
     return CameraDeviceSystem({
         [] { return NativeCameraSystem{}.cameras(); },
-        [](const std::string& id, const PairingOptions& options) { return NativeCameraSystem{}.pair(id, options); }
+        [](const std::string& id, const PairingOptions& options) { return NativeCameraSystem{}.pair(id, options); },
+        [](const std::string& id) { return NativeCameraSystem{}.controls(id); },
+        [](const std::string& id,const FeatureQueryOptions& options) {return NativeCameraSystem{}.features(id,options);}
     });
 }
 } // namespace iiCameraIntergration

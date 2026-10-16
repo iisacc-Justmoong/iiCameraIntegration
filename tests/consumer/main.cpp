@@ -51,6 +51,14 @@ int main() {
     NativeCameraSystem native;
     auto nativeDiscovery=native.devices().discover();
     if(!nativeDiscovery && nativeDiscovery.error().code!=ErrorCode::Unavailable) return 7;
+    auto reports=native.features(FeatureQueryOptions{false});
+    if(!reports && reports.error().code!=ErrorCode::Unavailable) return 9;
+    const auto values=pairedControls->queryAll();
+    if(values.size()!=1 || values[0].value || values[0].value.error().code!=ErrorCode::Cancelled) return 10;
+    auto features=devices.features();
+    if(!features || features->size()!=1 || !features->front().features ||
+       features->front().features->controls.size()!=1 ||
+       features->front().features->controls.front().value.error().code!=ErrorCode::Unavailable) return 11;
     auto absent=native.pair("iiCameraIntergration.consumer.absent.55cd76a3");
     if(absent || (absent.error().code!=ErrorCode::NotFound && absent.error().code!=ErrorCode::Unavailable)) return 8;
 #ifdef IICAMERA_CONSUMER_WITH_PROCESSING

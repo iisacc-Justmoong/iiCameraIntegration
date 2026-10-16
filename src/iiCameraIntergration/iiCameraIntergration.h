@@ -1,4 +1,5 @@
 #pragma once
+#include <iiCameraIntergration/Features.h>
 #include <iiCameraIntergration/Types.h>
 #include <iiCameraIntergration/Camera.h>
 #include <iiCameraIntergration/Media.h>

@@ -27,9 +27,14 @@ public:
     [[nodiscard]] CameraPermission permissionStatus() const noexcept;
     [[nodiscard]] Result<std::vector<CameraInfo>> cameras() const;
     [[nodiscard]] Result<ControlPort> controls(const std::string &deviceId) const;
+    [[nodiscard]] Result<CameraFeatures> features(const std::string& deviceId,
+        const FeatureQueryOptions& options = {}) const;
+    [[nodiscard]] Result<std::vector<CameraFeatureResult>> features(
+        const FeatureQueryOptions& options = {}) const;
     [[nodiscard]] CameraDeviceSystem devices() const;
-    // Creates and attaches AVCaptureDeviceInput to a stopped session on Apple.
-    // Requires existing permission; does not start capture or perform OS bonding.
+    // Owns a native device connection without starting capture or OS bonding.
+    // Apple attaches input to a stopped session; Linux retains an FD; Windows
+    // retains an unstarted media source; Android opens a Camera2 device.
     [[nodiscard]] Result<CameraPairing> pair(const std::string &deviceId,
         const PairingOptions& options = {}) const;
 };

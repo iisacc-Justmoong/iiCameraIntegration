@@ -44,7 +44,10 @@ enum class ControlId {
     Lens, FocalLengthMm, HorizontalFieldOfViewDegrees, ApertureFNumber,
     ZoomFactor, FocusDistanceMeters, LensPosition, FocusMode,
     ExposureSeconds, Iso, ExposureMode, ExposureCompensationEv,
-    WhiteBalanceKelvin, WhiteBalanceMode, StabilizationMode
+    WhiteBalanceKelvin, WhiteBalanceMode, StabilizationMode,
+    Brightness, Contrast, Saturation, Hue, Sharpness, Gamma, Gain,
+    BacklightCompensation, PowerLineFrequency, PanDegrees, TiltDegrees,
+    RollDegrees, TorchMode
 };
 enum class ControlMode { Manual, Automatic, Continuous, Locked, Off, On };
 using ControlValue = std::variant<double, ControlMode, std::string>;
@@ -73,6 +76,10 @@ struct CameraInfo {
     Metadata additional;
 };
 struct ControlCommand { ControlId id; ControlValue value; };
+struct ControlReading {
+    ControlCapability capability;
+    Result<ControlValue> value;
+};
 struct ControlCallbacks {
     std::function<Result<ControlValue>(ControlId)> query;
     std::function<Result<ControlValue>(const ControlCommand&)> apply;
@@ -84,6 +91,8 @@ public:
     ControlPort(std::vector<ControlCapability> capabilities, ControlCallbacks callbacks);
     [[nodiscard]] const std::vector<ControlCapability>& capabilities() const noexcept;
     [[nodiscard]] Result<ControlValue> query(ControlId id) const;
+    // Visits every advertised control in order. Errors remain per item.
+    [[nodiscard]] std::vector<ControlReading> queryAll() const;
     [[nodiscard]] Result<ControlValue> apply(const ControlCommand& command) const;
 private:
     std::vector<ControlCapability> capabilities_;

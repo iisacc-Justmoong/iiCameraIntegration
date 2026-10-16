@@ -64,8 +64,14 @@ existing media capture APIs retain their separate source and lifetime contract.
 `PairingMethod::DeviceBond` means actual device authentication or bonding and
 requires a provider that implements it. The native AVFoundation provider returns
 `Unsupported` for device bonding; the API does not promise Bluetooth, Wi-Fi,
-USB authorization, or operating-system pairing. Unsupported native platforms
+USB authorization, or operating-system pairing. Other unsupported platforms
 return `Unavailable` through their fallback provider.
+
+The Linux provider retains an open V4L2 descriptor; Windows retains an unstarted
+Media Foundation source; Android API 24+ opens a Camera2 device without creating
+a capture session. These native session providers also reject bonding/parameters.
+All providers share the revocable pairing lifetime. Bulk `features()` inspection
+and optional provider callbacks are described in [Features.md](Features.md).
 
 The native session provider accepts an empty `PairingOptions::parameters` map.
 Nonempty native parameters return `Unsupported`; no undocumented authentication

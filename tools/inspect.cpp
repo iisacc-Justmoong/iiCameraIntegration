@@ -1,4 +1,7 @@
+#include <iiFileProviderStorage.h>
 #include <iiCameraIntergration/iiCameraIntergration.h>
+#include "FeatureJson.h"
+#include <algorithm>
 #include <iostream>
 #include <cstdio>
 #include <cerrno>
@@ -23,6 +26,23 @@ void describe(const MediaInfo& m) {
 }
 int main(int argc, char** argv) {
     const std::string mode = argc>1 ? argv[1] : "--help";
+    if (mode=="--features") {
+        FeatureQueryOptions options;std::string id;
+        for(int i=2;i<argc;++i) {
+            const std::string argument=argv[i];
+            if(argument=="--metadata-only") options.includeCurrentValues=false;
+            else if(argument.starts_with("--")) return failure(Error{ErrorCode::InvalidArgument,"Unknown feature query option"});
+            else if(id.empty()) id=argument;
+            else return failure(Error{ErrorCode::InvalidArgument,"Expected one device ID and optional --metadata-only"});
+        }
+        NativeCameraSystem system;
+        Result<std::vector<CameraFeatureResult>> result=std::vector<CameraFeatureResult>{};
+        if(id.empty()) result=system.features(options);
+        else result->push_back({id,system.features(id,options)});
+        if(!result) return failure(result.error());
+        cli::report(std::cout,*result);
+        return std::any_of(result->begin(),result->end(),[](const auto& item){return !item.features;})?1:0;
+    }
     if (mode=="--catalog") {
         auto backend=mediaBackendInfo(); if (!backend) return failure(backend.error());
         auto codecs=codecCatalog(); if (!codecs) return failure(codecs.error());
@@ -55,7 +75,7 @@ int main(int argc, char** argv) {
     if (mode=="--frame" && argc==5) {
         MediaSource source; source.inputFormat=argv[2]; source.location=argv[3];
         auto frame=decodeRgbFrame(source); if(!frame) return failure(frame.error());
-        auto* output=std::fopen(argv[4],"wbx");
+        auto* output=iiFileProvider::native::openStream(argv[4],"wbx");
         if (!output) return failure(Error{errno==EEXIST ? ErrorCode::Busy : ErrorCode::Io,"Cannot create exclusive PPM output",errno});
         bool ok=std::fprintf(output,"P6\n%u %u\n255\n",frame->dimensions.width,frame->dimensions.height)>0;
         ok=std::fwrite(frame->pixels.data(),1,frame->pixels.size(),output)==frame->pixels.size() && ok;
@@ -75,6 +95,7 @@ int main(int argc, char** argv) {
                   << " bytes=" << report->fileBytes << '\n'; return 0;
     }
     std::cout << "iicamera-inspect --catalog | --cameras | --probe FILE\n"
+                 "iicamera-inspect --features [DEVICE_ID] [--metadata-only]\n"
                  "iicamera-inspect --capture INPUT_FORMAT SOURCE DESTINATION [OUTPUT_FORMAT]\n"
                  "iicamera-inspect --frame INPUT_FORMAT SOURCE DESTINATION.ppm\n";
     return mode=="--help" ? 0 : 2;

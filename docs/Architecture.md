@@ -5,6 +5,13 @@ and media identification. The public core is C++23 and does not require Qt. Plat
 backends may depend on their operating system's camera services, and media probing may
 depend on a separately detected codec provider.
 
+Bulk inspection is documented in [Features.md](Features.md). It composes discovery,
+typed control snapshots and native feature values without GUI dependencies.
+Pairing feature queries share the existing revocable resource gate. Separate
+Apple/Linux/Windows/Android translation units isolate OS dependencies. Private
+driver-test seams are excluded from installed headers. Version 0.4 requires
+consumer rebuilds because the callback object layouts have changed.
+
 ## Camera metadata
 
 `CameraInfo` is an owned value snapshot. It includes device identity, manufacturer,

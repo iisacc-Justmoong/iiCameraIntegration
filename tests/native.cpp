@@ -43,7 +43,8 @@ int main() {
         if (!valid) std::cerr << camera.name << ": " << valid.error().message << '\n';
         require(valid.has_value(), "OS metadata satisfies public metadata invariants");
         require(identifiers.insert(camera.id).second, "unique camera identifiers");
-        require(camera.backend == "AVFoundation", "native backend identifier");
+        require(camera.backend == "AVFoundation" || camera.backend == "V4L2" ||
+                camera.backend == "MediaFoundation" || camera.backend == "Camera2", "native backend identifier");
         formatCount += camera.formats.size();
         auto controls = system.controls(camera.id);
         if (!controls) {
@@ -52,12 +53,13 @@ int main() {
             continue;
         }
         const auto physicalFocus = controls->query(ControlId::FocusDistanceMeters);
-        require(!physicalFocus && physicalFocus.error().code == ErrorCode::Unsupported,
-                "native lens position is not fabricated as physical focus distance");
+        if(camera.backend=="AVFoundation" || camera.backend=="V4L2" || camera.backend=="Camera2")
+            require(!physicalFocus && physicalFocus.error().code == ErrorCode::Unsupported,
+                    "native lens position is not fabricated as physical focus distance");
         const auto unsupported = controls->apply({ControlId::Lens, std::string("nonexistent-lens")});
         require(!unsupported && unsupported.error().code == ErrorCode::Unsupported,
                 "unsupported lens mutation is rejected without configuring hardware");
-        if (before != CameraPermission::Authorized) {
+        if (camera.backend=="AVFoundation" && before != CameraPermission::Authorized) {
             const auto paired = system.pair(camera.id);
             require(!paired && (paired.error().code == ErrorCode::PermissionDenied ||
                                paired.error().code == ErrorCode::NotFound),
@@ -95,6 +97,19 @@ int main() {
     const auto discovered = system.devices().discover();
     require(discovered.has_value(), "native callback device port discovery");
     require(system.permissionStatus() == before, "discovery did not request or change camera permission");
+    const auto features=system.features();
+    require(features.has_value(),"bulk native feature discovery");
+    std::set<std::string> featureIds;
+    for(const auto& result:*features) {
+        require(featureIds.insert(result.deviceId).second,"unique feature result IDs");
+        if(result.features) {
+            require(result.features->camera.id==result.deviceId,"feature report identifies exact device");
+            require(validateCameraInfo(result.features->camera).has_value(),"feature metadata invariants");
+        }
+    }
+    const auto invalidFeatures=system.devices().features(std::string("\xff",1));
+    require(!invalidFeatures && invalidFeatures.error().code==ErrorCode::InvalidArgument,"invalid feature device ID");
+    require(system.permissionStatus()==before,"feature query leaves authorization unchanged");
     std::cout << "Read-only native discovery: " << cameras->size() << " cameras, " << formatCount
               << " formats; invalid/missing pairing checks passed; authorization unchanged; no camera session started\n";
 }

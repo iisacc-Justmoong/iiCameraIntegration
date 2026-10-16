@@ -9,6 +9,9 @@ Result<std::vector<CameraInfo>> NativeCameraSystem::cameras() const {
 Result<ControlPort> NativeCameraSystem::controls(const std::string &) const {
     return std::unexpected(Error{ErrorCode::Unavailable, "No native camera control adapter is installed for this platform"});
 }
+Result<CameraFeatures> NativeCameraSystem::features(const std::string&,const FeatureQueryOptions&) const {
+    return std::unexpected(Error{ErrorCode::Unavailable,"No native camera feature adapter is installed for this platform"});
+}
 Result<CameraPairing> NativeCameraSystem::pair(const std::string &, const PairingOptions &) const {
     return std::unexpected(Error{ErrorCode::Unavailable, "No native camera pairing adapter is installed for this platform"});
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iiCameraIntergration/Camera.h>
+#include <iiCameraIntergration/Features.h>
 #include <memory>
 
 namespace iiCameraIntergration {
@@ -22,6 +22,7 @@ struct PairingCallbacks {
     std::function<Result<PairingState>()> status;
     std::function<Result<ControlPort>()> controls;
     std::function<Result<void>()> unpair;
+    std::function<Result<CameraFeatures>(const FeatureQueryOptions&)> features;
 };
 
 // Single owner; returned control ports retain only a weak, revocable session gate.
@@ -38,6 +39,7 @@ public:
     [[nodiscard]] Result<PairingInfo> info() const;
     [[nodiscard]] Result<PairingState> status() const;
     [[nodiscard]] Result<ControlPort> controls() const;
+    [[nodiscard]] Result<CameraFeatures> features(const FeatureQueryOptions& options = {}) const;
     // Successful repeated unpair is idempotent. Failure keeps ownership so the
     // caller can retry; destruction makes one final best-effort release attempt.
     [[nodiscard]] Result<void> unpair();
@@ -50,6 +52,8 @@ private:
 struct DeviceCallbacks {
     std::function<Result<std::vector<CameraInfo>>()> discover;
     std::function<Result<CameraPairing>(const std::string&, const PairingOptions&)> pair;
+    std::function<Result<ControlPort>(const std::string&)> controls;
+    std::function<Result<CameraFeatures>(const std::string&,const FeatureQueryOptions&)> features;
 };
 
 // A concrete callback port, like ControlPort. Discovery does not establish a
@@ -60,7 +64,14 @@ public:
     [[nodiscard]] Result<std::vector<CameraInfo>> discover() const;
     [[nodiscard]] Result<CameraPairing> pair(const std::string& deviceId,
         const PairingOptions& options = {}) const;
+    [[nodiscard]] Result<CameraFeatures> features(const std::string& deviceId,
+        const FeatureQueryOptions& options = {}) const;
+    // Discover once. A failed camera remains as an error entry in the batch.
+    [[nodiscard]] Result<std::vector<CameraFeatureResult>> features(
+        const FeatureQueryOptions& options = {}) const;
 private:
+    [[nodiscard]] Result<CameraFeatures> featuresFor(const CameraInfo&,
+        const FeatureQueryOptions&) const;
     DeviceCallbacks callbacks_;
 };
 } // namespace iiCameraIntergration

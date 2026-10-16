@@ -1,9 +1,16 @@
-# Verification — 2026-10-09 (Asia/Seoul)
+# Verification
 
-## Current 0.3.0 device discovery and pairing
+## Current 0.4.0 compatibility and bulk inspection
 
-The current device API and full camera regression evidence are recorded in
-[DeviceVerification](DeviceVerification.md). The current version adds seven
+The 2026-10-13 results, native platform build matrix, 114 passing regression
+executions, staged/local consumers and physical-device boundaries are recorded
+in [FeatureVerification](FeatureVerification.md). The public batch API and
+compatibility contracts are in [Features](Features.md).
+
+## Historical 0.3.0 device discovery and pairing
+
+The preceding device API and camera regression evidence are recorded in
+[DeviceVerification](DeviceVerification.md). That version added seven
 device cases while retaining the preceding media/processing tests. Physical
 camera and OS authentication evidence remains explicitly separate.
 

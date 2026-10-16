@@ -1,3 +1,4 @@
+#include <iiFileProviderStorage.h>
 #include <iiCameraIntergration/ImageProcessing.h>
 #include <cstdio>
 #include <filesystem>
@@ -19,7 +20,7 @@ int main(int argc,char** argv) {
         auto photo=captureAndProcessPhoto(MediaSource{.location=argv[2],.inputFormat=argv[1]},options);
         if(!photo) {std::cerr<<photo.error().message<<'\n';return 1;}
         auto frame=photoFrame(*photo);if(!frame){std::cerr<<frame.error().message<<'\n';return 1;}
-        auto* output=std::fopen(argv[3],"wbx");if(!output){std::cerr<<"Cannot create exclusive output\n";return 1;}
+        auto* output=iiFileProvider::native::openStream(argv[3],"wbx");if(!output){std::cerr<<"Cannot create exclusive output\n";return 1;}
         bool ok=std::fprintf(output,"P6\n%u %u\n255\n",frame->dimensions.width,frame->dimensions.height)>0;
         ok=std::fwrite(frame->pixels.data(),1,frame->pixels.size(),output)==frame->pixels.size()&&ok;
         ok=std::fclose(output)==0&&ok;

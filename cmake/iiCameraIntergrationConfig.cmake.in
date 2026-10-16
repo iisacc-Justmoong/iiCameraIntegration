@@ -1,5 +1,12 @@
 @PACKAGE_INIT@
 include(CMakeFindDependencyMacro)
+find_dependency(iiFileProviderNative 0.6 CONFIG HINTS "$ENV{IIFILEPROVIDER_PREFIX}" "$ENV{HOME}/.local/SDK/iiFileProvider")
+
+
+
+
+
+
 find_dependency(Threads)
 if(NOT @BUILD_SHARED_LIBS@ AND @IICAMERA_WITH_FFMPEG@)
     find_dependency(PkgConfig)

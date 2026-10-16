@@ -1,8 +1,10 @@
 # Native camera discovery, pairing, and controls
 
-`NativeCameraSystem` is the AVFoundation adapter on macOS, iOS, and Mac Catalyst.
-Other systems compile the same public interface and return `Unavailable` until
-an operating system adapter is provided. The adapter does not use Qt.
+`NativeCameraSystem` uses AVFoundation on supported Apple platforms, V4L2 on
+Linux, Media Foundation on Windows and Camera2 on Android API 24+. All adapters
+are Qt-free. See [Features.md](Features.md) for the full compatibility matrix,
+batch queries and native feature payloads. The following sections describe
+the Apple adapter specifically.
 
 `cameras()` enumerates connected camera devices and reports the device ID, name,
 manufacturer, model, position, formats, native format subtype, and frame-rate

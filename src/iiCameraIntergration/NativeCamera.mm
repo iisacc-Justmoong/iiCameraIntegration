@@ -122,6 +122,15 @@ ControlCapability numeric(ControlId id, std::string unit, double minimum, double
 
 std::vector<ControlCapability> capabilities(AVCaptureDevice *device) {
     std::vector<ControlCapability> result;
+    if (device.hasTorch) {
+        ControlCapability torch;
+        torch.id=ControlId::TorchMode;torch.kind=ControlKind::Mode;torch.readable=true;
+        if ([device isTorchModeSupported:AVCaptureTorchModeOff]) torch.modes.push_back(ControlMode::Off);
+        if ([device isTorchModeSupported:AVCaptureTorchModeOn]) torch.modes.push_back(ControlMode::On);
+        if ([device isTorchModeSupported:AVCaptureTorchModeAuto]) torch.modes.push_back(ControlMode::Automatic);
+        torch.writable=device.isTorchAvailable;
+        if (!torch.modes.empty()) result.push_back(std::move(torch));
+    }
     ControlCapability focus;
     focus.id = ControlId::FocusMode;
     focus.kind = ControlKind::Mode;
@@ -209,6 +218,9 @@ std::vector<ControlCapability> capabilities(AVCaptureDevice *device) {
 
 Result<ControlValue> readControl(AVCaptureDevice *device, ControlId id) {
     switch (id) {
+    case ControlId::TorchMode:
+        return device.torchMode==AVCaptureTorchModeOff?ControlMode::Off:
+            device.torchMode==AVCaptureTorchModeAuto?ControlMode::Automatic:ControlMode::On;
     case ControlId::FocusMode:
         switch (device.focusMode) {
         case AVCaptureFocusModeLocked: return ControlMode::Locked;
@@ -320,6 +332,10 @@ Result<ControlValue> applyControl(AVCaptureDevice *device, const ControlCommand 
             return std::unexpected(Error{ErrorCode::InvalidArgument, "The value is outside the camera's newly active format range"});
     }
     switch (command.id) {
+    case ControlId::TorchMode:
+        device.torchMode=std::get<ControlMode>(command.value)==ControlMode::On?AVCaptureTorchModeOn:
+            std::get<ControlMode>(command.value)==ControlMode::Automatic?AVCaptureTorchModeAuto:AVCaptureTorchModeOff;
+        break;
     case ControlId::FocusMode: {
         const auto mode = std::get<ControlMode>(command.value);
         const auto native = mode == ControlMode::Locked ? AVCaptureFocusModeLocked :
@@ -452,6 +468,24 @@ CameraInfo describe(AVCaptureDevice *device) {
         format.additional["CoreMedia.mediaSubtype"] = nativeTag;
         format.additional["CoreMedia.formatExtensions"] = utf8([(__bridge NSDictionary *)CMFormatDescriptionGetExtensions(description) description]);
         format.additional["AVFoundation.description"] = utf8(native.description);
+        if (@available(macOS 10.15,iOS 10.0,macCatalyst 14.0,tvOS 17.0,*)) {
+            format.additional["AVFoundation.autoFocusSystem"]=std::to_string(static_cast<int>(native.autoFocusSystem));
+            std::string colors;
+            for (NSNumber* color in native.supportedColorSpaces) {
+                if (!colors.empty()) colors+=",";
+                colors+=std::to_string(color.intValue);
+            }
+            format.additional["AVFoundation.supportedColorSpaces"]=std::move(colors);
+        }
+        if (@available(macOS 13.0,iOS 16.0,macCatalyst 16.0,tvOS 17.0,*)) {
+            std::string sizes;
+            for (NSValue* item in native.supportedMaxPhotoDimensions) {
+                CMVideoDimensions dimensions{};[item getValue:&dimensions size:sizeof(dimensions)];
+                if (!sizes.empty()) sizes+=",";
+                sizes+=std::to_string(dimensions.width)+"x"+std::to_string(dimensions.height);
+            }
+            format.additional["AVFoundation.supportedMaxPhotoDimensions"]=std::move(sizes);
+        }
         for (AVFrameRateRange *range in native.videoSupportedFrameRateRanges) {
             if (std::isfinite(range.minFrameRate) && std::isfinite(range.maxFrameRate) && range.minFrameRate > 0 && range.maxFrameRate >= range.minFrameRate)
                 format.frameRates.push_back({range.minFrameRate, range.maxFrameRate, 0, {}});
@@ -460,6 +494,36 @@ CameraInfo describe(AVCaptureDevice *device) {
         if (std::isfinite(native.videoFieldOfView) && native.videoFieldOfView > 0 && native.videoFieldOfView < 180)
             format.horizontalFieldOfViewDegrees = native.videoFieldOfView;
         format.hdrSupported = native.isVideoHDRSupported;
+        std::string depth;
+        for (AVCaptureDeviceFormat* item in native.supportedDepthDataFormats) {
+            const auto dimensions=CMVideoFormatDescriptionGetDimensions(item.formatDescription);
+            if (!depth.empty()) depth+=",";
+            depth+=fourCC(CMFormatDescriptionGetMediaSubType(item.formatDescription))+":"+
+                std::to_string(dimensions.width)+"x"+std::to_string(dimensions.height);
+        }
+        format.additional["AVFoundation.supportedDepthDataFormats"]=std::move(depth);
+        std::string stabilization;
+        std::vector<AVCaptureVideoStabilizationMode> modes{AVCaptureVideoStabilizationModeOff,
+            AVCaptureVideoStabilizationModeStandard,AVCaptureVideoStabilizationModeCinematic,AVCaptureVideoStabilizationModeAuto};
+        if (@available(iOS 13.0,macCatalyst 14.0,tvOS 17.0,*)) {
+            modes.push_back(AVCaptureVideoStabilizationModeCinematicExtended);
+            format.additional["AVFoundation.multiCamSupported"]=native.isMultiCamSupported?"true":"false";
+        }
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000 || __TV_OS_VERSION_MAX_ALLOWED >= 170000
+        if (@available(iOS 17.0,macCatalyst 17.0,tvOS 17.0,*)) modes.push_back(AVCaptureVideoStabilizationModePreviewOptimized);
+#endif
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 180000 || __TV_OS_VERSION_MAX_ALLOWED >= 180000
+        if (@available(iOS 18.0,macCatalyst 18.0,tvOS 18.0,*)) modes.push_back(AVCaptureVideoStabilizationModeCinematicExtendedEnhanced);
+#endif
+#if TARGET_OS_IOS && !TARGET_OS_MACCATALYST && __IPHONE_OS_VERSION_MAX_ALLOWED >= 260000
+        if (@available(iOS 26.0,*)) modes.push_back(AVCaptureVideoStabilizationModeLowLatency);
+#endif
+        for (auto mode : modes) {
+            if (![native isVideoStabilizationModeSupported:mode]) continue;
+            if (!stabilization.empty()) stabilization+=",";
+            stabilization+=std::to_string(static_cast<int>(mode));
+        }
+        format.additional["AVFoundation.supportedStabilizationModes"]=std::move(stabilization);
         format.additional["AVFoundation.hdrMeaning"] = "EDR streaming toggle; not a complete HDR color-space capability";
 #endif
         if (native == device.activeFormat) value.activeFormatId = format.id;
@@ -637,6 +701,10 @@ Result<CameraPairing> NativeCameraSystem::pair(const std::string &deviceId,
                     }
                 }
             };
+            const auto identifier=info.device.id;
+            callbacks.features=[identifier](const FeatureQueryOptions& options) {
+                return NativeCameraSystem{}.features(identifier,options);
+            };
             // Native validation locks have ended before generic handle creation.
             // No session is started: ownership prepares input resources only.
             return CameraPairing::create(std::move(info), std::move(callbacks));
@@ -646,6 +714,49 @@ Result<CameraPairing> NativeCameraSystem::pair(const std::string &deviceId,
             return std::unexpected(Error{ErrorCode::BackendFailure, "Native camera pairing failed with an unknown exception"});
         }
     }
+}
+Result<CameraFeatures> NativeCameraSystem::features(const std::string& id,const FeatureQueryOptions& options) const {
+    // controls validates UTF-8 and resolves the connected video ID without
+    // creating or starting a capture session.
+    auto port=controls(id);
+    if (!port) return std::unexpected(port.error());
+    CameraInfo info;
+    std::vector<NativeFeature> nativeFeatures;
+    @autoreleasepool {
+        std::lock_guard guard(nativeMutex());
+        @try {
+            NSString *identifier=[[NSString alloc] initWithBytes:id.data() length:id.size() encoding:NSUTF8StringEncoding];
+            AVCaptureDevice *device=[AVCaptureDevice deviceWithUniqueID:identifier];
+            if (!device || !device.isConnected || ![device hasMediaType:AVMediaTypeVideo])
+                return std::unexpected(Error{ErrorCode::NotFound,"The camera was disconnected"});
+            info=describe(device);
+            const auto flag=[&](const char* name,bool value) {
+                NativeFeature feature;feature.id=std::string("AVFoundation:")+name;feature.name=name;
+                feature.type=FeatureType::Boolean;feature.readable=true;feature.value=FeatureValue{value};
+                feature.additional["AVFoundation.scope"]="reported device capability";
+                nativeFeatures.push_back(std::move(feature));
+            };
+            flag("hasFlash",device.hasFlash);flag("hasTorch",device.hasTorch);
+            flag("focusPointOfInterestSupported",device.isFocusPointOfInterestSupported);
+            flag("exposurePointOfInterestSupported",device.isExposurePointOfInterestSupported);
+#if IICAMERA_MOBILE_OPTICS
+            flag("smoothAutoFocusSupported",device.isSmoothAutoFocusSupported);
+            flag("lowLightBoostSupported",device.isLowLightBoostSupported);
+            if (@available(iOS 13.0,macCatalyst 14.0,tvOS 17.0,*)) {
+                flag("virtualDevice",device.isVirtualDevice);
+                std::string constituents;
+                for (AVCaptureDevice* child in device.constituentDevices) {
+                    if (!constituents.empty()) constituents+=",";
+                    constituents+=utf8(child.uniqueID);
+                }
+                info.additional["AVFoundation.constituentDeviceIds"]=std::move(constituents);
+            }
+#endif
+        } @catch (NSException *exception) {return std::unexpected(exceptionError(exception));}
+    }
+    auto result=queryCameraFeatures(std::move(info),port,options);
+    result.nativeFeatures=std::move(nativeFeatures);
+    return result;
 }
 } // namespace iiCameraIntergration
 

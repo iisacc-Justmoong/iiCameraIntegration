@@ -1,3 +1,4 @@
+#include <iiFileProviderStorage.h>
 #include <iiCameraIntergration/Media.h>
 
 extern "C" {
@@ -785,7 +786,7 @@ Result<RecordingReport> recordMedia(const MediaSource& source, const std::filesy
 #ifdef _WIN32
     output.file = _wfopen(destination.c_str(), L"wbx");
 #else
-    output.file = std::fopen(destination.c_str(), "wbx");
+    output.file = iiFileProvider::native::openStream(destination.c_str(), "wbx");
 #endif
     if (!output.file) return std::unexpected(backendError(AVERROR(errno ? errno : EIO), "create exclusive recording file"));
     output.destination = destination;
