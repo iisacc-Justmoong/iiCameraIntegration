@@ -1,6 +1,11 @@
 # iiCameraIntergration
 
-Version **0.4.0**. A C++23 camera integration SDK for camera metadata, capability-aware optical
+Package release: **0.4.1** (2026-10-19). This patch packages the current
+source snapshot; build, test and installation evidence is recorded in the SDK
+patch-release report. Earlier versioned feature notes remain historical.
+
+
+Version **0.4.1**. A C++23 camera integration SDK for camera metadata, capability-aware optical
 controls, media capture, and codec/container identification. The package and
 namespace preserve the requested spelling **iiCameraIntergration**.
 The public API uses standard C++ values and `std::expected`; it has no Qt dependency.
