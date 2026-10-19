@@ -3,7 +3,7 @@
 using namespace iiCameraIntergration;
 int main() {
     CameraFeatures result;
-    result.camera.id="fixture:camera";result.camera.name="Camera \"A\"\n한국어";result.camera.backend="fixture";
+    result.camera.id="fixture:camera";result.camera.name="Camera \"A\"\n한국어 😀";result.camera.backend="fixture";
     result.camera.additional["path"]="C:\\camera";
     result.camera.controls.push_back({.id=ControlId::Brightness,.readable=true,.range=NumericRange{0,100,1,{}}});
     result.controls.push_back({result.camera.controls[0],std::unexpected(Error{ErrorCode::Busy,"try\tagain"})});
