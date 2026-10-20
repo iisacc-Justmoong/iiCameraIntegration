@@ -131,7 +131,7 @@ providers use `DeviceCallbacks`. See [Devices](docs/Devices.md) and the current
 ## Photograph processing component
 
 An optional `iiCameraIntergration::ImageProcessing` target links to iiGraphicAdjust
-0.5. It imports RGB24 with a verified color interpretation, applies EXIF orientation,
+0.6.x. It imports RGB24 with a verified color interpretation, applies EXIF orientation,
 integer crop, existing development stages, existing resamplers, and histograms.
 Unknown color tags require an explicit source interpretation. Known conflicting
 transfer/primary tags, ICC input, wide-gamut and HDR transfers are rejected.

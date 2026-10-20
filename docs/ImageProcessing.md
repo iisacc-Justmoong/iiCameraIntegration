@@ -1,7 +1,7 @@
 # Captured photograph processing
 
 The optional `ImageProcessing` component depends publicly on camera core and
-`iiGraphicAdjust` 0.5. The standard C++ processing library has no reverse dependency.
+`iiGraphicAdjust` 0.6.x. The standard C++ processing library has no reverse dependency.
 Camera core remains usable without this component or iiGraphicAdjust.
 
 `processPhoto(RgbFrame, PhotoProcessingOptions)` returns a detached normalized
@@ -43,12 +43,19 @@ existing file, and demonstrates real capture/decode/development pixels. It assum
 only the explicit color interpretation given in its command arguments.
 
 Build with `-DIICAMERA_WITH_IMAGE_PROCESSING=ON` and a compatible iiGraphicAdjust
-0.5 package. Consume with `find_package(iiCameraIntergration 0.3 CONFIG REQUIRED
+0.6.x package. Consume with `find_package(iiCameraIntergration 0.4 CONFIG REQUIRED
 COMPONENTS ImageProcessing)` and link `iiCameraIntergration::ImageProcessing`.
 A package built without the component correctly rejects a required component request.
 Core-only requests do not search for iiGraphicAdjust. With `OPTIONAL_COMPONENTS
 ImageProcessing`, an unavailable iiGraphicAdjust leaves core usable and sets the
 component's found flag to false. A required ImageProcessing request fails instead.
+
+With FFmpeg, tools and testing enabled, `iiCamera.processing.package` installs the
+SDK into the build tree, checks the missing-dependency component behavior, then
+builds and runs an independent C++23 consumer against the selected iiGraphicAdjust
+package. The consumer checks processed RGB pixels, histogram counts and RAW
+development as well as core camera APIs. This also verifies that the installed
+package and the SDK build accept the same dependency version.
 
 The installed processing library/tool use their own library directory as a runtime
 search path and include external linked-library directories. When iiGraphicAdjust

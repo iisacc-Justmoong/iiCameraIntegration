@@ -86,7 +86,7 @@ else()
     target_sources(iiCameraIntergration PRIVATE src/iiCameraIntergration/NativeCameraUnavailable.cpp)
 endif()
 if(IICAMERA_WITH_IMAGE_PROCESSING)
-    find_package(iiGraphicAdjust 0.5 CONFIG REQUIRED)
+    find_package(iiGraphicAdjust 0.6 CONFIG REQUIRED)
     add_library(iiCameraImageProcessing src/iiCameraIntergration/ImageProcessing.cpp)
     add_library(iiCameraIntergration::ImageProcessing ALIAS iiCameraImageProcessing)
     target_compile_features(iiCameraImageProcessing PUBLIC cxx_std_23)
@@ -219,8 +219,11 @@ if(BUILD_TESTING)
                     "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/processing-package"
                     "-DLIBDIR=${CMAKE_INSTALL_LIBDIR}" "-DBINDIR=${CMAKE_INSTALL_BINDIR}"
                     "-DTOOL_NAME=$<TARGET_FILE_NAME:iiCameraProcess>" "-DCONFIG=$<CONFIG>"
+                    "-DGRAPHIC_ADJUST_DIR=${iiGraphicAdjust_DIR}"
+                    "-DFILE_PROVIDER_DIR=${iiFileProviderNative_DIR}"
+                    "-DGENERATOR=${CMAKE_GENERATOR}" "-DMAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
                     -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/processing_package.cmake")
-                set_tests_properties(iiCamera.processing.package PROPERTIES TIMEOUT 60)
+                set_tests_properties(iiCamera.processing.package PROPERTIES TIMEOUT 180)
             endif()
             add_test(NAME iiCamera.cli_frame COMMAND "${CMAKE_COMMAND}"
                 "-DTOOL=$<TARGET_FILE:iiCameraInspect>" "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/cli"
