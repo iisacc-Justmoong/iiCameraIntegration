@@ -188,3 +188,11 @@ information](https://ffmpeg.org/legal.html). This package does not bundle FFmpeg
 
 See [Architecture](docs/Architecture.md), [Media API](docs/Media.md),
 [Native adapter](docs/Native.md), and [Verification](docs/Verification.md).
+
+## License
+
+SPDX-License-Identifier: MIT
+
+The original code and documentation in this repository are licensed under the
+[MIT License](LICENSE). Third-party code, libraries, fonts, tools, and model
+weights retain their respective licenses.
