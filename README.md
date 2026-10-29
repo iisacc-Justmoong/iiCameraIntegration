@@ -14,6 +14,8 @@ namespace are both named **iiCameraIntegration**. See the
 existing consumers after the spelling correction.
 The public API uses standard C++ values and `std::expected`; it has no Qt dependency.
 Native platform code is isolated in an optional adapter.
+Sources under `src/` separate device discovery, features, media, and platform
+adapters; public `<iiCameraIntegration/...>` include names stay unchanged.
 
 | Requirement | API | Implemented behavior |
 | --- | --- | --- |

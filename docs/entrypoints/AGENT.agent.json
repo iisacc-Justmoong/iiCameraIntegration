@@ -10,8 +10,8 @@
   },
   "source": {
     "path": "AGENT.md",
-    "sha256": "da4897ab63775ded51d8ae27cc2d6755e5c105c443095b1084411788b24972d4",
-    "bytes": 2377,
+    "sha256": "81ee0b5df4323324397ff08e8af6a1970691f9552129068e4acf13e9dbd48ed8",
+    "bytes": 2383,
     "line_count": 30,
     "encoding": "utf-8",
     "language": "ko"
@@ -43,7 +43,7 @@
       "kind": "paragraph",
       "start_line": 3,
       "end_line": 4,
-      "raw": "C++23과 Qt 없는 공개 API를 유지한다. 소스와 동명 헤더는 src/iiCameraIntegration/\n아래에 함께 둔다. 자동 생성 헤더와 모든 빌드·설치 검증 산출물은 build/에 둔다.\n"
+      "raw": "C++23과 Qt 없는 공개 API를 유지한다. 소스와 동명 헤더는 src/와 책임별\n하위 디렉터리에 함께 둔다. 자동 생성 헤더와 모든 빌드·설치 검증 산출물은 build/에 둔다.\n"
     },
     {
       "id": "b000004",

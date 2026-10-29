@@ -3,7 +3,7 @@ if(NOT IICAMERA_SOURCE)
 endif()
 file(READ "${IICAMERA_SOURCE}/CMakeLists.txt" cmake_source)
 file(READ "${IICAMERA_SOURCE}/cmake/iiCameraIntegrationConfig.cmake.in" package_source)
-file(READ "${IICAMERA_SOURCE}/src/iiCameraIntegration/Media.cpp" media_source)
+file(READ "${IICAMERA_SOURCE}/src/Media/Media.cpp" media_source)
 file(READ "${IICAMERA_SOURCE}/install.sh" install_source)
 if(cmake_source MATCHES "find_package\\([ \\t\\n]*iiFileProvider" OR
    cmake_source MATCHES "iiFileProvider::" OR package_source MATCHES "iiFileProvider" OR

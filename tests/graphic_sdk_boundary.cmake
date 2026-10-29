@@ -7,8 +7,9 @@ if(cmake_source MATCHES "find_package\\([ \t\n]*iiGraphicAdjust" OR
    cmake_source MATCHES "iiGraphicAdjust::" OR package_source MATCHES "iiGraphicAdjust")
     message(FATAL_ERROR "Camera SDK must not discover or link the image SDK")
 endif()
-if(EXISTS "${IICAMERA_SOURCE}/src/iiCameraIntegration/ImageProcessing.h" OR
-   EXISTS "${IICAMERA_SOURCE}/src/iiCameraIntegration/ImageProcessing.cpp")
+file(GLOB_RECURSE image_composition_sources
+    "${IICAMERA_SOURCE}/src/ImageProcessing.h" "${IICAMERA_SOURCE}/src/ImageProcessing.cpp")
+if(image_composition_sources)
     message(FATAL_ERROR "Cross-SDK image composition belongs to a separate consumer")
 endif()
 file(READ "${IICAMERA_SOURCE}/example/ImageProcessing/CMakeLists.txt" consumer_source)

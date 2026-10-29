@@ -1,7 +1,7 @@
 # iiCameraIntegration 작업 지침
 
-C++23과 Qt 없는 공개 API를 유지한다. 소스와 동명 헤더는 src/iiCameraIntegration/
-아래에 함께 둔다. 자동 생성 헤더와 모든 빌드·설치 검증 산출물은 build/에 둔다.
+C++23과 Qt 없는 공개 API를 유지한다. 소스와 동명 헤더는 src/와 책임별
+하위 디렉터리에 함께 둔다. 자동 생성 헤더와 모든 빌드·설치 검증 산출물은 build/에 둔다.
 
 모듈·네임스페이스·헤더·CMake 패키지의 이름은 iiCameraIntegration이다.
 소스 변경에는 tests/와 한국어 docs/ 갱신을 포함하며 README.md는 영어로 작성한다.

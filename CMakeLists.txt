@@ -27,8 +27,28 @@ if(PROJECT_IS_TOP_LEVEL AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         set(CMAKE_INSTALL_PREFIX "$ENV{USERPROFILE}/.local/SDK/iiCameraIntegration" CACHE PATH "Install prefix" FORCE)
     endif()
 endif()
-add_library(iiCameraIntegration src/iiCameraIntegration/Camera.cpp src/iiCameraIntegration/Devices.cpp
-    src/iiCameraIntegration/Features.cpp)
+set(_camera_public_headers
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Camera.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Types.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/iiCameraIntegration.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Devices/Devices.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Features/Features.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Media/Media.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/NativeCamera.h")
+foreach(_header IN LISTS _camera_public_headers)
+    get_filename_component(_name "${_header}" NAME)
+    file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/iiCameraIntegration/${_name}"
+        CONTENT "#pragma once\n#include \"${_header}\"\n")
+endforeach()
+# Driver tests also use private detail headers in the build tree. They are not installed.
+file(GLOB _camera_detail_headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/*.h")
+foreach(_header IN LISTS _camera_detail_headers)
+    get_filename_component(_name "${_header}" NAME)
+    file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/iiCameraIntegration/detail/${_name}"
+        CONTENT "#pragma once\n#include \"${_header}\"\n")
+endforeach()
+add_library(iiCameraIntegration src/Camera.cpp src/Devices/Devices.cpp
+    src/Features/Features.cpp)
 add_library(iiCameraIntegration::iiCameraIntegration ALIAS iiCameraIntegration)
 target_compile_features(iiCameraIntegration PUBLIC cxx_std_23)
 target_include_directories(iiCameraIntegration PUBLIC
@@ -54,17 +74,17 @@ if(IICAMERA_WITH_FFMPEG)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(IICameraFFmpeg REQUIRED IMPORTED_TARGET
         libavformat libavcodec libavdevice libavutil libswscale)
-    target_sources(iiCameraIntegration PRIVATE src/iiCameraIntegration/Media.cpp)
+    target_sources(iiCameraIntegration PRIVATE src/Media/Media.cpp)
     target_link_libraries(iiCameraIntegration PRIVATE PkgConfig::IICameraFFmpeg)
 else()
-    target_sources(iiCameraIntegration PRIVATE src/iiCameraIntegration/MediaUnavailable.cpp)
+    target_sources(iiCameraIntegration PRIVATE src/Media/MediaUnavailable.cpp)
 endif()
 set(IICAMERA_HAS_APPLE_NATIVE OFF)
 if(APPLE AND IICAMERA_WITH_NATIVE)
     enable_language(OBJCXX)
     set(IICAMERA_HAS_APPLE_NATIVE ON)
-    target_sources(iiCameraIntegration PRIVATE src/iiCameraIntegration/NativeCamera.mm)
-    set_source_files_properties(src/iiCameraIntegration/NativeCamera.mm PROPERTIES COMPILE_FLAGS "-fobjc-arc")
+    target_sources(iiCameraIntegration PRIVATE src/Platform/NativeCamera.mm)
+    set_source_files_properties(src/Platform/NativeCamera.mm PROPERTIES COMPILE_FLAGS "-fobjc-arc")
     set_target_properties(iiCameraIntegration PROPERTIES OBJCXX_STANDARD 23 OBJCXX_STANDARD_REQUIRED YES OBJCXX_EXTENSIONS OFF)
     find_library(IICameraAVFoundation AVFoundation REQUIRED)
     find_library(IICameraFoundation Foundation REQUIRED)
@@ -74,26 +94,26 @@ if(APPLE AND IICAMERA_WITH_NATIVE)
 elseif(ANDROID AND IICAMERA_WITH_NATIVE)
     if(CMAKE_SYSTEM_VERSION VERSION_LESS 24)
         message(STATUS "Native Camera2 unavailable before Android API 24; building the explicit fallback")
-        target_sources(iiCameraIntegration PRIVATE src/iiCameraIntegration/NativeCameraUnavailable.cpp)
+        target_sources(iiCameraIntegration PRIVATE src/Platform/NativeCameraUnavailable.cpp)
     else()
-        target_sources(iiCameraIntegration PRIVATE src/iiCameraIntegration/NativeCameraAndroid.cpp)
+        target_sources(iiCameraIntegration PRIVATE src/Platform/NativeCameraAndroid.cpp)
         target_link_libraries(iiCameraIntegration PRIVATE camera2ndk)
     endif()
 elseif(WIN32 AND IICAMERA_WITH_NATIVE)
-    target_sources(iiCameraIntegration PRIVATE src/iiCameraIntegration/NativeCameraWindows.cpp)
+    target_sources(iiCameraIntegration PRIVATE src/Platform/NativeCameraWindows.cpp)
     target_link_libraries(iiCameraIntegration PRIVATE mfplat mf mfuuid strmiids ole32 oleaut32 propsys)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND IICAMERA_WITH_NATIVE)
-    target_sources(iiCameraIntegration PRIVATE src/iiCameraIntegration/NativeCameraLinux.cpp
-        src/iiCameraIntegration/V4L2.cpp)
+    target_sources(iiCameraIntegration PRIVATE src/Platform/NativeCameraLinux.cpp
+        src/Platform/V4L2.cpp)
 else()
-    target_sources(iiCameraIntegration PRIVATE src/iiCameraIntegration/NativeCameraUnavailable.cpp)
+    target_sources(iiCameraIntegration PRIVATE src/Platform/NativeCameraUnavailable.cpp)
 endif()
 set(_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/iiCameraIntegration")
 install(TARGETS iiCameraIntegration EXPORT iiCameraIntegrationTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY src/iiCameraIntegration/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iiCameraIntegration FILES_MATCHING PATTERN "*.h" PATTERN "ImageProcessing.h" EXCLUDE PATTERN "detail" EXCLUDE)
+install(FILES ${_camera_public_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iiCameraIntegration)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/iiCameraIntegration/Export.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iiCameraIntegration)
 install(EXPORT iiCameraIntegrationTargets NAMESPACE iiCameraIntegration:: DESTINATION "${_package_dir}")
 configure_package_config_file(cmake/iiCameraIntegrationConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/iiCameraIntegrationConfig.cmake" INSTALL_DESTINATION "${_package_dir}")
@@ -105,6 +125,8 @@ install(DIRECTORY docs/ DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraIntegration
 install(DIRECTORY example/ DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraIntegration/example
     PATTERN ".*.iisacc-preview" EXCLUDE PATTERN ".iisacc-temporary.lock" EXCLUDE PATTERN ".DS_Store" EXCLUDE)
 if(BUILD_TESTING)
+    add_test(NAME iiCamera.source_layout COMMAND "${CMAKE_COMMAND}"
+        "-DIICAMERA_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/source_layout.cmake")
     add_test(NAME iiCamera.graphic_sdk_boundary COMMAND "${CMAKE_COMMAND}"
         "-DIICAMERA_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/graphic_sdk_boundary.cmake")
     add_test(NAME iiCamera.provider_sdk_boundary COMMAND "${CMAKE_COMMAND}"
@@ -122,7 +144,7 @@ if(BUILD_TESTING)
     if(IICAMERA_ANDROID_TEST_INCLUDE_DIR AND NOT ANDROID)
         file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/android-test-api.h"
             "#define __INTRODUCED_IN(x)\n#define __INTRODUCED_IN_32(x)\n#define __INTRODUCED_IN_64(x)\n#define __ANDROID_API__ 24\n")
-        add_executable(iiCameraAndroidTests tests/android.cpp src/iiCameraIntegration/NativeCameraAndroid.cpp)
+        add_executable(iiCameraAndroidTests tests/android.cpp src/Platform/NativeCameraAndroid.cpp)
         target_link_libraries(iiCameraAndroidTests PRIVATE iiCameraIntegration::iiCameraIntegration)
         target_compile_definitions(iiCameraAndroidTests PRIVATE NativeCameraSystem=AndroidFixtureSystem)
         target_compile_options(iiCameraAndroidTests PRIVATE -include "${CMAKE_CURRENT_BINARY_DIR}/android-test-api.h")
@@ -132,7 +154,7 @@ if(BUILD_TESTING)
     endif()
     set(IICAMERA_V4L2_TEST_INCLUDE_DIR "" CACHE PATH "Optional Linux UAPI headers for artificial V4L2 driver tests on a non-Linux host")
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR IICAMERA_V4L2_TEST_INCLUDE_DIR)
-        add_executable(iiCameraV4L2Tests tests/v4l2.cpp src/iiCameraIntegration/V4L2.cpp)
+        add_executable(iiCameraV4L2Tests tests/v4l2.cpp src/Platform/V4L2.cpp)
         target_link_libraries(iiCameraV4L2Tests PRIVATE iiCameraIntegration::iiCameraIntegration)
         if(IICAMERA_V4L2_TEST_INCLUDE_DIR)
             target_include_directories(iiCameraV4L2Tests PRIVATE "${IICAMERA_V4L2_TEST_INCLUDE_DIR}")
