@@ -1,0 +1,739 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:0f3436d6bd115cba588ac7c1b3cb507106ab90e8a56c99a656df488b7c8db240",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/WindowsBuildAndRun.md",
+    "sha256": "650ab1af1c9fc53b3c6e240009be6540ed35345206c3b889caaeaca741345ed8",
+    "bytes": 8227,
+    "line_count": 131,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "iiCameraIntegration: Windows 빌드 및 실행",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# iiCameraIntegration: Windows 빌드 및 실행\r\n",
+      "level": 1,
+      "title": "iiCameraIntegration: Windows 빌드 및 실행"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 3,
+      "raw": "카메라 메타데이터·제어와 미디어 형식 인식을 제공하는 C++23 SDK이다. 패키지와 네임스페이스는 Integration 표기를 사용한다.\r\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 4,
+      "end_line": 4,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 5,
+      "end_line": 5,
+      "raw": "검증 기록 갱신: `2026-10-20T02:45:37+09:00`. 변경 전 소스 기준 commit: `6d69f91f6330108f5c92a34a7afbbcd18ff851f8`. 아래 결과는 이번 변경을 포함한 작업 트리의 검증이다.\r\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 6,
+      "end_line": 6,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "heading",
+      "start_line": 7,
+      "end_line": 7,
+      "raw": "## 현재 검증 상태\r\n",
+      "level": 2,
+      "title": "현재 검증 상태"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 8,
+      "end_line": 8,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 9,
+      "end_line": 9,
+      "raw": "아래 26개 검사 통과 기록은 2026-10-20 소스에 대한 이전 결과다. 2026-10-28 파일 포트 분리 이후 Windows 빌드와 실행은 아직 검증하지 않았다.\r\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 10,
+      "end_line": 10,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "heading",
+      "start_line": 11,
+      "end_line": 11,
+      "raw": "## 이 프로젝트의 의존성과 실행 범위\r\n",
+      "level": 2,
+      "title": "이 프로젝트의 의존성과 실행 범위"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 12,
+      "end_line": 12,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 13,
+      "end_line": 13,
+      "raw": "카메라 SDK 본체는 다른 SDK를 필요로 하지 않는다. 다음 모듈은 별도로 구성하는 소비자에서 사용한다.\r\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 14,
+      "end_line": 14,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "list",
+      "start_line": 15,
+      "end_line": 16,
+      "raw": "- [iiFileProvider](../../../SDK/iiFileProvider/docs/WindowsBuildAndRun.md) — 별도 Media 소비자의 파일 생성·게시\r\n- [iiGraphicAdjust](../../../SDK/iiGraphicAdjust/docs/WindowsBuildAndRun.md) — 별도 ImageProcessing 소비자에서 사용\r\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "[iiFileProvider](../../../SDK/iiFileProvider/docs/WindowsBuildAndRun.md) — 별도 Media 소비자의 파일 생성·게시",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "[iiGraphicAdjust](../../../SDK/iiGraphicAdjust/docs/WindowsBuildAndRun.md) — 별도 ImageProcessing 소비자에서 사용",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 17,
+      "end_line": 17,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "list",
+      "start_line": 18,
+      "end_line": 20,
+      "raw": "- 본체에는 Windows 네이티브 카메라 API, pkg-config 및 FFmpeg 개발 헤더·라이브러리가 필요하다. iiFileProvider Native는 Media 소비자에만 필요하다.\r\n- `Tools/FFmpeg/SDK9`의 LGPL shared FFmpeg SDK는 MSVC용 import library를 갖춘 설치본이다. 테스트 영상 생성은 libx264를 제공하는 `Tools/FFmpeg/ffmpeg-9.0.2-essentials_build/bin/ffmpeg.exe`를 사용한다.\r\n- iiGraphicAdjust는 별도로 구성하는 ImageProcessing 소비자에만 필요하다. 아래 구성은 카메라 SDK 본체이다.\r\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "본체에는 Windows 네이티브 카메라 API, pkg-config 및 FFmpeg 개발 헤더·라이브러리가 필요하다. iiFileProvider Native는 Media 소비자에만 필요하다.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`Tools/FFmpeg/SDK9`의 LGPL shared FFmpeg SDK는 MSVC용 import library를 갖춘 설치본이다. 테스트 영상 생성은 libx264를 제공하는 `Tools/FFmpeg/ffmpeg-9.0.2-essentials_build/bin/ffmpeg.exe`를 사용한다.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "iiGraphicAdjust는 별도로 구성하는 ImageProcessing 소비자에만 필요하다. 아래 구성은 카메라 SDK 본체이다.",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 21,
+      "end_line": 21,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 22,
+      "end_line": 22,
+      "raw": "프로젝트별 Windows 조건은 다음과 같다.\r\n"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 23,
+      "end_line": 23,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "list",
+      "start_line": 24,
+      "end_line": 25,
+      "raw": "- CMake가 JSON fixture의 stdout을 수집할 때 UTF-8을 명시한다. 한글·emoji·따옴표·개행이 포함된 장치명을 검사하여 Windows ANSI code page에 따른 문자열 손상을 방지한다.\r\n- 카메라 장치가 없으면 열거 결과가 비어 있을 수 있다. 실제 촬영·권한·드라이버 동작은 해당 장치에서 별도 확인한다.\r\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "CMake가 JSON fixture의 stdout을 수집할 때 UTF-8을 명시한다. 한글·emoji·따옴표·개행이 포함된 장치명을 검사하여 Windows ANSI code page에 따른 문자열 손상을 방지한다.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "카메라 장치가 없으면 열거 결과가 비어 있을 수 있다. 실제 촬영·권한·드라이버 동작은 해당 장치에서 별도 확인한다.",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 26,
+      "end_line": 26,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "heading",
+      "start_line": 27,
+      "end_line": 27,
+      "raw": "## 환경 준비\r\n",
+      "level": 2,
+      "title": "환경 준비"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 28,
+      "end_line": 28,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "paragraph",
+      "start_line": 29,
+      "end_line": 29,
+      "raw": "PowerShell에서 이 프로젝트 루트로 이동한 뒤 순서대로 실행한다. workspace 배치는 `Workspace/SDK/<이름>`을 전제로 한다.\r\n"
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 30,
+      "end_line": 30,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 31,
+      "end_line": 31,
+      "raw": "검증 도구는 MSVC 19.51 x64, Windows SDK 10.0.28000, CMake 4.4.4, Ninja 1.13.2이다. 개발 shell은 빌드 재현을 위해 Python 3.14.8을 선택하며 시스템 기본 Python 3.15.0과 구분한다.\r\n"
+    },
+    {
+      "id": "b000028",
+      "kind": "blank",
+      "start_line": 32,
+      "end_line": 32,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000029",
+      "kind": "fenced_code",
+      "start_line": 33,
+      "end_line": 44,
+      "raw": "```powershell\r\n$ErrorActionPreference = 'Stop'\r\n$project = (Get-Location).Path\r\n$workspace = (Resolve-Path -LiteralPath '../..').Path\r\n. (Join-Path $workspace 'SDK/Windows/Enter-DevEnvironment.ps1')\r\nSet-Location -LiteralPath $project\r\n$python = (Join-Path $workspace 'Tools/Python314/tools/python.exe').Replace('\\', '/')\r\n$compiler = (Get-Command cl.exe -ErrorAction Stop).Source.Replace('\\', '/')\r\n$toolchain = (Join-Path $workspace 'Tools/vcpkg/scripts/buildsystems/vcpkg.cmake').Replace('\\', '/')\r\n$msvcInclude = (Join-Path $workspace 'SDK/Windows/WindowsMsvcPrefix.cmake').Replace('\\', '/')\r\n$prefix = (Join-Path $env:USERPROFILE '.local/SDK/iiCameraIntegration').Replace('\\', '/')\r\n```\r\n",
+      "language": "powershell",
+      "code": "$ErrorActionPreference = 'Stop'\r\n$project = (Get-Location).Path\r\n$workspace = (Resolve-Path -LiteralPath '../..').Path\r\n. (Join-Path $workspace 'SDK/Windows/Enter-DevEnvironment.ps1')\r\nSet-Location -LiteralPath $project\r\n$python = (Join-Path $workspace 'Tools/Python314/tools/python.exe').Replace('\\', '/')\r\n$compiler = (Get-Command cl.exe -ErrorAction Stop).Source.Replace('\\', '/')\r\n$toolchain = (Join-Path $workspace 'Tools/vcpkg/scripts/buildsystems/vcpkg.cmake').Replace('\\', '/')\r\n$msvcInclude = (Join-Path $workspace 'SDK/Windows/WindowsMsvcPrefix.cmake').Replace('\\', '/')\r\n$prefix = (Join-Path $env:USERPROFILE '.local/SDK/iiCameraIntegration').Replace('\\', '/')\r\n",
+      "closed": true
+    },
+    {
+      "id": "b000030",
+      "kind": "blank",
+      "start_line": 45,
+      "end_line": 45,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000031",
+      "kind": "paragraph",
+      "start_line": 46,
+      "end_line": 46,
+      "raw": "`Enter-DevEnvironment.ps1`은 Qt MSVC kit, vcpkg, 설치된 SDK의 검색 경로와 UTF-8 설정을 준비한다. `CMAKE_PREFIX_PATH`의 디렉터리 존재만으로 의존성 검증을 대신하지 않는다. 선행 SDK의 실행 검사와 설치를 먼저 완료해야 한다.\r\n"
+    },
+    {
+      "id": "b000032",
+      "kind": "blank",
+      "start_line": 47,
+      "end_line": 47,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000033",
+      "kind": "heading",
+      "start_line": 48,
+      "end_line": 48,
+      "raw": "## 구성과 빌드\r\n",
+      "level": 2,
+      "title": "구성과 빌드"
+    },
+    {
+      "id": "b000034",
+      "kind": "blank",
+      "start_line": 49,
+      "end_line": 49,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000035",
+      "kind": "fenced_code",
+      "start_line": 50,
+      "end_line": 81,
+      "raw": "```powershell\r\n$configure = @(\r\n    '-S', '.', '-B', 'build', '-G', 'Ninja'\r\n    '-DCMAKE_BUILD_TYPE=Release'\r\n    \"-DCMAKE_C_COMPILER=$compiler\"\r\n    \"-DCMAKE_CXX_COMPILER=$compiler\"\r\n    \"-DCMAKE_INSTALL_PREFIX=$prefix\"\r\n    \"-DCMAKE_PREFIX_PATH=$env:CMAKE_PREFIX_PATH\"\r\n    \"-DCMAKE_TOOLCHAIN_FILE=$toolchain\"\r\n    '-DVCPKG_TARGET_TRIPLET=x64-windows'\r\n    \"-DCMAKE_PROJECT_INCLUDE=$msvcInclude\"\r\n    \"-DPython3_EXECUTABLE=$python\"\r\n    \"-DPython_EXECUTABLE=$python\"\r\n    '-DQt6_DIR=C:/Qt/6.8.3/msvc2022_64/lib/cmake/Qt6'\r\n    '-DBUILD_TESTING=ON'\r\n    '-DIICAMERA_WITH_FFMPEG=ON'\r\n    '-DIICAMERA_WITH_NATIVE=ON'\r\n    '-DIICAMERA_WITH_IMAGE_PROCESSING=OFF'\r\n    '-DIICAMERA_BUILD_TOOLS=OFF'\r\n    \"-DIICAMERA_FFMPEG_EXECUTABLE=$($workspace.Replace('\\', '/'))/Tools/FFmpeg/ffmpeg-9.0.2-essentials_build/bin/ffmpeg.exe\"\r\n)\r\n& cmake @configure\r\nif ($LASTEXITCODE -ne 0) { throw 'CMake 구성 실패' }\r\n$cache = Get-Content -LiteralPath 'build/CMakeCache.txt' -Raw\r\nif ($cache -notmatch '(?m)^CMAKE_BUILD_TYPE:STRING=Release\\r?$') {\r\n    throw 'Release 구성이 유실되었음. 같은 구성 인수에 --fresh를 추가하여 다시 구성할 것'\r\n}\r\n& $python (Join-Path $workspace 'SDK/Windows/Configure-WindowsNinja.py') (Join-Path $project 'build')\r\nif ($LASTEXITCODE -ne 0) { throw 'Ninja MSVC 의존성 설정 실패' }\r\ncmake --build build --config Release --parallel 4\r\nif ($LASTEXITCODE -ne 0) { throw '빌드 실패' }\r\n```\r\n",
+      "language": "powershell",
+      "code": "$configure = @(\r\n    '-S', '.', '-B', 'build', '-G', 'Ninja'\r\n    '-DCMAKE_BUILD_TYPE=Release'\r\n    \"-DCMAKE_C_COMPILER=$compiler\"\r\n    \"-DCMAKE_CXX_COMPILER=$compiler\"\r\n    \"-DCMAKE_INSTALL_PREFIX=$prefix\"\r\n    \"-DCMAKE_PREFIX_PATH=$env:CMAKE_PREFIX_PATH\"\r\n    \"-DCMAKE_TOOLCHAIN_FILE=$toolchain\"\r\n    '-DVCPKG_TARGET_TRIPLET=x64-windows'\r\n    \"-DCMAKE_PROJECT_INCLUDE=$msvcInclude\"\r\n    \"-DPython3_EXECUTABLE=$python\"\r\n    \"-DPython_EXECUTABLE=$python\"\r\n    '-DQt6_DIR=C:/Qt/6.8.3/msvc2022_64/lib/cmake/Qt6'\r\n    '-DBUILD_TESTING=ON'\r\n    '-DIICAMERA_WITH_FFMPEG=ON'\r\n    '-DIICAMERA_WITH_NATIVE=ON'\r\n    '-DIICAMERA_WITH_IMAGE_PROCESSING=OFF'\r\n    '-DIICAMERA_BUILD_TOOLS=OFF'\r\n    \"-DIICAMERA_FFMPEG_EXECUTABLE=$($workspace.Replace('\\', '/'))/Tools/FFmpeg/ffmpeg-9.0.2-essentials_build/bin/ffmpeg.exe\"\r\n)\r\n& cmake @configure\r\nif ($LASTEXITCODE -ne 0) { throw 'CMake 구성 실패' }\r\n$cache = Get-Content -LiteralPath 'build/CMakeCache.txt' -Raw\r\nif ($cache -notmatch '(?m)^CMAKE_BUILD_TYPE:STRING=Release\\r?$') {\r\n    throw 'Release 구성이 유실되었음. 같은 구성 인수에 --fresh를 추가하여 다시 구성할 것'\r\n}\r\n& $python (Join-Path $workspace 'SDK/Windows/Configure-WindowsNinja.py') (Join-Path $project 'build')\r\nif ($LASTEXITCODE -ne 0) { throw 'Ninja MSVC 의존성 설정 실패' }\r\ncmake --build build --config Release --parallel 4\r\nif ($LASTEXITCODE -ne 0) { throw '빌드 실패' }\r\n",
+      "closed": true
+    },
+    {
+      "id": "b000036",
+      "kind": "blank",
+      "start_line": 82,
+      "end_line": 82,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000037",
+      "kind": "paragraph",
+      "start_line": 83,
+      "end_line": 83,
+      "raw": "모든 생성 파일은 이 프로젝트의 `build/` 아래에 둔다. 컴파일러는 위에서 확인한 절대 경로를 사용한다. 기존 캐시가 다른 compiler 또는 generator를 사용한다면 같은 구성 인수에 `--fresh`를 추가하여 다시 구성한다. MSVC 키트와 MinGW 또는 Debug/Release 라이브러리를 혼합하지 않는다.\r\n"
+    },
+    {
+      "id": "b000038",
+      "kind": "blank",
+      "start_line": 84,
+      "end_line": 84,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000039",
+      "kind": "paragraph",
+      "start_line": 85,
+      "end_line": 85,
+      "raw": "`WindowsMsvcPrefix.cmake`와 `Configure-WindowsNinja.py`는 MSVC include 출력 언어를 Ninja에 맞추고 UTF-8 실행 manifest를 적용한다. 빌드 병렬도는 4로 제한하며 실행 검사는 직렬로 수행한다.\r\n"
+    },
+    {
+      "id": "b000040",
+      "kind": "blank",
+      "start_line": 86,
+      "end_line": 86,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000041",
+      "kind": "heading",
+      "start_line": 87,
+      "end_line": 87,
+      "raw": "## 실행과 확인\r\n",
+      "level": 2,
+      "title": "실행과 확인"
+    },
+    {
+      "id": "b000042",
+      "kind": "blank",
+      "start_line": 88,
+      "end_line": 88,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000043",
+      "kind": "paragraph",
+      "start_line": 89,
+      "end_line": 89,
+      "raw": "본체의 기능 JSON과 장치 수명을 검증한다. 미디어 저장 및 CLI는 별도 Media 소비자에서 검증한다.\r\n"
+    },
+    {
+      "id": "b000044",
+      "kind": "blank",
+      "start_line": 90,
+      "end_line": 90,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000045",
+      "kind": "fenced_code",
+      "start_line": 91,
+      "end_line": 98,
+      "raw": "```powershell\r\n$dllDirectories = @(Get-ChildItem -LiteralPath build -Recurse -Filter '*.dll' -File |\r\n    Select-Object -ExpandProperty DirectoryName | Sort-Object -Unique)\r\n$env:PATH = (@($dllDirectories) + @($env:PATH)) -join ';'\r\n$env:QSG_RENDER_LOOP = 'basic'\r\nctest --test-dir build -C Release --output-on-failure --parallel 1 --no-tests=error\r\nif ($LASTEXITCODE -ne 0) { throw '전체 실행 검사 실패' }\r\n```\r\n",
+      "language": "powershell",
+      "code": "$dllDirectories = @(Get-ChildItem -LiteralPath build -Recurse -Filter '*.dll' -File |\r\n    Select-Object -ExpandProperty DirectoryName | Sort-Object -Unique)\r\n$env:PATH = (@($dllDirectories) + @($env:PATH)) -join ';'\r\n$env:QSG_RENDER_LOOP = 'basic'\r\nctest --test-dir build -C Release --output-on-failure --parallel 1 --no-tests=error\r\nif ($LASTEXITCODE -ne 0) { throw '전체 실행 검사 실패' }\r\n",
+      "closed": true
+    },
+    {
+      "id": "b000046",
+      "kind": "blank",
+      "start_line": 99,
+      "end_line": 99,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000047",
+      "kind": "paragraph",
+      "start_line": 100,
+      "end_line": 100,
+      "raw": "현재 빌드에 실제 등록된 실행 경로의 예는 `iiCamera.features.json`, `iiCamera.features.bulk`, `iiCamera.features.devices`이다. 전체 목록은 `ctest --test-dir build -N`으로 확인한다.\r\n"
+    },
+    {
+      "id": "b000048",
+      "kind": "blank",
+      "start_line": 101,
+      "end_line": 101,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000049",
+      "kind": "paragraph",
+      "start_line": 102,
+      "end_line": 102,
+      "raw": "추가 수동 실행은 다음과 같다. 앞의 DLL 검색 환경을 유지한다.\r\n"
+    },
+    {
+      "id": "b000050",
+      "kind": "blank",
+      "start_line": 103,
+      "end_line": 103,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000051",
+      "kind": "fenced_code",
+      "start_line": 104,
+      "end_line": 112,
+      "raw": "```powershell\r\ncmake --install build --prefix $prefix\r\ncmake -S example/Media -B build/media-consumer -G Ninja `\r\n    \"-DiiCameraIntegration_DIR=$prefix/lib/cmake/iiCameraIntegration\" `\r\n    \"-DiiFileProviderNative_DIR=$env:USERPROFILE/.local/SDK/iiFileProvider/lib/cmake/iiFileProviderNative\"\r\ncmake --build build/media-consumer --config Release\r\n& ./build/media-consumer/iicamera-inspect.exe --help\r\nif ($LASTEXITCODE -ne 0) { throw 'Camera CLI 실행 실패' }\r\n```\r\n",
+      "language": "powershell",
+      "code": "cmake --install build --prefix $prefix\r\ncmake -S example/Media -B build/media-consumer -G Ninja `\r\n    \"-DiiCameraIntegration_DIR=$prefix/lib/cmake/iiCameraIntegration\" `\r\n    \"-DiiFileProviderNative_DIR=$env:USERPROFILE/.local/SDK/iiFileProvider/lib/cmake/iiFileProviderNative\"\r\ncmake --build build/media-consumer --config Release\r\n& ./build/media-consumer/iicamera-inspect.exe --help\r\nif ($LASTEXITCODE -ne 0) { throw 'Camera CLI 실행 실패' }\r\n",
+      "closed": true
+    },
+    {
+      "id": "b000052",
+      "kind": "blank",
+      "start_line": 113,
+      "end_line": 113,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000053",
+      "kind": "heading",
+      "start_line": 114,
+      "end_line": 114,
+      "raw": "## 설치와 배포 범위\r\n",
+      "level": 2,
+      "title": "설치와 배포 범위"
+    },
+    {
+      "id": "b000054",
+      "kind": "blank",
+      "start_line": 115,
+      "end_line": 115,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000055",
+      "kind": "paragraph",
+      "start_line": 116,
+      "end_line": 116,
+      "raw": "전체 테스트가 통과한 구성만 설치한다. skip된 선택 기능은 지원·실행 범위를 별도 기록한다.\r\n"
+    },
+    {
+      "id": "b000056",
+      "kind": "blank",
+      "start_line": 117,
+      "end_line": 117,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000057",
+      "kind": "fenced_code",
+      "start_line": 118,
+      "end_line": 121,
+      "raw": "```powershell\r\ncmake --install build --config Release --prefix \"$prefix\"\r\nif ($LASTEXITCODE -ne 0) { throw '설치 실패' }\r\n```\r\n",
+      "language": "powershell",
+      "code": "cmake --install build --config Release --prefix \"$prefix\"\r\nif ($LASTEXITCODE -ne 0) { throw '설치 실패' }\r\n",
+      "closed": true
+    },
+    {
+      "id": "b000058",
+      "kind": "blank",
+      "start_line": 122,
+      "end_line": 122,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000059",
+      "kind": "paragraph",
+      "start_line": 123,
+      "end_line": 123,
+      "raw": "설치 파일은 `build/install_manifest.txt`와 실제 prefix의 파일을 대조한다. 소비자 실행 시 prefix의 `bin`과 필요한 vcpkg DLL을 검색할 수 있어야 한다.\r\n"
+    },
+    {
+      "id": "b000060",
+      "kind": "blank",
+      "start_line": 124,
+      "end_line": 124,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000061",
+      "kind": "heading",
+      "start_line": 125,
+      "end_line": 125,
+      "raw": "## 검증 근거\r\n",
+      "level": 2,
+      "title": "검증 근거"
+    },
+    {
+      "id": "b000062",
+      "kind": "blank",
+      "start_line": 126,
+      "end_line": 126,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000063",
+      "kind": "list",
+      "start_line": 127,
+      "end_line": 129,
+      "raw": "- 빌드 정의: [CMakeLists.txt](../CMakeLists.txt)와 프로젝트 테스트 등록이다.\r\n- 이번 실행 결과: [Windows SDK 전체 검증 기록](https://github.com/iisacc-Justmoong/SDK/blob/main/Windows/Verification-20261020.md)이다.\r\n- 프로젝트별 실행 로그와 JUnit은 같은 검증 디렉터리에 보관한다. 로그의 종료 코드, 실패·skip 목록과 실제 실행 범위를 함께 확인한다.\r\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "빌드 정의: [CMakeLists.txt](../CMakeLists.txt)와 프로젝트 테스트 등록이다.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "이번 실행 결과: [Windows SDK 전체 검증 기록](https://github.com/iisacc-Justmoong/SDK/blob/main/Windows/Verification-20261020.md)이다.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "프로젝트별 실행 로그와 JUnit은 같은 검증 디렉터리에 보관한다. 로그의 종료 코드, 실패·skip 목록과 실제 실행 범위를 함께 확인한다.",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000064",
+      "kind": "blank",
+      "start_line": 130,
+      "end_line": 130,
+      "raw": "\r\n"
+    },
+    {
+      "id": "b000065",
+      "kind": "paragraph",
+      "start_line": 131,
+      "end_line": 131,
+      "raw": "전체 SDK의 실행·설치와 커밋 조건은 [공통 Windows 검증 도구](https://github.com/iisacc-Justmoong/SDK/blob/main/Windows/README.md)에서 재현한다. 원본 JSON·JUnit·상세 로그는 로컬 `Workspace/build/maintenance/20261019-221920-sdk-recovery/final/`에 보관하며 Git에는 포함하지 않는다. 이 프로젝트의 성공은 제품·다른 플랫폼·별도 계정 및 물리 장치의 실연동을 대신하지 않는다.\r\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "iiCameraIntegration: Windows 빌드 및 실행",
+      "anchor": "iicameraintegration-windows-빌드-및-실행",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000007",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "현재 검증 상태",
+      "anchor": "현재-검증-상태",
+      "start_line": 7
+    },
+    {
+      "block_id": "b000011",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "이 프로젝트의 의존성과 실행 범위",
+      "anchor": "이-프로젝트의-의존성과-실행-범위",
+      "start_line": 11
+    },
+    {
+      "block_id": "b000023",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "환경 준비",
+      "anchor": "환경-준비",
+      "start_line": 27
+    },
+    {
+      "block_id": "b000033",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "구성과 빌드",
+      "anchor": "구성과-빌드",
+      "start_line": 48
+    },
+    {
+      "block_id": "b000041",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "실행과 확인",
+      "anchor": "실행과-확인",
+      "start_line": 87
+    },
+    {
+      "block_id": "b000053",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "설치와 배포 범위",
+      "anchor": "설치와-배포-범위",
+      "start_line": 114
+    },
+    {
+      "block_id": "b000061",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "검증 근거",
+      "anchor": "검증-근거",
+      "start_line": 125
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000013",
+        "line": 13,
+        "text": "카메라 SDK 본체는 다른 SDK를 필요로 하지 않는다. 다음 모듈은 별도로 구성하는 소비자에서 사용한다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000031",
+        "line": 46,
+        "text": "`Enter-DevEnvironment.ps1`은 Qt MSVC kit, vcpkg, 설치된 SDK의 검색 경로와 UTF-8 설정을 준비한다. `CMAKE_PREFIX_PATH`의 디렉터리 존재만으로 의존성 검증을 대신하지 않는다. 선행 SDK의 실행 검사와 설치를 먼저 완료해야 한다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000037",
+        "line": 83,
+        "text": "모든 생성 파일은 이 프로젝트의 `build/` 아래에 둔다. 컴파일러는 위에서 확인한 절대 경로를 사용한다. 기존 캐시가 다른 compiler 또는 generator를 사용한다면 같은 구성 인수에 `--fresh`를 추가하여 다시 구성한다. MSVC 키트와 MinGW 또는 Debug/Release 라이브러리를 혼합하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000065",
+        "line": 131,
+        "text": "전체 SDK의 실행·설치와 커밋 조건은 [공통 Windows 검증 도구](https://github.com/iisacc-Justmoong/SDK/blob/main/Windows/README.md)에서 재현한다. 원본 JSON·JUnit·상세 로그는 로컬 `Workspace/build/maintenance/20261019-221920-sdk-recovery/final/`에 보관하며 Git에는 포함하지 않는다. 이 프로젝트의 성공은 제품·다른 플랫폼·별도 계정 및 물리 장치의 실연동을 대신하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [
+      {
+        "block_id": "b000029",
+        "language": "powershell",
+        "code": "$ErrorActionPreference = 'Stop'\r\n$project = (Get-Location).Path\r\n$workspace = (Resolve-Path -LiteralPath '../..').Path\r\n. (Join-Path $workspace 'SDK/Windows/Enter-DevEnvironment.ps1')\r\nSet-Location -LiteralPath $project\r\n$python = (Join-Path $workspace 'Tools/Python314/tools/python.exe').Replace('\\', '/')\r\n$compiler = (Get-Command cl.exe -ErrorAction Stop).Source.Replace('\\', '/')\r\n$toolchain = (Join-Path $workspace 'Tools/vcpkg/scripts/buildsystems/vcpkg.cmake').Replace('\\', '/')\r\n$msvcInclude = (Join-Path $workspace 'SDK/Windows/WindowsMsvcPrefix.cmake').Replace('\\', '/')\r\n$prefix = (Join-Path $env:USERPROFILE '.local/SDK/iiCameraIntegration').Replace('\\', '/')\r\n"
+      },
+      {
+        "block_id": "b000035",
+        "language": "powershell",
+        "code": "$configure = @(\r\n    '-S', '.', '-B', 'build', '-G', 'Ninja'\r\n    '-DCMAKE_BUILD_TYPE=Release'\r\n    \"-DCMAKE_C_COMPILER=$compiler\"\r\n    \"-DCMAKE_CXX_COMPILER=$compiler\"\r\n    \"-DCMAKE_INSTALL_PREFIX=$prefix\"\r\n    \"-DCMAKE_PREFIX_PATH=$env:CMAKE_PREFIX_PATH\"\r\n    \"-DCMAKE_TOOLCHAIN_FILE=$toolchain\"\r\n    '-DVCPKG_TARGET_TRIPLET=x64-windows'\r\n    \"-DCMAKE_PROJECT_INCLUDE=$msvcInclude\"\r\n    \"-DPython3_EXECUTABLE=$python\"\r\n    \"-DPython_EXECUTABLE=$python\"\r\n    '-DQt6_DIR=C:/Qt/6.8.3/msvc2022_64/lib/cmake/Qt6'\r\n    '-DBUILD_TESTING=ON'\r\n    '-DIICAMERA_WITH_FFMPEG=ON'\r\n    '-DIICAMERA_WITH_NATIVE=ON'\r\n    '-DIICAMERA_WITH_IMAGE_PROCESSING=OFF'\r\n    '-DIICAMERA_BUILD_TOOLS=OFF'\r\n    \"-DIICAMERA_FFMPEG_EXECUTABLE=$($workspace.Replace('\\', '/'))/Tools/FFmpeg/ffmpeg-9.0.2-essentials_build/bin/ffmpeg.exe\"\r\n)\r\n& cmake @configure\r\nif ($LASTEXITCODE -ne 0) { throw 'CMake 구성 실패' }\r\n$cache = Get-Content -LiteralPath 'build/CMakeCache.txt' -Raw\r\nif ($cache -notmatch '(?m)^CMAKE_BUILD_TYPE:STRING=Release\\r?$') {\r\n    throw 'Release 구성이 유실되었음. 같은 구성 인수에 --fresh를 추가하여 다시 구성할 것'\r\n}\r\n& $python (Join-Path $workspace 'SDK/Windows/Configure-WindowsNinja.py') (Join-Path $project 'build')\r\nif ($LASTEXITCODE -ne 0) { throw 'Ninja MSVC 의존성 설정 실패' }\r\ncmake --build build --config Release --parallel 4\r\nif ($LASTEXITCODE -ne 0) { throw '빌드 실패' }\r\n"
+      },
+      {
+        "block_id": "b000045",
+        "language": "powershell",
+        "code": "$dllDirectories = @(Get-ChildItem -LiteralPath build -Recurse -Filter '*.dll' -File |\r\n    Select-Object -ExpandProperty DirectoryName | Sort-Object -Unique)\r\n$env:PATH = (@($dllDirectories) + @($env:PATH)) -join ';'\r\n$env:QSG_RENDER_LOOP = 'basic'\r\nctest --test-dir build -C Release --output-on-failure --parallel 1 --no-tests=error\r\nif ($LASTEXITCODE -ne 0) { throw '전체 실행 검사 실패' }\r\n"
+      },
+      {
+        "block_id": "b000051",
+        "language": "powershell",
+        "code": "cmake --install build --prefix $prefix\r\ncmake -S example/Media -B build/media-consumer -G Ninja `\r\n    \"-DiiCameraIntegration_DIR=$prefix/lib/cmake/iiCameraIntegration\" `\r\n    \"-DiiFileProviderNative_DIR=$env:USERPROFILE/.local/SDK/iiFileProvider/lib/cmake/iiFileProviderNative\"\r\ncmake --build build/media-consumer --config Release\r\n& ./build/media-consumer/iicamera-inspect.exe --help\r\nif ($LASTEXITCODE -ne 0) { throw 'Camera CLI 실행 실패' }\r\n"
+      },
+      {
+        "block_id": "b000057",
+        "language": "powershell",
+        "code": "cmake --install build --config Release --prefix \"$prefix\"\r\nif ($LASTEXITCODE -ne 0) { throw '설치 실패' }\r\n"
+      }
+    ],
+    "links": [
+      {
+        "block_id": "b000015",
+        "label": "iiFileProvider",
+        "target": "../../../SDK/iiFileProvider/docs/WindowsBuildAndRun.md",
+        "kind": "relative",
+        "line": 15
+      },
+      {
+        "block_id": "b000015",
+        "label": "iiGraphicAdjust",
+        "target": "../../../SDK/iiGraphicAdjust/docs/WindowsBuildAndRun.md",
+        "kind": "relative",
+        "line": 16
+      },
+      {
+        "block_id": "b000063",
+        "label": "CMakeLists.txt",
+        "target": "../CMakeLists.txt",
+        "kind": "relative",
+        "line": 127
+      },
+      {
+        "block_id": "b000063",
+        "label": "Windows SDK 전체 검증 기록",
+        "target": "https://github.com/iisacc-Justmoong/SDK/blob/main/Windows/Verification-20261020.md",
+        "kind": "external",
+        "line": 128
+      },
+      {
+        "block_id": "b000065",
+        "label": "공통 Windows 검증 도구",
+        "target": "https://github.com/iisacc-Justmoong/SDK/blob/main/Windows/README.md",
+        "kind": "external",
+        "line": 131
+      }
+    ],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

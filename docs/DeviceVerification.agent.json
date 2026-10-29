@@ -1,0 +1,264 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:a823e19d7a4c13dc454d9c33db49f61f642317f49cc40737d89c8d1bc84d74dc",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/DeviceVerification.md",
+    "sha256": "535ece8166632ea623a0cceff1e32d952caf63be6d0f930b69a45e1297946cd9",
+    "bytes": 3841,
+    "line_count": 61,
+    "encoding": "utf-8",
+    "language": "en"
+  },
+  "document": {
+    "title": "Hardware discovery and pairing verification — 0.3.0",
+    "role": "evidence",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Hardware discovery and pairing verification — 0.3.0\n",
+      "level": 1,
+      "title": "Hardware discovery and pairing verification — 0.3.0"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 7,
+      "raw": "On 2026-10-09 (Asia/Seoul), iiCameraIntegration 0.3.0 was built and executed on\nmacOS arm64 with AppleClang 21.0.0. This change adds only camera discovery and\npairing APIs; it does not add capture, image processing, a GUI, or a device\nauthentication protocol. The existing iiGraphicAdjust 0.5.0 dependency is reused\nfor camera regression tests and its source is unchanged.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 8,
+      "end_line": 8,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "table",
+      "start_line": 9,
+      "end_line": 14,
+      "raw": "| Configuration | Camera CTest | Installed public-package consumer |\n| --- | ---: | ---: |\n| Release shared, FFmpeg/native/optional processing enabled | 28/28 | 1/1 |\n| Release static, same components | 28/28 | 1/1 |\n| Debug shared, ASan + UBSan, same components | 28/28 | 1/1 |\n| Release static, independent standard C++ core | 16/16 | 1/1 |\n",
+      "columns": [
+        "Configuration",
+        "Camera CTest",
+        "Installed public-package consumer"
+      ],
+      "rows": [
+        [
+          "Release shared, FFmpeg/native/optional processing enabled",
+          "28/28",
+          "1/1"
+        ],
+        [
+          "Release static, same components",
+          "28/28",
+          "1/1"
+        ],
+        [
+          "Debug shared, ASan + UBSan, same components",
+          "28/28",
+          "1/1"
+        ],
+        [
+          "Release static, independent standard C++ core",
+          "16/16",
+          "1/1"
+        ]
+      ]
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 15,
+      "end_line": 15,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 16,
+      "end_line": 23,
+      "raw": "The seven new device cases cover discovery snapshots, exact-ID/method preflight,\nprovider dispatch order, ready-state validation, move-only ownership, repeated\nrelease, failed-release retry, destructor cleanup, weak revocable control ports,\nlatched physical disconnection, invalid UTF-8 and malformed provider metadata.\nAn eight-thread query/apply fixture checks serialization. A separately paused\nquery races against unpair to check that resource release occurs after the query\nexits, and subsequent escaped-port operations are blocked. Provider errors and\nexceptions remain distinct from invalid caller arguments.\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 24,
+      "end_line": 24,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 25,
+      "end_line": 28,
+      "raw": "The test-first link attempt against the preceding implementation failed with\nmissing device/pairing definitions; `build/devices-tdd-red.log` records it.\nFinal passing results are separate. Every device-success fixture is artificial\nand is identified as such; it does not prove native input acquisition or bonding.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 29,
+      "end_line": 29,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 30,
+      "end_line": 34,
+      "raw": "The native smoke test enumerates the host and rejects invalid/unknown IDs,\nunsupported DeviceBond requests and native provider parameters without prompting\nfor camera permission or starting capture. The host reports **zero cameras** and\nunchanged NotDetermined permission. Native input/session attachment success,\nphysical hot-unplug, release and optical-control runtime remain unverified.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 35,
+      "end_line": 35,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 36,
+      "end_line": 42,
+      "raw": "The changed native adapter was additionally compiled as an object with C++23,\nARC and warnings treated as errors for macOS 14 arm64, iOS 16 arm64 against the\ninstalled iOS 27 SDK, and Mac Catalyst 16 arm64. These object checks do not prove\nan iOS/Catalyst package link or device execution. Windows/Linux/Android native\ndiscovery/pairing remain unavailable; custom providers can use the portable API.\nAVFoundation pairing prepares a stopped camera session and explicitly rejects\nOS/device bonding. Bluetooth/Wi-Fi authentication is not implemented here.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 43,
+      "end_line": 43,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "paragraph",
+      "start_line": 44,
+      "end_line": 49,
+      "raw": "Installed consumers use only public headers and imported CMake targets, exercise\nall new APIs with a fixture and perform read-only native discovery. Loader\ninspection confirms the staged camera and processing 0.3.0 libraries. Both new\npublic headers and updated documentation are compared with the staged package.\nASan/UBSan instrument the SDK; external libraries are not rebuilt. LeakSanitizer\nis unavailable on this macOS toolchain.\n"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 50,
+      "end_line": 50,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "paragraph",
+      "start_line": 51,
+      "end_line": 55,
+      "raw": "All build/consumer/staging output remains under `build/`. Existing `~/.local`\ninstallations and running products were not replaced or restarted. Source/build\nproof is recorded in `build/devices-verification-report.json`, JUnit files\n`build/devices-{shared,static,sanitized,core}-ctest.xml`, test logs with the same\nvariant names, and `build/device-native-{macos,ios,catalyst}.log`.\n"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 56,
+      "end_line": 56,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 57,
+      "end_line": 61,
+      "raw": "`tools/verify.sh --photo --sanitize` reproduces the complete SDK workflow,\nincluding unchanged image-processing suites. For the device-only API tests, use\n`ctest --test-dir build -R 'iiCamera.devices' --output-on-failure` after building.\nSee [Devices](Devices.md) for contracts and examples and\n[historical verification](Verification.md) for earlier component evidence.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Hardware discovery and pairing verification — 0.3.0",
+      "anchor": "hardware-discovery-and-pairing-verification--030",
+      "start_line": 1
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000013",
+        "line": 38,
+        "text": "installed iOS 27 SDK, and Mac Catalyst 16 arm64. These object checks do not prove",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000019",
+        "label": "Devices",
+        "target": "Devices.md",
+        "kind": "relative",
+        "line": 60
+      },
+      {
+        "block_id": "b000019",
+        "label": "historical verification",
+        "target": "Verification.md",
+        "kind": "relative",
+        "line": 61
+      }
+    ],
+    "tables": [
+      {
+        "block_id": "b000005",
+        "columns": [
+          "Configuration",
+          "Camera CTest",
+          "Installed public-package consumer"
+        ],
+        "rows": [
+          [
+            "Release shared, FFmpeg/native/optional processing enabled",
+            "28/28",
+            "1/1"
+          ],
+          [
+            "Release static, same components",
+            "28/28",
+            "1/1"
+          ],
+          [
+            "Debug shared, ASan + UBSan, same components",
+            "28/28",
+            "1/1"
+          ],
+          [
+            "Release static, independent standard C++ core",
+            "16/16",
+            "1/1"
+          ]
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

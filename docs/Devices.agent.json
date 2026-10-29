@@ -1,0 +1,606 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:29ef531000cf0d0bac32e4057dec2cbd3483aa64b0215f20f502008b4000de12",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/Devices.md",
+    "sha256": "104b92bf9ee7870ee42ebf5596fecf50ef2c1c4198aa84b32c052a7205556c31",
+    "bytes": 10929,
+    "line_count": 225,
+    "encoding": "utf-8",
+    "language": "en"
+  },
+  "document": {
+    "title": "Camera discovery and pairing",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Camera discovery and pairing\n",
+      "level": 1,
+      "title": "Camera discovery and pairing"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 7,
+      "raw": "`Devices.h` provides synchronous camera discovery and single-owner pairing.\nDiscovery returns validated `CameraInfo` snapshots. Pairing re-discovers the\nrequested ID, verifies that it is connected, and checks that the provider's\nhandle identifies that same device, uses the requested pairing method, and is\nready. The library does not treat discovering a camera as connecting to it.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 8,
+      "end_line": 8,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 9,
+      "end_line": 11,
+      "raw": "The API uses C++23 and standard-library callbacks. It is part of the core\n`iiCameraIntegration::iiCameraIntegration` target and does not require the\noptional image-processing component or FFmpeg.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 12,
+      "end_line": 12,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "heading",
+      "start_line": 13,
+      "end_line": 13,
+      "raw": "## Native camera use\n",
+      "level": 2,
+      "title": "Native camera use"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 14,
+      "end_line": 14,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "fenced_code",
+      "start_line": 15,
+      "end_line": 54,
+      "raw": "```cpp\n#include <iiCameraIntegration/NativeCamera.h>\n#include <iostream>\n\nusing namespace iiCameraIntegration;\n\nint prepareFirstCamera() {\n    NativeCameraSystem native;\n    auto devices = native.devices();\n    auto discovered = devices.discover();\n    if (!discovered) {\n        std::cerr << discovered.error().message << '\\n';\n        return 1;\n    }\n    if (discovered->empty()) return 0;\n\n    // The host application must already have camera permission.\n    // A Session prepares input resources without starting capture.\n    auto pairing = devices.pair(discovered->front().id);\n    if (!pairing) {\n        std::cerr << pairing.error().message << '\\n';\n        return 1;\n    }\n    auto info = pairing->info();\n    if (!info) return 1;\n    std::cout << info->device.name << '\\n';\n\n    // Obtain a control port while the pairing is live. Its supported\n    // capabilities are available through controls->capabilities().\n    auto controls = pairing->controls();\n    if (!controls) return 1;\n\n    auto released = pairing->unpair();\n    if (!released) {\n        std::cerr << released.error().message << '\\n';\n        return 1; // Destruction makes one final best-effort release attempt.\n    }\n    return 0;\n}\n```\n",
+      "language": "cpp",
+      "code": "#include <iiCameraIntegration/NativeCamera.h>\n#include <iostream>\n\nusing namespace iiCameraIntegration;\n\nint prepareFirstCamera() {\n    NativeCameraSystem native;\n    auto devices = native.devices();\n    auto discovered = devices.discover();\n    if (!discovered) {\n        std::cerr << discovered.error().message << '\\n';\n        return 1;\n    }\n    if (discovered->empty()) return 0;\n\n    // The host application must already have camera permission.\n    // A Session prepares input resources without starting capture.\n    auto pairing = devices.pair(discovered->front().id);\n    if (!pairing) {\n        std::cerr << pairing.error().message << '\\n';\n        return 1;\n    }\n    auto info = pairing->info();\n    if (!info) return 1;\n    std::cout << info->device.name << '\\n';\n\n    // Obtain a control port while the pairing is live. Its supported\n    // capabilities are available through controls->capabilities().\n    auto controls = pairing->controls();\n    if (!controls) return 1;\n\n    auto released = pairing->unpair();\n    if (!released) {\n        std::cerr << released.error().message << '\\n';\n        return 1; // Destruction makes one final best-effort release attempt.\n    }\n    return 0;\n}\n",
+      "closed": true
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 55,
+      "end_line": 55,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 56,
+      "end_line": 61,
+      "raw": "On supported Apple platforms, native discovery uses AVFoundation. Session\npairing creates an `AVCaptureDeviceInput` and attaches it to a stopped\n`AVCaptureSession`. It does not request privacy permission, start a capture\nstream, capture a photograph, or expose the native session as a media source.\nApplications own their permission prompt and camera usage description. The\nexisting media capture APIs retain their separate source and lifetime contract.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 62,
+      "end_line": 62,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 63,
+      "end_line": 68,
+      "raw": "`PairingMethod::Session` means preparing an SDK/provider session.\n`PairingMethod::DeviceBond` means actual device authentication or bonding and\nrequires a provider that implements it. The native AVFoundation provider returns\n`Unsupported` for device bonding; the API does not promise Bluetooth, Wi-Fi,\nUSB authorization, or operating-system pairing. Other unsupported platforms\nreturn `Unavailable` through their fallback provider.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 69,
+      "end_line": 69,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "paragraph",
+      "start_line": 70,
+      "end_line": 74,
+      "raw": "The Linux provider retains an open V4L2 descriptor; Windows retains an unstarted\nMedia Foundation source; Android API 24+ opens a Camera2 device without creating\na capture session. These native session providers also reject bonding/parameters.\nAll providers share the revocable pairing lifetime. Bulk `features()` inspection\nand optional provider callbacks are described in [Features.md](Features.md).\n"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 75,
+      "end_line": 75,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "paragraph",
+      "start_line": 76,
+      "end_line": 78,
+      "raw": "The native session provider accepts an empty `PairingOptions::parameters` map.\nNonempty native parameters return `Unsupported`; no undocumented authentication\nor configuration parameter is silently accepted.\n"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 79,
+      "end_line": 79,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "heading",
+      "start_line": 80,
+      "end_line": 80,
+      "raw": "## Provider integration\n",
+      "level": 2,
+      "title": "Provider integration"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 81,
+      "end_line": 81,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 82,
+      "end_line": 86,
+      "raw": "`CameraDeviceSystem` is a concrete callback port. A USB, network, or vendor SDK\ncan supply its discovery and pairing implementation without inheriting an SDK\nbase class. IDs must be nonempty, valid UTF-8, contain no NUL, and be unique\nwithin one discovery result. Their stability across hotplug or restart is the\nprovider's responsibility.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 87,
+      "end_line": 87,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "paragraph",
+      "start_line": 88,
+      "end_line": 89,
+      "raw": "The following abbreviated provider demonstrates a prepared session, not device\nauthentication or a real hardware implementation:\n"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 90,
+      "end_line": 90,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "fenced_code",
+      "start_line": 91,
+      "end_line": 144,
+      "raw": "```cpp\n#include <iiCameraIntegration/Devices.h>\n#include <memory>\n\nusing namespace iiCameraIntegration;\n\nstruct ExampleSession {\n    CameraInfo camera;\n    bool connected{true};\n    bool released{false};\n};\n\nCameraDeviceSystem exampleDevices(CameraInfo camera) {\n    return CameraDeviceSystem({\n        [camera]() -> Result<std::vector<CameraInfo>> {\n            return std::vector{camera};\n        },\n        [camera](const std::string& id, const PairingOptions& options)\n            -> Result<CameraPairing> {\n            if (options.method != PairingMethod::Session)\n                return std::unexpected(Error{\n                    ErrorCode::Unsupported, \"Example provider supports sessions only\"});\n            if (id != camera.id)\n                return std::unexpected(Error{\n                    ErrorCode::NotFound, \"Camera no longer exists\"});\n\n            // A real provider acquires its device input here and rechecks\n            // availability after acquisition. Keep credentials in provider\n            // resources; do not copy options.parameters into PairingInfo.\n            auto resource = std::make_shared<ExampleSession>();\n            resource->camera = camera;\n            PairingInfo info{camera, options.method,\n                             {{\"example.session\", \"prepared\"}}};\n            return CameraPairing::create(std::move(info), {\n                [resource]() -> Result<PairingState> {\n                    if (resource->released) return PairingState::Unpaired;\n                    return resource->connected ? PairingState::Ready\n                                               : PairingState::Disconnected;\n                },\n                [resource]() -> Result<ControlPort> {\n                    // Replace this empty port with actual capability and\n                    // hardware callbacks when the provider supports controls.\n                    return ControlPort({}, {});\n                },\n                [resource]() -> Result<void> {\n                    // Release the real provider's input resources here.\n                    resource->released = true;\n                    return {};\n                }\n            });\n        }\n    });\n}\n```\n",
+      "language": "cpp",
+      "code": "#include <iiCameraIntegration/Devices.h>\n#include <memory>\n\nusing namespace iiCameraIntegration;\n\nstruct ExampleSession {\n    CameraInfo camera;\n    bool connected{true};\n    bool released{false};\n};\n\nCameraDeviceSystem exampleDevices(CameraInfo camera) {\n    return CameraDeviceSystem({\n        [camera]() -> Result<std::vector<CameraInfo>> {\n            return std::vector{camera};\n        },\n        [camera](const std::string& id, const PairingOptions& options)\n            -> Result<CameraPairing> {\n            if (options.method != PairingMethod::Session)\n                return std::unexpected(Error{\n                    ErrorCode::Unsupported, \"Example provider supports sessions only\"});\n            if (id != camera.id)\n                return std::unexpected(Error{\n                    ErrorCode::NotFound, \"Camera no longer exists\"});\n\n            // A real provider acquires its device input here and rechecks\n            // availability after acquisition. Keep credentials in provider\n            // resources; do not copy options.parameters into PairingInfo.\n            auto resource = std::make_shared<ExampleSession>();\n            resource->camera = camera;\n            PairingInfo info{camera, options.method,\n                             {{\"example.session\", \"prepared\"}}};\n            return CameraPairing::create(std::move(info), {\n                [resource]() -> Result<PairingState> {\n                    if (resource->released) return PairingState::Unpaired;\n                    return resource->connected ? PairingState::Ready\n                                               : PairingState::Disconnected;\n                },\n                [resource]() -> Result<ControlPort> {\n                    // Replace this empty port with actual capability and\n                    // hardware callbacks when the provider supports controls.\n                    return ControlPort({}, {});\n                },\n                [resource]() -> Result<void> {\n                    // Release the real provider's input resources here.\n                    resource->released = true;\n                    return {};\n                }\n            });\n        }\n    });\n}\n",
+      "closed": true
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 145,
+      "end_line": 145,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 146,
+      "end_line": 151,
+      "raw": "The factory validates the information, connected flag, method, and all three\nrequired callbacks. It does not call the provider's status callback. The system\nperforms the ready-state check after the provider returns a handle. A provider\nmust release any resources it acquired if its own construction fails before it\nreturns a valid owner. Provider exceptions become `BackendFailure` errors at API\nboundaries.\n"
+    },
+    {
+      "id": "b000028",
+      "kind": "blank",
+      "start_line": 152,
+      "end_line": 152,
+      "raw": "\n"
+    },
+    {
+      "id": "b000029",
+      "kind": "paragraph",
+      "start_line": 153,
+      "end_line": 157,
+      "raw": "`PairingOptions::parameters` is provider-specific input. The SDK forwards it to\nthe provider and does not insert it into pairing information. A provider is\nresponsible for parameter validation, secret handling, and the device's actual\nauthentication protocol. Discovery metadata describes only the fields the\nprovider can report; it does not invent hardware capabilities.\n"
+    },
+    {
+      "id": "b000030",
+      "kind": "blank",
+      "start_line": 158,
+      "end_line": 158,
+      "raw": "\n"
+    },
+    {
+      "id": "b000031",
+      "kind": "heading",
+      "start_line": 159,
+      "end_line": 159,
+      "raw": "## Ownership and disconnection\n",
+      "level": 2,
+      "title": "Ownership and disconnection"
+    },
+    {
+      "id": "b000032",
+      "kind": "blank",
+      "start_line": 160,
+      "end_line": 160,
+      "raw": "\n"
+    },
+    {
+      "id": "b000033",
+      "kind": "paragraph",
+      "start_line": 161,
+      "end_line": 164,
+      "raw": "`CameraPairing` is movable and noncopyable. `info()` returns a value snapshot,\nso changing the returned metadata does not mutate a session. That initial\nsnapshot remains accessible after release; `status()` reports the live or\nlatched lifecycle state.\n"
+    },
+    {
+      "id": "b000034",
+      "kind": "blank",
+      "start_line": 165,
+      "end_line": 165,
+      "raw": "\n"
+    },
+    {
+      "id": "b000035",
+      "kind": "paragraph",
+      "start_line": 166,
+      "end_line": 173,
+      "raw": "Successful `unpair()` changes the state to `Unpaired` and is idempotent. Failed\nrelease preserves ownership so the caller can inspect the error and retry.\nDestruction makes one final best-effort release attempt and suppresses provider\nexceptions. Move assignment also releases the destination's previous owner.\nDestruction and move assignment revoke the old gate even if their final release\nattempt fails, so an escaped port cannot continue using abandoned ownership.\nApplications requiring release confirmation must call `unpair()` and check its\nresult before destroying the owner.\n"
+    },
+    {
+      "id": "b000036",
+      "kind": "blank",
+      "start_line": 174,
+      "end_line": 174,
+      "raw": "\n"
+    },
+    {
+      "id": "b000037",
+      "kind": "paragraph",
+      "start_line": 175,
+      "end_line": 182,
+      "raw": "A control port returned by a pairing holds a weak session gate. It rechecks the\nprovider's status before forwarding valid control operations and serializes the\nstatus check with the actual hardware operation. It cannot retain a session\nafter the owner dies. Successful release or destruction revokes escaped ports;\notherwise valid operations return `Cancelled` without calling the provider.\nPhysical disconnection latches `Disconnected`, and controls return `NotFound`.\nA reappearing device requires a newly established pairing. Capability preflight\nstill rejects unsupported or malformed commands before dispatch.\n"
+    },
+    {
+      "id": "b000038",
+      "kind": "blank",
+      "start_line": 183,
+      "end_line": 183,
+      "raw": "\n"
+    },
+    {
+      "id": "b000039",
+      "kind": "paragraph",
+      "start_line": 184,
+      "end_line": 186,
+      "raw": "Moving from a pairing leaves an inert object whose operations return\n`InvalidArgument`. The moved-to owner retains the original resources and all\npreviously issued control ports continue to refer to that same live session.\n"
+    },
+    {
+      "id": "b000040",
+      "kind": "blank",
+      "start_line": 187,
+      "end_line": 187,
+      "raw": "\n"
+    },
+    {
+      "id": "b000041",
+      "kind": "heading",
+      "start_line": 188,
+      "end_line": 188,
+      "raw": "## Threading and error boundaries\n",
+      "level": 2,
+      "title": "Threading and error boundaries"
+    },
+    {
+      "id": "b000042",
+      "kind": "blank",
+      "start_line": 189,
+      "end_line": 189,
+      "raw": "\n"
+    },
+    {
+      "id": "b000043",
+      "kind": "paragraph",
+      "start_line": 190,
+      "end_line": 195,
+      "raw": "Operations on a live pairing and its escaped control ports are serialized by\nthe same session gate. Calls are synchronous. Provider callbacks must not\nreenter the pairing or a control port from that pairing: callbacks execute while\nthe gate is held. Do not move or destroy an object concurrently with operations\non that same object. The SDK does not schedule work, impose a callback timeout,\nor interrupt a blocked vendor callback.\n"
+    },
+    {
+      "id": "b000044",
+      "kind": "blank",
+      "start_line": 196,
+      "end_line": 196,
+      "raw": "\n"
+    },
+    {
+      "id": "b000045",
+      "kind": "paragraph",
+      "start_line": 197,
+      "end_line": 203,
+      "raw": "`CameraDeviceSystem` stores callbacks but does not serialize independent\ndiscovery or pairing calls. Providers sharing resources across those calls must\nsynchronize them. Distinct pairing owners also have distinct gates; a provider\nmust protect any resources shared between their sessions and implement its own\nexclusive-camera policy where required. Physical changes can still occur after\nthe SDK's preflight check, so the provider must validate the device again during\nresource acquisition and hardware control.\n"
+    },
+    {
+      "id": "b000046",
+      "kind": "blank",
+      "start_line": 204,
+      "end_line": 204,
+      "raw": "\n"
+    },
+    {
+      "id": "b000047",
+      "kind": "table",
+      "start_line": 205,
+      "end_line": 215,
+      "raw": "| Condition | Result |\n| --- | --- |\n| Invalid caller ID, method, or factory information/callbacks | `InvalidArgument` |\n| Missing discovery/pair callback or unavailable native backend | `Unavailable` |\n| Unknown or disconnected requested device | `NotFound` |\n| Invalid provider discovery/returned pairing identity, method, or ready state | `BackendFailure` |\n| Unsupported device bonding | `Unsupported` from that provider |\n| Missing native camera privacy permission | `PermissionDenied` |\n| Escaped port after successful unpair or owner destruction | `Cancelled` for an otherwise valid operation |\n| Provider error | Original error code, message, and native code retained |\n| Provider exception | `BackendFailure` |\n",
+      "columns": [
+        "Condition",
+        "Result"
+      ],
+      "rows": [
+        [
+          "Invalid caller ID, method, or factory information/callbacks",
+          "`InvalidArgument`"
+        ],
+        [
+          "Missing discovery/pair callback or unavailable native backend",
+          "`Unavailable`"
+        ],
+        [
+          "Unknown or disconnected requested device",
+          "`NotFound`"
+        ],
+        [
+          "Invalid provider discovery/returned pairing identity, method, or ready state",
+          "`BackendFailure`"
+        ],
+        [
+          "Unsupported device bonding",
+          "`Unsupported` from that provider"
+        ],
+        [
+          "Missing native camera privacy permission",
+          "`PermissionDenied`"
+        ],
+        [
+          "Escaped port after successful unpair or owner destruction",
+          "`Cancelled` for an otherwise valid operation"
+        ],
+        [
+          "Provider error",
+          "Original error code, message, and native code retained"
+        ],
+        [
+          "Provider exception",
+          "`BackendFailure`"
+        ]
+      ]
+    },
+    {
+      "id": "b000048",
+      "kind": "blank",
+      "start_line": 216,
+      "end_line": 216,
+      "raw": "\n"
+    },
+    {
+      "id": "b000049",
+      "kind": "paragraph",
+      "start_line": 217,
+      "end_line": 225,
+      "raw": "The discovery, pairing, lifecycle, controls, failures, concurrency, and validation\ntests use independent artificial providers and counters. They verify ownership,\ndispatch order, malformed input rejection, revocation, retry, and session\nserialization. The concurrency case also pauses an active provider query with a\nbounded condition-variable wait while another thread calls `unpair()`. It checks\nthat resource release cannot enter before the query exits, that the resulting\norder is query exit followed by unpair, and that the escaped port cannot dispatch\nanother query after release. These fixtures are not evidence of actual hardware discovery,\ndevice authentication, or physical camera operation.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Camera discovery and pairing",
+      "anchor": "camera-discovery-and-pairing",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000007",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Native camera use",
+      "anchor": "native-camera-use",
+      "start_line": 13
+    },
+    {
+      "block_id": "b000019",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Provider integration",
+      "anchor": "provider-integration",
+      "start_line": 80
+    },
+    {
+      "block_id": "b000031",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Ownership and disconnection",
+      "anchor": "ownership-and-disconnection",
+      "start_line": 159
+    },
+    {
+      "block_id": "b000041",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Threading and error boundaries",
+      "anchor": "threading-and-error-boundaries",
+      "start_line": 188
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000021",
+        "line": 84,
+        "text": "base class. IDs must be nonempty, valid UTF-8, contain no NUL, and be unique",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000027",
+        "line": 147,
+        "text": "required callbacks. It does not call the provider's status callback. The system",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000027",
+        "line": 149,
+        "text": "must release any resources it acquired if its own construction fails before it",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000035",
+        "line": 172,
+        "text": "Applications requiring release confirmation must call `unpair()` and check its",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000043",
+        "line": 191,
+        "text": "the same session gate. Calls are synchronous. Provider callbacks must not",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000043",
+        "line": 193,
+        "text": "the gate is held. Do not move or destroy an object concurrently with operations",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000045",
+        "line": 198,
+        "text": "discovery or pairing calls. Providers sharing resources across those calls must",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000045",
+        "line": 200,
+        "text": "must protect any resources shared between their sessions and implement its own",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000045",
+        "line": 201,
+        "text": "exclusive-camera policy where required. Physical changes can still occur after",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000045",
+        "line": 202,
+        "text": "the SDK's preflight check, so the provider must validate the device again during",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000015",
+        "label": "Features.md",
+        "target": "Features.md",
+        "kind": "relative",
+        "line": 74
+      }
+    ],
+    "tables": [
+      {
+        "block_id": "b000047",
+        "columns": [
+          "Condition",
+          "Result"
+        ],
+        "rows": [
+          [
+            "Invalid caller ID, method, or factory information/callbacks",
+            "`InvalidArgument`"
+          ],
+          [
+            "Missing discovery/pair callback or unavailable native backend",
+            "`Unavailable`"
+          ],
+          [
+            "Unknown or disconnected requested device",
+            "`NotFound`"
+          ],
+          [
+            "Invalid provider discovery/returned pairing identity, method, or ready state",
+            "`BackendFailure`"
+          ],
+          [
+            "Unsupported device bonding",
+            "`Unsupported` from that provider"
+          ],
+          [
+            "Missing native camera privacy permission",
+            "`PermissionDenied`"
+          ],
+          [
+            "Escaped port after successful unpair or owner destruction",
+            "`Cancelled` for an otherwise valid operation"
+          ],
+          [
+            "Provider error",
+            "Original error code, message, and native code retained"
+          ],
+          [
+            "Provider exception",
+            "`BackendFailure`"
+          ]
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

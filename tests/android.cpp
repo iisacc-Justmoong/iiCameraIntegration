@@ -1,10 +1,10 @@
-#include <iiCameraIntergration/NativeCamera.h>
+#include <iiCameraIntegration/NativeCamera.h>
 #include <camera/NdkCameraManager.h>
 #include <map>
 #include <iostream>
 #include <stdexcept>
 
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 struct ACameraManager {};
 struct ACameraMetadata {};
 struct ACameraDevice {ACameraDevice_StateCallbacks callbacks;};

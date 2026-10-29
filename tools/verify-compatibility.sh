@@ -25,7 +25,7 @@ verify_host() {
         --output-junit "$output/compatibility-ctest.xml"
     cmake --install "$output" --prefix "$camera_base/$variant/install"
     cmake -S "$camera_root/tests/consumer" -B "$camera_base/$variant/consumer/build" -G Ninja \
-        -DiiCameraIntergration_DIR="$camera_base/$variant/install/lib/cmake/iiCameraIntergration" \
+        -DiiCameraIntegration_DIR="$camera_base/$variant/install/lib/cmake/iiCameraIntegration" \
         -DCMAKE_CXX_FLAGS="$flags" -DCMAKE_EXE_LINKER_FLAGS="$flags"
     cmake --build "$camera_base/$variant/consumer/build" --parallel 2
     ASAN_OPTIONS=detect_leaks=0 ctest --test-dir "$camera_base/$variant/consumer/build" --output-on-failure

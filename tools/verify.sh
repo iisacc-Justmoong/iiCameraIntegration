@@ -60,17 +60,42 @@ verify_variant() {
             --output-junit "$graphic_consumer/ctest.xml"
     fi
     cmake -S "$camera_root" -B "$camera_build" -G Ninja -DCMAKE_BUILD_TYPE="$camera_type" \
-        -DBUILD_TESTING=ON -DIICAMERA_BUILD_TOOLS=ON -DBUILD_SHARED_LIBS="$camera_shared" \
+        -DBUILD_TESTING=ON -DIICAMERA_BUILD_TOOLS=OFF -DBUILD_SHARED_LIBS="$camera_shared" \
         -DIICAMERA_WITH_FFMPEG="$camera_ffmpeg" -DIICAMERA_WITH_NATIVE="$camera_native" \
-        -DIICAMERA_WITH_IMAGE_PROCESSING="$variant_photo" -DiiGraphicAdjust_DIR="$graphic_package" \
+        -DIICAMERA_WITH_IMAGE_PROCESSING=OFF \
         -DCMAKE_CXX_FLAGS="$camera_flags" -DCMAKE_OBJCXX_FLAGS="$camera_flags" \
         -DCMAKE_EXE_LINKER_FLAGS="$camera_link_flags" -DCMAKE_SHARED_LINKER_FLAGS="$camera_link_flags"
     cmake --build "$camera_build" --parallel 3
     ASAN_OPTIONS=detect_leaks=0 ctest --test-dir "$camera_build" --output-on-failure \
         --output-junit "$camera_build/ctest-results.xml"
     cmake --install "$camera_build" --prefix "$camera_stage"
+    local media_build="$camera_build/media-consumer"
+    cmake -S "$camera_root/example/Media" -B "$media_build" -G Ninja \
+        -DCMAKE_BUILD_TYPE="$camera_type" -DBUILD_TESTING=ON \
+        -DiiCameraIntegration_DIR="$camera_stage/lib/cmake/iiCameraIntegration" \
+        -DCMAKE_CXX_FLAGS="$camera_flags" -DCMAKE_EXE_LINKER_FLAGS="$camera_link_flags"
+    cmake --build "$media_build" --parallel 2
+    if [[ "$camera_ffmpeg" == ON ]]; then
+        ASAN_OPTIONS=detect_leaks=0 ctest --test-dir "$media_build" --output-on-failure \
+            --output-junit "$media_build/ctest-results.xml"
+    fi
+    cmake --install "$media_build" --prefix "$camera_stage"
+    if [[ "$variant_photo" == ON ]]; then
+        local photo_build="$camera_build/image-consumer"
+        cmake -S "$camera_root/example/ImageProcessing" -B "$photo_build" -G Ninja \
+            -DCMAKE_BUILD_TYPE="$camera_type" -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS="$camera_shared" \
+            -DiiCameraIntegration_DIR="$camera_stage/lib/cmake/iiCameraIntegration" \
+            -DiiGraphicAdjust_DIR="$graphic_package" \
+            -DCMAKE_CXX_FLAGS="$camera_flags" -DCMAKE_EXE_LINKER_FLAGS="$camera_link_flags" \
+            -DCMAKE_SHARED_LINKER_FLAGS="$camera_link_flags"
+        cmake --build "$photo_build" --parallel 3
+        ASAN_OPTIONS=detect_leaks=0 ctest --test-dir "$photo_build" --output-on-failure \
+            --output-junit "$photo_build/ctest-results.xml"
+        cmake --install "$photo_build" --prefix "$camera_stage"
+    fi
     cmake -S "$camera_root/tests/consumer" -B "$camera_consumer" -G Ninja \
-        -DiiCameraIntergration_DIR="$camera_stage/lib/cmake/iiCameraIntergration" \
+        -DiiCameraIntegration_DIR="$camera_stage/lib/cmake/iiCameraIntegration" \
+        -DiiCameraImageProcessing_DIR="$camera_stage/lib/cmake/iiCameraImageProcessing" \
         -DIICAMERA_CONSUMER_WITH_PROCESSING="$variant_photo" -DiiGraphicAdjust_DIR="$graphic_package" \
         -DCMAKE_BUILD_TYPE="$camera_type" -DCMAKE_CXX_FLAGS="$camera_flags" \
         -DCMAKE_EXE_LINKER_FLAGS="$camera_link_flags"

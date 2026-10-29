@@ -1,4 +1,4 @@
-#include <iiCameraIntergration/Devices.h>
+#include <iiCameraIntegration/Devices.h>
 
 #include <atomic>
 #include <barrier>
@@ -12,7 +12,7 @@
 #include <thread>
 #include <type_traits>
 
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 
 namespace {
 #define CHECK(expression) do { if (!(expression)) throw std::runtime_error( \

@@ -1,6 +1,6 @@
 # Hardware discovery and pairing verification — 0.3.0
 
-On 2026-10-09 (Asia/Seoul), iiCameraIntergration 0.3.0 was built and executed on
+On 2026-10-09 (Asia/Seoul), iiCameraIntegration 0.3.0 was built and executed on
 macOS arm64 with AppleClang 21.0.0. This change adds only camera discovery and
 pairing APIs; it does not add capture, image processing, a GUI, or a device
 authentication protocol. The existing iiGraphicAdjust 0.5.0 dependency is reused

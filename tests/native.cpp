@@ -1,10 +1,10 @@
-#include <iiCameraIntergration/NativeCamera.h>
+#include <iiCameraIntegration/NativeCamera.h>
 
 #include <cstdlib>
 #include <iostream>
 #include <set>
 
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 
 namespace {
 void require(bool condition, const char *message) {
@@ -70,7 +70,7 @@ int main() {
     require(!empty && empty.error().code == ErrorCode::InvalidArgument, "empty device identifier");
     const auto embeddedNull = system.controls(std::string("camera\0suffix", 13));
     require(!embeddedNull && embeddedNull.error().code == ErrorCode::InvalidArgument, "embedded null device identifier");
-    const auto missing = system.controls("iiCameraIntergration.test.absent.device.7e2fef72");
+    const auto missing = system.controls("iiCameraIntegration.test.absent.device.7e2fef72");
     require(!missing && missing.error().code == ErrorCode::NotFound, "unknown camera identifier");
     const auto invalidUtf8 = system.controls(std::string("\xff", 1));
     require(!invalidUtf8 && invalidUtf8.error().code == ErrorCode::InvalidArgument, "invalid UTF-8 control identifier");
@@ -80,19 +80,19 @@ int main() {
     require(!nullPair && nullPair.error().code == ErrorCode::InvalidArgument, "embedded null pairing identifier");
     const auto utf8Pair = system.pair(std::string("\xff", 1));
     require(!utf8Pair && utf8Pair.error().code == ErrorCode::InvalidArgument, "invalid UTF-8 pairing identifier");
-    const auto absentPair = system.pair("iiCameraIntergration.test.absent.device.7e2fef72");
+    const auto absentPair = system.pair("iiCameraIntegration.test.absent.device.7e2fef72");
     require(!absentPair && absentPair.error().code == ErrorCode::NotFound, "pairing unknown camera identifier");
     PairingOptions bond;
     bond.method = PairingMethod::DeviceBond;
-    const auto unsupportedBond = system.pair("iiCameraIntergration.test.absent.device.7e2fef72", bond);
+    const auto unsupportedBond = system.pair("iiCameraIntegration.test.absent.device.7e2fef72", bond);
     require(!unsupportedBond && unsupportedBond.error().code == ErrorCode::Unsupported, "native hardware bonding is explicit unsupported");
     PairingOptions parameters;
     parameters.parameters["credential"] = "test-only";
-    const auto unsupportedParameters = system.pair("iiCameraIntergration.test.absent.device.7e2fef72", parameters);
+    const auto unsupportedParameters = system.pair("iiCameraIntegration.test.absent.device.7e2fef72", parameters);
     require(!unsupportedParameters && unsupportedParameters.error().code == ErrorCode::Unsupported, "native pairing rejects provider parameters");
     PairingOptions unknownMethod;
     unknownMethod.method = static_cast<PairingMethod>(-1);
-    const auto invalidMethod = system.pair("iiCameraIntergration.test.absent.device.7e2fef72", unknownMethod);
+    const auto invalidMethod = system.pair("iiCameraIntegration.test.absent.device.7e2fef72", unknownMethod);
     require(!invalidMethod && invalidMethod.error().code == ErrorCode::InvalidArgument, "invalid native pairing method");
     const auto discovered = system.devices().discover();
     require(discovered.has_value(), "native callback device port discovery");

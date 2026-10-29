@@ -44,11 +44,11 @@ than 16 MiB are rejected as invalid media.
 ## Packet capture
 
 ```cpp
-#include <iiCameraIntergration/Media.h>
+#include <iiCameraIntegration/Media.h>
 
-iiCameraIntergration::MediaSource source;
+iiCameraIntegration::MediaSource source;
 source.location = "/path/to/capture.mkv";
-auto capture = iiCameraIntergration::PacketCapture::open(source);
+auto capture = iiCameraIntegration::PacketCapture::open(source);
 if (!capture) {
     // Inspect capture.error().code/message/nativeCode.
     return;
@@ -105,7 +105,7 @@ Cancellation is permanent. Reading a moved-from session returns `InvalidArgument
 
 ## Recording
 
-`recordMedia(source, destination, options)` remuxes compatible video, audio and
+`recordMedia(source, destination, files, options)` remuxes compatible video, audio and
 subtitle streams into a local single-file container. It copies compressed media
 without encoding or changing the codec. Data/attachment streams are skipped.
 An incompatible container is an error; no transcoding is silently attempted.
@@ -113,12 +113,21 @@ Multi-file/segmented muxers are rejected because they cannot meet this function'
 exclusive single-file output contract. Unknown output options appear in the
 returned `unusedOutputOptions` dictionary.
 
-The destination is opened exclusively with the C runtime's `x` creation mode.
-An existing destination is preserved, including if another process wins the
-creation race. The function finalizes and closes successful recordings and
-reports actual file size, compressed payload bytes, packet count and stop reason.
-Cancellation, decode/mux/IO failure, or an empty recording removes the partially
-created output. A successfully finalized bounded recording is returned when its
+`RecordingFilePort`는 호출자가 제공하는 세 연산이다. `createExclusive`는 기존
+대상을 덮어쓰지 않는 탐색 가능한 바이너리 스트림을 반환하고, 생성에 실패하거나
+예외가 발생하면 스스로 확보한 자원을 정리해야 한다. 성공한 스트림의 소유권은
+동기 호출 동안 카메라 SDK에 이전되며 SDK가 닫는다. SDK는 성공 시 스트림을 닫은
+뒤 `publishExclusive`로 덮어쓰기 없는 게시를 요청하고, 실패 시에는
+`removeIncomplete`로 미완성 출력을 정리하도록 요청한다. 생성·게시 예외는 I/O
+오류로 변환하고 정리 콜백의 예외는 호출 밖으로 전달하지 않는다.
+`example/Media`는 iiFileProvider의 임시 파일을 사용하고 대상이 이미 있거나 게시
+중 다른 파일이 생기면 덮어쓰지 않는다. POSIX에서는 하드 링크가 가능한 파일
+시스템이어야 한다. SDK 자체는 파일 제공자나 다른 SDK를 검색·링크하지 않는다.
+기존 경로만 받는 `recordMedia` 호출자는 포트를 제공하도록 수정하고 다시 빌드한다.
+
+호출자는 출력 크기, 압축 페이로드 바이트, 패킷 수와 종료 이유를 받는다.
+Cancellation, decode/mux/IO failure, or an empty recording requests cleanup
+through the supplied port. A successfully finalized bounded recording is returned when its
 packet, payload or duration limit is reached. Payload limits do not include
 container overhead, and packet-count limits count only streams written.
 

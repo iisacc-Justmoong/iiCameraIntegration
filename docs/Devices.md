@@ -7,16 +7,16 @@ handle identifies that same device, uses the requested pairing method, and is
 ready. The library does not treat discovering a camera as connecting to it.
 
 The API uses C++23 and standard-library callbacks. It is part of the core
-`iiCameraIntergration::iiCameraIntergration` target and does not require the
+`iiCameraIntegration::iiCameraIntegration` target and does not require the
 optional image-processing component or FFmpeg.
 
 ## Native camera use
 
 ```cpp
-#include <iiCameraIntergration/NativeCamera.h>
+#include <iiCameraIntegration/NativeCamera.h>
 #include <iostream>
 
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 
 int prepareFirstCamera() {
     NativeCameraSystem native;
@@ -89,10 +89,10 @@ The following abbreviated provider demonstrates a prepared session, not device
 authentication or a real hardware implementation:
 
 ```cpp
-#include <iiCameraIntergration/Devices.h>
+#include <iiCameraIntegration/Devices.h>
 #include <memory>
 
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 
 struct ExampleSession {
     CameraInfo camera;

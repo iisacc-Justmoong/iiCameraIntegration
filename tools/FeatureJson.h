@@ -1,11 +1,11 @@
 #pragma once
-#include <iiCameraIntergration/Features.h>
+#include <iiCameraIntegration/Features.h>
 #include <cmath>
 #include <iomanip>
 #include <ostream>
 #include <type_traits>
 
-namespace iiCameraIntergration::cli {
+namespace iiCameraIntegration::cli {
 inline void string(std::ostream& out,std::string_view text) {
     constexpr char hex[]="0123456789abcdef";out<<'"';
     for(unsigned char c:text) {
@@ -117,4 +117,4 @@ inline void report(std::ostream& out,const std::vector<CameraFeatureResult>& val
         out<<",\"error\":";if(item.features) out<<"null";else error(out,item.features.error());out<<'}';
     });out<<"}\n";
 }
-} // namespace iiCameraIntergration::cli
+} // namespace iiCameraIntegration::cli

@@ -1,6 +1,6 @@
 # Architecture and contracts
 
-iiCameraIntergration separates camera descriptions, control operations, native acquisition,
+iiCameraIntegration separates camera descriptions, control operations, native acquisition,
 and media identification. The public core is C++23 and does not require Qt. Platform
 backends may depend on their operating system's camera services, and media probing may
 depend on a separately detected codec provider.

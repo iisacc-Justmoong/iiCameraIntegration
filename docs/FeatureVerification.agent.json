@@ -1,0 +1,358 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:f548ce9be52ff45a5cc9a7858c4c66e4090177672003ca3ae497f0e9e1394414",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/FeatureVerification.md",
+    "sha256": "0f6222fceed8ceba7719fe17f89926754df16c38266253461aa96d88767e9d39",
+    "bytes": 5225,
+    "line_count": 73,
+    "encoding": "utf-8",
+    "language": "en"
+  },
+  "document": {
+    "title": "Compatibility and bulk feature verification — 0.4.0",
+    "role": "evidence",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Compatibility and bulk feature verification — 0.4.0\n",
+      "level": 1,
+      "title": "Compatibility and bulk feature verification — 0.4.0"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 5,
+      "raw": "Verification date: 2026-10-13, Asia/Seoul. The source and public ABI version is\n0.4.0. Runtime checks use macOS arm64, AppleClang 21 and the installed FFmpeg\n63.1.102 family. The portable SDK and adapters have no Qt dependency.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 6,
+      "end_line": 6,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "table",
+      "start_line": 7,
+      "end_line": 13,
+      "raw": "| Host configuration | Passing CTest cases | Independent staged-package consumer |\n| --- | ---: | ---: |\n| Release shared, native + FFmpeg + existing optional photo component | 35/35 | 1/1, including photo component |\n| Release static, native + FFmpeg | 28/28 | 1/1 |\n| Release static, native/media-disabled core | 23/23 | 1/1 |\n| Debug shared, native + FFmpeg, ASan + UBSan | 28/28 | 1/1 |\n| Actual local installation, native + FFmpeg Core | Separately built and installed | 1/1 |\n",
+      "columns": [
+        "Host configuration",
+        "Passing CTest cases",
+        "Independent staged-package consumer"
+      ],
+      "rows": [
+        [
+          "Release shared, native + FFmpeg + existing optional photo component",
+          "35/35",
+          "1/1, including photo component"
+        ],
+        [
+          "Release static, native + FFmpeg",
+          "28/28",
+          "1/1"
+        ],
+        [
+          "Release static, native/media-disabled core",
+          "23/23",
+          "1/1"
+        ],
+        [
+          "Debug shared, native + FFmpeg, ASan + UBSan",
+          "28/28",
+          "1/1"
+        ],
+        [
+          "Actual local installation, native + FFmpeg Core",
+          "Separately built and installed",
+          "1/1"
+        ]
+      ]
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 14,
+      "end_line": 14,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 15,
+      "end_line": 19,
+      "raw": "The four regression suites contain 114 test executions with no failures. Counts\ninclude optional artificial V4L2 and Camera2 driver fixtures, compiled against\nLinux UAPI and official Android headers. These fixtures do not execute hardware\nor run Linux/Android operating systems. ASan/UBSan instrument this SDK; external\nFFmpeg/system libraries are not rebuilt. LeakSanitizer is disabled on this host.\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 20,
+      "end_line": 20,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 21,
+      "end_line": 29,
+      "raw": "New contracts check complete control traversal, readable/write-only handling,\nper-item permission/busy/failure results, malformed values, metadata-only reads,\nall-camera results, native vendor payload preservation, invalid/duplicate/wrong\nIDs, callback exceptions, pairing revocation and concurrent batch/unpair gating.\nJSON tests parse the emitted structure and check quoted/UTF-8 names, byte arrays\nand nested errors. V4L2 fixtures check modern/legacy control enumeration, int64 and\ncompound values, read-only flags, partial payload failure, step rejection and\nunplug. Camera2 fixtures check sensor/lens/output metadata, all vendor tags,\npermission failure, no metadata-triggered opening, disconnect and release.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 30,
+      "end_line": 30,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "table",
+      "start_line": 31,
+      "end_line": 38,
+      "raw": "| Target adapter | Compilation / artifact evidence | Hardware/runtime evidence |\n| --- | --- | --- |\n| macOS AVFoundation | Shared/static and instrumented execution on the host | Read-only discovery returns zero cameras; authorization stays NotDetermined |\n| Linux x86_64 V4L2 | Full shared library and inspection-tool cross build | No Linux runtime or physical-camera test |\n| Windows x86_64 Media Foundation | Full DLL/import library and inspection EXE cross build | No Windows runtime or physical-camera test |\n| iOS arm64 AVFoundation | Full CMake static-library cross build, iOS 17 deployment with the installed iOS 27 SDK | No iPhone/iPad execution |\n| Mac Catalyst arm64 AVFoundation | Native adapter compiles against the installed SDK with a Catalyst 17 target | No linked Catalyst product/runtime test |\n| Android Camera2 | Source compiles against official Camera2/JNI/native-window headers; artificial NDK fixture executes on the host | No full Android NDK package link or physical-device execution |\n",
+      "columns": [
+        "Target adapter",
+        "Compilation / artifact evidence",
+        "Hardware/runtime evidence"
+      ],
+      "rows": [
+        [
+          "macOS AVFoundation",
+          "Shared/static and instrumented execution on the host",
+          "Read-only discovery returns zero cameras; authorization stays NotDetermined"
+        ],
+        [
+          "Linux x86_64 V4L2",
+          "Full shared library and inspection-tool cross build",
+          "No Linux runtime or physical-camera test"
+        ],
+        [
+          "Windows x86_64 Media Foundation",
+          "Full DLL/import library and inspection EXE cross build",
+          "No Windows runtime or physical-camera test"
+        ],
+        [
+          "iOS arm64 AVFoundation",
+          "Full CMake static-library cross build, iOS 17 deployment with the installed iOS 27 SDK",
+          "No iPhone/iPad execution"
+        ],
+        [
+          "Mac Catalyst arm64 AVFoundation",
+          "Native adapter compiles against the installed SDK with a Catalyst 17 target",
+          "No linked Catalyst product/runtime test"
+        ],
+        [
+          "Android Camera2",
+          "Source compiles against official Camera2/JNI/native-window headers; artificial NDK fixture executes on the host",
+          "No full Android NDK package link or physical-device execution"
+        ]
+      ]
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 39,
+      "end_line": 39,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 40,
+      "end_line": 44,
+      "raw": "Linux/Windows cross builds use the official Zig 0.15.2 distribution verified\nagainst its published SHA-256. Zig's bundled libc++ enables the removed legacy\nstd::unexpected function; the cross toolchain first includes __config and undefines\nthat compatibility switch so C++23 std::unexpected<T> is unambiguous. This is a\nbuild-tool configuration workaround, not a modified standard-library source.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 45,
+      "end_line": 45,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "paragraph",
+      "start_line": 46,
+      "end_line": 53,
+      "raw": "Actual installation is at ~/.local/SDK/iiCameraIntegration and contains the\n0.4.0 Core library, native adapter, FFmpeg bridge, public headers, CMake package,\ninspection CLI and documentation. The optional photo component was regression-\ntested and staged; it is not part of this Core installation. The independent\nlocal-package consumer passes, and dyld tracing confirms it loads the local\nlibiiCameraIntegration.0.4.0.dylib. Public Features.h and Devices.h match source;\nprivate detail headers are excluded. The installed --features command emits\nschemaVersion 1 with an empty device list on this host.\n"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 54,
+      "end_line": 54,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "paragraph",
+      "start_line": 55,
+      "end_line": 58,
+      "raw": "Physical input opening, optical/image control success, stream capture, real\nhot unplug and device-specific combinations remain unverified. Network/RTSP,\nPTP-only cameras and manufacturer authentication are not established by these\ncompile/fixture results. Build success is not universal device compatibility.\n"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 59,
+      "end_line": 59,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 60,
+      "end_line": 65,
+      "raw": "Evidence stays under build/: compatibility-ctest.xml, compatibility/{static,\ncore,sanitized}/build/compatibility-ctest.xml, corresponding workflow logs,\nlinux/windows/ios build logs, catalyst-syntax.log, android-syntax.log,\ninstalled-consumer.runtime.log, installed-host-features.json and\ncompatibility-verification-report.json. All build/consumer outputs remain within\nthe module's build directory; only the requested SDK installation uses ~/.local.\n"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 66,
+      "end_line": 66,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 67,
+      "end_line": 73,
+      "raw": "Use tools/verify-compatibility.sh [all|static|core|sanitized] to reproduce the Core\nhost workflow and staged consumers. Optional fixture headers are selected with\nIICAMERA_ANDROID_TEST_INCLUDE_DIR and IICAMERA_V4L2_TEST_INCLUDE_DIR. They are not\nSDK dependencies or installed headers. The original tools/verify.sh --photo\n--sanitize remains the full sibling photo-component workflow. Cross toolchain\nfiles and fetched validation headers are retained only under build/toolchains\nand build/android-headers. See [Features](Features.md) for the API and boundaries.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Compatibility and bulk feature verification — 0.4.0",
+      "anchor": "compatibility-and-bulk-feature-verification--040",
+      "start_line": 1
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000007",
+        "line": 17,
+        "text": "Linux UAPI and official Android headers. These fixtures do not execute hardware",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000021",
+        "label": "Features",
+        "target": "Features.md",
+        "kind": "relative",
+        "line": 73
+      }
+    ],
+    "tables": [
+      {
+        "block_id": "b000005",
+        "columns": [
+          "Host configuration",
+          "Passing CTest cases",
+          "Independent staged-package consumer"
+        ],
+        "rows": [
+          [
+            "Release shared, native + FFmpeg + existing optional photo component",
+            "35/35",
+            "1/1, including photo component"
+          ],
+          [
+            "Release static, native + FFmpeg",
+            "28/28",
+            "1/1"
+          ],
+          [
+            "Release static, native/media-disabled core",
+            "23/23",
+            "1/1"
+          ],
+          [
+            "Debug shared, native + FFmpeg, ASan + UBSan",
+            "28/28",
+            "1/1"
+          ],
+          [
+            "Actual local installation, native + FFmpeg Core",
+            "Separately built and installed",
+            "1/1"
+          ]
+        ]
+      },
+      {
+        "block_id": "b000011",
+        "columns": [
+          "Target adapter",
+          "Compilation / artifact evidence",
+          "Hardware/runtime evidence"
+        ],
+        "rows": [
+          [
+            "macOS AVFoundation",
+            "Shared/static and instrumented execution on the host",
+            "Read-only discovery returns zero cameras; authorization stays NotDetermined"
+          ],
+          [
+            "Linux x86_64 V4L2",
+            "Full shared library and inspection-tool cross build",
+            "No Linux runtime or physical-camera test"
+          ],
+          [
+            "Windows x86_64 Media Foundation",
+            "Full DLL/import library and inspection EXE cross build",
+            "No Windows runtime or physical-camera test"
+          ],
+          [
+            "iOS arm64 AVFoundation",
+            "Full CMake static-library cross build, iOS 17 deployment with the installed iOS 27 SDK",
+            "No iPhone/iPad execution"
+          ],
+          [
+            "Mac Catalyst arm64 AVFoundation",
+            "Native adapter compiles against the installed SDK with a Catalyst 17 target",
+            "No linked Catalyst product/runtime test"
+          ],
+          [
+            "Android Camera2",
+            "Source compiles against official Camera2/JNI/native-window headers; artificial NDK fixture executes on the host",
+            "No full Android NDK package link or physical-device execution"
+          ]
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

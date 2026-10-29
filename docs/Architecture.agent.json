@@ -1,0 +1,480 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:ee31ccfb60db0beb65290510b246eaecd8973e0637c82bfff87623161544eff3",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/Architecture.md",
+    "sha256": "35f9f5357610924c81e7b73755fd191c20e410f8cba385327840be9ef2846a4d",
+    "bytes": 8243,
+    "line_count": 126,
+    "encoding": "utf-8",
+    "language": "en"
+  },
+  "document": {
+    "title": "Architecture and contracts",
+    "role": "reference",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Architecture and contracts\n",
+      "level": 1,
+      "title": "Architecture and contracts"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 6,
+      "raw": "iiCameraIntegration separates camera descriptions, control operations, native acquisition,\nand media identification. The public core is C++23 and does not require Qt. Platform\nbackends may depend on their operating system's camera services, and media probing may\ndepend on a separately detected codec provider.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 7,
+      "end_line": 7,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 8,
+      "end_line": 13,
+      "raw": "Bulk inspection is documented in [Features.md](Features.md). It composes discovery,\ntyped control snapshots and native feature values without GUI dependencies.\nPairing feature queries share the existing revocable resource gate. Separate\nApple/Linux/Windows/Android translation units isolate OS dependencies. Private\ndriver-test seams are excluded from installed headers. Version 0.4 requires\nconsumer rebuilds because the callback object layouts have changed.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 14,
+      "end_line": 14,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "heading",
+      "start_line": 15,
+      "end_line": 15,
+      "raw": "## Camera metadata\n",
+      "level": 2,
+      "title": "Camera metadata"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 16,
+      "end_line": 16,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 17,
+      "end_line": 21,
+      "raw": "`CameraInfo` is an owned value snapshot. It includes device identity, manufacturer,\nmodel, serial number, firmware, transport, position, connection state, sensor properties,\nlenses, capture formats, the active format, and control capabilities. Sensor dimensions,\nbit depth, focal length, aperture, focus distance, field of view, frame rates, pixel format,\nand codec information are represented where the provider reports them.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 22,
+      "end_line": 22,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 23,
+      "end_line": 30,
+      "raw": "Optional values mean that the provider has not reported the property. Empty lens or\nformat lists are valid when discovery cannot supply those details. Consumers must not\ninfer a physical aperture, sensor size, or interchangeable lens from an absent value.\nProviders preserve properties without a standard field in `additional`, using provider\nnamespaces such as `avfoundation.device.uniqueID`. Each nested sensor, lens, format,\nand control object also has its own `additional` map. Validation retains these fields.\nThe object can represent provider metadata without a fixed list of vendor extensions;\nit cannot promise information that hardware or its driver does not expose.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 31,
+      "end_line": 31,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 32,
+      "end_line": 37,
+      "raw": "`validateCameraInfo` verifies required identity fields and consistency of reported\ndimensions, ranges, lens and format identifiers, the active format, and control lists.\nReported optical focal-length and aperture ranges must be positive, and their current\nvalues must belong to the reported range. Focus distance may include zero.\nValidation does not contact a device or make a discovery snapshot current. Applications\nshould rediscover devices or request a new backend snapshot when hardware changes.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 38,
+      "end_line": 38,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "heading",
+      "start_line": 39,
+      "end_line": 39,
+      "raw": "## Lens and exposure controls\n",
+      "level": 2,
+      "title": "Lens and exposure controls"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 40,
+      "end_line": 40,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "paragraph",
+      "start_line": 41,
+      "end_line": 47,
+      "raw": "`ControlCapability` describes a numeric value, a mode, or a string identifier. Capability\nflags distinguish readable controls from writable controls. Numeric ranges can be\ncontinuous, stepped from their minimum, or an explicit discrete list. A discrete list is\nauthoritative when present. Each command is checked against the captured capability\nbefore a provider callback runs. Unknown controls, read-only commands, wrong value\ntypes, nonfinite numbers, unsupported modes or identifiers, and out-of-range numeric\ncommands produce an error without dispatching to the provider.\n"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 48,
+      "end_line": 48,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 49,
+      "end_line": 53,
+      "raw": "`ControlPort` owns a copy of its capabilities and callbacks. Capturing a shared backend\nobject in a callback keeps that backend alive for the port's lifetime, including copies\nof the port. The provider determines the actual applied value and returns it to the\ncaller. Provider errors retain their category, message, and native error code. Exceptions\nfrom callbacks become `BackendFailure` results.\n"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 54,
+      "end_line": 54,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 55,
+      "end_line": 60,
+      "raw": "Capabilities are a snapshot, so the provider must revalidate the live device before\nreading or applying a command. The core does not assume that a digital zoom is an\noptical focal-length change, or that selecting an aperture is possible on every camera.\nApplications must inspect capabilities before offering those controls. Atomic batches,\nthread safety, and serialization are provider responsibilities; `ControlPort` itself does\nnot schedule hardware operations or add synchronization.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 61,
+      "end_line": 61,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "heading",
+      "start_line": 62,
+      "end_line": 62,
+      "raw": "## Optical geometry\n",
+      "level": 2,
+      "title": "Optical geometry"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 63,
+      "end_line": 63,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "paragraph",
+      "start_line": 64,
+      "end_line": 70,
+      "raw": "The optical helpers compute rectilinear field of view from physical sensor dimensions\nand focal length, and the inverse focal length from horizontal field of view. Dimensions\nuse millimeters and angles use degrees. The forward relationship is\n`angle = 2 * atan(sensor_dimension / (2 * focal_length))`; diagonal geometry uses the\nsensor diagonal. These helpers apply to a rectilinear lens. Fisheye projection,\ndistortion, stabilization crop, digital zoom, and active sensor-area crop require\nprovider-specific data and are not inferred from nominal dimensions.\n"
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 71,
+      "end_line": 71,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 72,
+      "end_line": 74,
+      "raw": "Nonfinite or nonpositive dimensions are rejected. The inverse accepts an angle strictly\nbetween zero and 180 degrees. Values whose result cannot be represented as a finite,\npositive optical quantity also return `InvalidArgument`.\n"
+    },
+    {
+      "id": "b000028",
+      "kind": "blank",
+      "start_line": 75,
+      "end_line": 75,
+      "raw": "\n"
+    },
+    {
+      "id": "b000029",
+      "kind": "heading",
+      "start_line": 76,
+      "end_line": 76,
+      "raw": "## Media identity and acquisition\n",
+      "level": 2,
+      "title": "Media identity and acquisition"
+    },
+    {
+      "id": "b000030",
+      "kind": "blank",
+      "start_line": 77,
+      "end_line": 77,
+      "raw": "\n"
+    },
+    {
+      "id": "b000031",
+      "kind": "paragraph",
+      "start_line": 78,
+      "end_line": 84,
+      "raw": "The FFmpeg-backed API reports codec identities separately from the decoders and\nencoders available in the current provider build. Format discovery reports the\ninstalled demuxer and muxer inventory. Content probing supplies container identity,\nindividual stream codec IDs and names, time bases, dimensions, audio properties,\nduration where available, and provider metadata. `probeMediaBytes` uses caller-owned\nbytes synchronously through a seekable input without an extension hint. The caller\nmust keep those bytes valid until the call returns.\n"
+    },
+    {
+      "id": "b000032",
+      "kind": "blank",
+      "start_line": 85,
+      "end_line": 85,
+      "raw": "\n"
+    },
+    {
+      "id": "b000033",
+      "kind": "paragraph",
+      "start_line": 86,
+      "end_line": 90,
+      "raw": "`MediaSource` accepts a file, URL, device location, or supported input graph. Automatic\ncontent identification is appropriate for self-describing media. Native device inputs\nand raw streams may require an explicit input format and provider-specific options.\nUnconsumed input options are returned in metadata so that applications can detect\nunsupported or misspelled settings.\n"
+    },
+    {
+      "id": "b000034",
+      "kind": "blank",
+      "start_line": 91,
+      "end_line": 91,
+      "raw": "\n"
+    },
+    {
+      "id": "b000035",
+      "kind": "paragraph",
+      "start_line": 92,
+      "end_line": 96,
+      "raw": "`PacketCapture` owns a native input and returns owned packet payloads. Each packet\nretains its stream index, presentation and decoding timestamps, duration, key-frame\nflag, and the stream's time base. The session is movable and requires serialization\nfor reading and metadata access. `cancel()` may run concurrently with a read; provider\ninterruption is cooperative. A moved-from session reports an error on reading.\n"
+    },
+    {
+      "id": "b000036",
+      "kind": "blank",
+      "start_line": 97,
+      "end_line": 97,
+      "raw": "\n"
+    },
+    {
+      "id": "b000037",
+      "kind": "paragraph",
+      "start_line": 98,
+      "end_line": 104,
+      "raw": "`decodeRgbFrame` decodes one selected video frame and converts it to an owned RGB24\nbuffer. It limits packets, pixels, and operation time. `recordMedia` remuxes compatible\ncompressed streams into a local single file, preserving codec identity instead of\ntranscoding. It creates the destination exclusively, refuses multi-file muxers, and\nremoves an uncommitted destination after failure. Callers should inspect the reported\nstop reason, packet count, and payload and file sizes. Duration, packet, and payload\nlimits can produce a successful shorter recording.\n"
+    },
+    {
+      "id": "b000038",
+      "kind": "blank",
+      "start_line": 105,
+      "end_line": 105,
+      "raw": "\n"
+    },
+    {
+      "id": "b000039",
+      "kind": "heading",
+      "start_line": 106,
+      "end_line": 106,
+      "raw": "## Evidence boundaries\n",
+      "level": 2,
+      "title": "Evidence boundaries"
+    },
+    {
+      "id": "b000040",
+      "kind": "blank",
+      "start_line": 107,
+      "end_line": 107,
+      "raw": "\n"
+    },
+    {
+      "id": "b000041",
+      "kind": "paragraph",
+      "start_line": 108,
+      "end_line": 126,
+      "raw": "Unit tests exercise metadata preservation and rejection, numeric ranges, control\npreflight and provider contracts, and independently specified optical reference values.\nGenerated PNG, JPEG, WAV, FLAC, MP4, WebM, and Matroska fixtures exercise content\nrecognition from a path, caller-owned bytes, and a path with a misleading `.txt`\nextension. The tests identify their expected PNG, MJPEG, PCM, FLAC, H.264, AAC, VP9,\nOpus, and FFV1 codecs and verify stream dimensions, audio properties, time bases, and\ncontainer metadata. This sample set establishes behavior for those fixtures; codec and\nformat catalogs describe the detected provider's broader inventory without claiming\nthat every possible format, codec profile, or damaged file has been tested.\n`StreamInfo::parametersComplete` and `MediaInfo::streamParametersComplete` distinguish\nrecognized identity from the presence of usable stream parameters. For example, a\nPNG signature alone can identify PNG while leaving image dimensions unavailable.\nCompleteness reports required parameter presence; it does not establish integrity of\nthe complete file, successful decoding of all frames, or an undamaged media payload.\nThe installed consumer checks package discovery, public header composition, linkage,\nand optical calls through the installed CMake target. These checks do not establish\npermission to a physical camera, successful hardware control, or a real capture. Native\ndevice and media-provider checks must report their actual available platform,\ndependencies, and devices separately.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Architecture and contracts",
+      "anchor": "architecture-and-contracts",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000007",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Camera metadata",
+      "anchor": "camera-metadata",
+      "start_line": 15
+    },
+    {
+      "block_id": "b000015",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Lens and exposure controls",
+      "anchor": "lens-and-exposure-controls",
+      "start_line": 39
+    },
+    {
+      "block_id": "b000023",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Optical geometry",
+      "anchor": "optical-geometry",
+      "start_line": 62
+    },
+    {
+      "block_id": "b000029",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Media identity and acquisition",
+      "anchor": "media-identity-and-acquisition",
+      "start_line": 76
+    },
+    {
+      "block_id": "b000039",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Evidence boundaries",
+      "anchor": "evidence-boundaries",
+      "start_line": 106
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000011",
+        "line": 24,
+        "text": "format lists are valid when discovery cannot supply those details. Consumers must not",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000013",
+        "line": 32,
+        "text": "`validateCameraInfo` verifies required identity fields and consistency of reported",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000013",
+        "line": 34,
+        "text": "Reported optical focal-length and aperture ranges must be positive, and their current",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000013",
+        "line": 35,
+        "text": "values must belong to the reported range. Focus distance may include zero.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000013",
+        "line": 37,
+        "text": "should rediscover devices or request a new backend snapshot when hardware changes.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000021",
+        "line": 55,
+        "text": "Capabilities are a snapshot, so the provider must revalidate the live device before",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000021",
+        "line": 58,
+        "text": "Applications must inspect capabilities before offering those controls. Atomic batches,",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000031",
+        "line": 84,
+        "text": "must keep those bytes valid until the call returns.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000037",
+        "line": 102,
+        "text": "removes an uncommitted destination after failure. Callers should inspect the reported",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000041",
+        "line": 120,
+        "text": "Completeness reports required parameter presence; it does not establish integrity of",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000041",
+        "line": 123,
+        "text": "and optical calls through the installed CMake target. These checks do not establish",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000041",
+        "line": 125,
+        "text": "device and media-provider checks must report their actual available platform,",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000005",
+        "label": "Features.md",
+        "target": "Features.md",
+        "kind": "relative",
+        "line": 8
+      }
+    ],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

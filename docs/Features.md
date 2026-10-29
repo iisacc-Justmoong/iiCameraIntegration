@@ -31,8 +31,8 @@ authentication require a corresponding callback provider.
 ## Public API
 
 ```cpp
-#include <iiCameraIntergration/iiCameraIntergration.h>
-using namespace iiCameraIntergration;
+#include <iiCameraIntegration/iiCameraIntegration.h>
+using namespace iiCameraIntegration;
 NativeCameraSystem system;
 auto all = system.features();
 if (all) {
@@ -128,7 +128,7 @@ native feature errors remain at their respective levels. Camera objects include
 every public field and nested metadata map. A failed device returns exit 1 after
 emitting the batch; per-control errors remain within a successful report. Invalid
 options/extra IDs are rejected. Public batch APIs remain in core-only builds.
-Use find_package(iiCameraIntergration 0.4 CONFIG REQUIRED) and rebuild consumers.
+Use find_package(iiCameraIntegration 0.4 CONFIG REQUIRED) and rebuild consumers.
 
 Primary contracts: [V4L2 enumeration](https://cdn.kernel.org/doc/html/latest/userspace-api/media/v4l/vidioc-queryctrl.html),
 [V4L2 camera units](https://cdn.kernel.org/doc/html/latest/userspace-api/media/v4l/ext-ctrls-camera.html),

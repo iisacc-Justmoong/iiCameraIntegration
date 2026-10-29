@@ -63,10 +63,10 @@ RAW sensor samples, or provide a still-image encoder.
 
 `iiGraphicAdjust` already supplies CPU sRGB SDR development, tone/color/detail
 adjustments, masks, compositing and four resize kernels. Its `cameraRawFilter`
-operates on rendered RGB; it is not a RAW decoder or sensor ISP. Camera processing
-integration should reuse those operations and keep camera types out of the
-lower-level image-processing SDK. A separate optional bridge may depend on both
-libraries without introducing a circular dependency.
+operates on rendered RGB; it is not a RAW decoder or sensor ISP. 카메라 처리는
+별도로 구성한 `example/ImageProcessing` 애플리케이션 어댑터에서
+그 연산을 사용한다. 두 SDK 패키지는 서로 독립적이며 어댑터가 둘을 명시적으로
+링크한다.
 
 ## Automated color validation
 

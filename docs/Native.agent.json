@@ -1,0 +1,311 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:1ce7bdc5d3a120fd1f09e0fd06dd1dbaa47326ad2a5546f7e9c51ecde16566ab",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/Native.md",
+    "sha256": "d0d9557b10c524562a9114ab170d8b46fb3a479302f7651884f3bd6495a25eac",
+    "bytes": 6424,
+    "line_count": 93,
+    "encoding": "utf-8",
+    "language": "en"
+  },
+  "document": {
+    "title": "Native camera discovery, pairing, and controls",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Native camera discovery, pairing, and controls\n",
+      "level": 1,
+      "title": "Native camera discovery, pairing, and controls"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 7,
+      "raw": "`NativeCameraSystem` uses AVFoundation on supported Apple platforms, V4L2 on\nLinux, Media Foundation on Windows and Camera2 on Android API 24+. All adapters\nare Qt-free. See [Features.md](Features.md) for the full compatibility matrix,\nbatch queries and native feature payloads. The following sections describe\nthe Apple adapter specifically.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 8,
+      "end_line": 8,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 9,
+      "end_line": 17,
+      "raw": "`cameras()` enumerates connected camera devices and reports the device ID, name,\nmanufacturer, model, position, formats, native format subtype, and frame-rate\nranges supplied by the operating system. Unknown sensor dimensions, physical\nfocal length, lens identity, and other undisclosed hardware facts remain unknown.\nAn operating system format subtype is a native media description; it does not\nestablish that a recording container or compressed codec can be encoded.\n`pixelFormat` is populated only when CoreVideo recognizes the subtype as a\nregistered pixel format. Other subtypes remain preserved in the native metadata\nwithout being guessed to be either a pixel format or a recording codec.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 18,
+      "end_line": 18,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 19,
+      "end_line": 23,
+      "raw": "`permissionStatus()` only reads the application's camera authorization status.\nNeither discovery nor control creation displays a permission prompt or starts a\ncapture session. The application is responsible for an appropriate camera privacy\nusage description and requesting access through its own user flow. Applying a\ncontrol requires existing authorization.\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 24,
+      "end_line": 24,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 25,
+      "end_line": 33,
+      "raw": "`devices()` returns a `CameraDeviceSystem` callback port whose discovery and\npairing delegate to the native adapter. `pair(id)` resolves the exact connected\nAVFoundation video-device ID again, requires existing camera authorization,\ncreates an `AVCaptureDeviceInput`, and attaches it to a stopped\n`AVCaptureSession`. Only after the input is attached does it return a\n`CameraPairing` with `PairingMethod::Session`. It never starts the session,\nadds an output, requests camera permission, or captures media. This prepares\nan application-owned camera input connection; it does not prove that the\nhardware is exclusively reserved or that captured frames are available.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 34,
+      "end_line": 34,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 35,
+      "end_line": 42,
+      "raw": "The native adapter supports `Session` only. `DeviceBond` and nonempty\nprovider-specific parameters return `Unsupported`: it does not perform\nBluetooth, Wi-Fi, vendor authentication, or persistent operating system bonding.\nAn empty ID, embedded NUL, invalid UTF-8 ID, or unknown method returns\n`InvalidArgument`. A missing or disconnected exact device returns `NotFound`.\nThe adapter checks an existing device's permission before creating its input and\nreturns `PermissionDenied` when authorization is absent. Native input failures\nretain their OS error code; known device-in-use errors map to `Busy`.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 43,
+      "end_line": 43,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 44,
+      "end_line": 52,
+      "raw": "The pairing retains the exact native device, input, and stopped session. Its\n`status()` checks the physical device's current connection and that the input\nstill belongs to that session; disconnection reports `Disconnected`. Its\n`controls()` resolves the retained device's exact ID through the existing native\ncontrol bridge. Pairing operations and returned controls are serialized by the\npublic pairing handle, and a successful `unpair()` removes the input and releases\nthe native resources. Existing pairing control ports are revoked by the handle's\nsession gate after unpairing. Pairing information is a discovery-time snapshot,\nwhereas `status()` observes the current connection.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 53,
+      "end_line": 53,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "paragraph",
+      "start_line": 54,
+      "end_line": 57,
+      "raw": "Control support comes from the selected device and its current active format.\nmacOS AVFoundation exposes focus and exposure modes but does not expose the iOS\nzoom, lens position, lens aperture, ISO, or exposure-duration APIs. Those controls\nare explicitly unsupported on macOS. No UVC vendor extension is implied.\n"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 58,
+      "end_line": 58,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "paragraph",
+      "start_line": 59,
+      "end_line": 65,
+      "raw": "On iOS and Mac Catalyst, supported devices can provide zoom, normalized lens\nposition, exposure duration in seconds, ISO, and automatic/manual modes. Lens\nposition is a unitless value in `[0, 1]`, **not** a focus distance in metres, and\nthe endpoint `1` does not guarantee infinity focus. Field of view is supplied by\nthe active format in degrees when the operating system reports it. Changing zoom\ncan affect field of view; the adapter does not invent a physical focal length or\npromise an independently adjustable field-of-view control.\n"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 66,
+      "end_line": 66,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 67,
+      "end_line": 69,
+      "raw": "On operating systems and SDKs with the iOS 27 variable-aperture API, the adapter\nuses the format's reported aperture bounds and support check. On earlier versions\nthe reported lens aperture is read-only. A fixed aperture stays read-only.\n"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 70,
+      "end_line": 70,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 71,
+      "end_line": 76,
+      "raw": "Each mutation rechecks the device and capability, serializes access, obtains\n`lockForConfiguration`, and promptly releases it. An accepted mutation is not\nproof that a frame using that setting has been captured: the operating system may\napply focus and exposure changes asynchronously. Query the resulting device state\nand validate actual captured media in the host application when such proof is\nrequired. The adapter does not wait for frame synchronization.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 77,
+      "end_line": 77,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "paragraph",
+      "start_line": 78,
+      "end_line": 84,
+      "raw": "The native smoke test enumerates metadata, checks invalid and missing pairing\nIDs, rejects unsupported bonding/parameters, and verifies permission remains\nunchanged. When permission is absent it also checks that pairing an enumerated\ndevice returns a permission error without opening an input. On a host with no\ncamera, these are error-path and discovery checks; they do not prove successful\nphysical input attachment, hot-unplug behavior, captured frames, hardware\ncontrols, or runtime behavior on an iPhone or iPad.\n"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 85,
+      "end_line": 85,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "paragraph",
+      "start_line": 86,
+      "end_line": 93,
+      "raw": "Primary references: [Apple AVCaptureDevice](https://developer.apple.com/documentation/avfoundation/avcapturedevice),\n[Apple AVCaptureDevice.Format](https://developer.apple.com/documentation/avfoundation/avcapturedevice/format),\n[camera authorization](https://developer.apple.com/documentation/avfoundation/avcapturedevice/authorizationstatus(for:)),\n[lens position](https://developer.apple.com/documentation/avfoundation/avcapturedevice/lensposition),\nand [configuration locking](https://developer.apple.com/documentation/avfoundation/avcapturedevice/lockforconfiguration()).\nThe connection contract also uses [device input construction](https://developer.apple.com/documentation/avfoundation/avcapturedeviceinput/init(device:)),\n[input attachment](https://developer.apple.com/documentation/avfoundation/avcapturesession/addinput(_:)),\nand [input removal](https://developer.apple.com/documentation/avfoundation/avcapturesession/removeinput(_:)).\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Native camera discovery, pairing, and controls",
+      "anchor": "native-camera-discovery-pairing-and-controls",
+      "start_line": 1
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000009",
+        "line": 30,
+        "text": "`CameraPairing` with `PairingMethod::Session`. It never starts the session,",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000021",
+        "line": 76,
+        "text": "required. The adapter does not wait for frame synchronization.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000023",
+        "line": 82,
+        "text": "camera, these are error-path and discovery checks; they do not prove successful",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000003",
+        "label": "Features.md",
+        "target": "Features.md",
+        "kind": "relative",
+        "line": 5
+      },
+      {
+        "block_id": "b000025",
+        "label": "Apple AVCaptureDevice",
+        "target": "https://developer.apple.com/documentation/avfoundation/avcapturedevice",
+        "kind": "external",
+        "line": 86
+      },
+      {
+        "block_id": "b000025",
+        "label": "Apple AVCaptureDevice.Format",
+        "target": "https://developer.apple.com/documentation/avfoundation/avcapturedevice/format",
+        "kind": "external",
+        "line": 87
+      },
+      {
+        "block_id": "b000025",
+        "label": "camera authorization",
+        "target": "https://developer.apple.com/documentation/avfoundation/avcapturedevice/authorizationstatus(for:)",
+        "kind": "external",
+        "line": 88
+      },
+      {
+        "block_id": "b000025",
+        "label": "lens position",
+        "target": "https://developer.apple.com/documentation/avfoundation/avcapturedevice/lensposition",
+        "kind": "external",
+        "line": 89
+      },
+      {
+        "block_id": "b000025",
+        "label": "configuration locking",
+        "target": "https://developer.apple.com/documentation/avfoundation/avcapturedevice/lockforconfiguration()",
+        "kind": "external",
+        "line": 90
+      },
+      {
+        "block_id": "b000025",
+        "label": "device input construction",
+        "target": "https://developer.apple.com/documentation/avfoundation/avcapturedeviceinput/init(device:)",
+        "kind": "external",
+        "line": 91
+      },
+      {
+        "block_id": "b000025",
+        "label": "input attachment",
+        "target": "https://developer.apple.com/documentation/avfoundation/avcapturesession/addinput(_:)",
+        "kind": "external",
+        "line": 92
+      },
+      {
+        "block_id": "b000025",
+        "label": "input removal",
+        "target": "https://developer.apple.com/documentation/avfoundation/avcapturesession/removeinput(_:)",
+        "kind": "external",
+        "line": 93
+      }
+    ],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

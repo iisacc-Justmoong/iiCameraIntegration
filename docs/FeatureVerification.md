@@ -43,12 +43,12 @@ std::unexpected function; the cross toolchain first includes __config and undefi
 that compatibility switch so C++23 std::unexpected<T> is unambiguous. This is a
 build-tool configuration workaround, not a modified standard-library source.
 
-Actual installation is at ~/.local/SDK/iiCameraIntergration and contains the
+Actual installation is at ~/.local/SDK/iiCameraIntegration and contains the
 0.4.0 Core library, native adapter, FFmpeg bridge, public headers, CMake package,
 inspection CLI and documentation. The optional photo component was regression-
 tested and staged; it is not part of this Core installation. The independent
 local-package consumer passes, and dyld tracing confirms it loads the local
-libiiCameraIntergration.0.4.0.dylib. Public Features.h and Devices.h match source;
+libiiCameraIntegration.0.4.0.dylib. Public Features.h and Devices.h match source;
 private detail headers are excluded. The installed --features command emits
 schemaVersion 1 with an empty device list on this host.
 

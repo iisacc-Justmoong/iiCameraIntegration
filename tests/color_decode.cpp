@@ -1,4 +1,4 @@
-#include <iiCameraIntergration/Media.h>
+#include <iiCameraIntegration/Media.h>
 
 #include <algorithm>
 #include <array>
@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 
 namespace {
 void require(bool condition, const std::string& message) {

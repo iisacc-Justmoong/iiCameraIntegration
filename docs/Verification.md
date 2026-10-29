@@ -1,5 +1,27 @@
 # Verification
 
+## 이미지 SDK 경계 이전, 2026-10-28
+
+macOS arm64에서 파일 제공자와 이미지 SDK 검색을 비활성화한 카메라 SDK 빌드가
+성공했고, 핵심 계약과 독립성 경계 검사 8개가 기존 제한 시간 안에 통과했다.
+FFmpeg와 네이티브 장치 구현을 끈 별도 구성의 경계 및 사용 불가 검사 3개도
+통과했다. 설치된 SDK는 두 SDK와 Qt 검색을 끈 소비자에서 컴파일됐으며,
+바이너리 연결 목록에도 두 SDK가 없었다.
+
+별도 사진 처리 소비자는 합성 RGB·색상·처리·입력 검증·FFmpeg 합성 소스
+검사 5개를 기존 30초 제한 안에 통과했다. 별도 Media 소비자의 합성 미디어
+검사는 녹화·재생용 데이터 확인, 제한·취소, 파일 생성·게시 오류, 기존 파일
+보존과 게시 경합을 통과했다. 실제 오디오 재생은 하지 않았다. 테스트 파일은
+파일 제공자가 `example/Media/resources`의 임시 디렉터리에 만들고 제거했다.
+
+FFmpeg가 없는 구성에서도 사진 처리 합성 검사 5개가 통과했고, FFmpeg 전용
+CLI·패키지 검사는 등록되지 않았다. 이 구성의 캡처 검사는 사용 불가 경로를
+확인하므로 실제 영상 캡처 성공을 의미하지 않는다. 실제 카메라, 권한 요청과
+애플리케이션은 실행하지 않았다. 두 CLI와 설치 패키지 실행 검사는 등록했지만
+이번에는 실행하지 않았다. 격리된 설치본에서 임시 파일 제공자 제어 파일과
+Finder 메타데이터의 제외를 검사한다. Windows·Linux 실제 빌드와 실행은 이번에
+확인하지 않았다.
+
 ## Current 0.4.0 compatibility and bulk inspection
 
 The 2026-10-13 results, native platform build matrix, 114 passing regression
@@ -105,7 +127,7 @@ These are representative content tests, not an exhaustive test of every codec.
 
 The installed shared CLI identified MP4/H.264/AAC from a generated artifact.
 `DYLD_PRINT_LIBRARIES` confirmed that the consumer loads the staged
-`build/install/lib/libiiCameraIntergration.0.1.0.dylib`.
+`build/install/lib/libiiCameraIntegration.0.1.0.dylib`.
 
 ## Connected FFmpeg inventory
 
@@ -158,4 +180,4 @@ are created beneath `build/`. To skip the sanitizer configuration, omit the flag
 - `build/cli/cli-red.ppm`: a synthetic captured-frame artifact.
 
 This verification installed only into Workspace staging directories.
-The default `~/.local/SDK/iiCameraIntergration` prefix has not been modified.
+The default `~/.local/SDK/iiCameraIntegration` prefix has not been modified.

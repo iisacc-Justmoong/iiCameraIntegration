@@ -1,4 +1,4 @@
-#include <iiCameraIntergration/Camera.h>
+#include <iiCameraIntegration/Camera.h>
 
 #include <array>
 #include <cmath>
@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <string_view>
 
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 
 namespace {
 #define CHECK(expression) do { if (!(expression)) throw std::runtime_error( \

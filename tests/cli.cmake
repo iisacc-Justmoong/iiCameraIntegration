@@ -1,3 +1,5 @@
+# Historical test retained for reference. The separate Media consumer maintains
+# the equivalent CLI checks in example/Media/tests/cli.py.
 file(MAKE_DIRECTORY "${OUTPUT}")
 set(image "${OUTPUT}/cli-red.ppm")
 file(REMOVE "${image}")

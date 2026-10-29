@@ -1,3 +1,5 @@
+# Historical pre-migration package check. The active equivalent is
+# example/ImageProcessing/tests/installed_package.cmake.
 file(MAKE_DIRECTORY "${OUTPUT}")
 set(prefix "${OUTPUT}/install")
 execute_process(COMMAND "${CMAKE_COMMAND}" --install "${BUILD}" --prefix "${prefix}" --config "${CONFIG}"
@@ -7,8 +9,8 @@ if(NOT status EQUAL 0)
     message(FATAL_ERROR "Photo package installation failed: ${error}")
 endif()
 foreach(mode Core Optional Required)
-    execute_process(COMMAND "${CMAKE_COMMAND}" -S "${SOURCE}/tests/package" -B "${OUTPUT}/${mode}"
-        "-DMODE=${mode}" "-DiiCameraIntergration_DIR=${prefix}/${LIBDIR}/cmake/iiCameraIntergration"
+    execute_process(COMMAND "${CMAKE_COMMAND}" --fresh -S "${SOURCE}/tests/package" -B "${OUTPUT}/${mode}"
+        "-DMODE=${mode}" "-DiiCameraIntegration_DIR=${prefix}/${LIBDIR}/cmake/iiCameraIntegration"
         RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error TIMEOUT 15)
     file(WRITE "${OUTPUT}/${mode}.log" "${output}${error}")
     if(mode STREQUAL "Required")
@@ -26,10 +28,10 @@ set(consumer_generator -G "${GENERATOR}")
 if(MAKE_PROGRAM)
     list(APPEND consumer_generator "-DCMAKE_MAKE_PROGRAM=${MAKE_PROGRAM}")
 endif()
-execute_process(COMMAND "${CMAKE_COMMAND}" -S "${SOURCE}/tests/consumer" -B "${consumer_build}"
+execute_process(COMMAND "${CMAKE_COMMAND}" --fresh -S "${SOURCE}/tests/consumer" -B "${consumer_build}"
     ${consumer_generator} "-DCMAKE_BUILD_TYPE=${CONFIG}"
     -DIICAMERA_CONSUMER_WITH_PROCESSING=ON
-    "-DiiCameraIntergration_DIR=${prefix}/${LIBDIR}/cmake/iiCameraIntergration"
+    "-DiiCameraIntegration_DIR=${prefix}/${LIBDIR}/cmake/iiCameraIntegration"
     "-DiiGraphicAdjust_DIR=${GRAPHIC_ADJUST_DIR}" "-DiiFileProviderNative_DIR=${FILE_PROVIDER_DIR}"
     RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error TIMEOUT 30)
 file(WRITE "${OUTPUT}/consumer-configure.log" "${output}${error}")

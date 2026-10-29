@@ -1,23 +1,23 @@
-# iiCameraIntergration: Windows 빌드 및 실행
+# iiCameraIntegration: Windows 빌드 및 실행
 
-카메라 메타데이터·제어와 미디어 형식 인식을 제공하는 C++23 SDK이다. 저장소의 Intergration 표기를 유지한다.
+카메라 메타데이터·제어와 미디어 형식 인식을 제공하는 C++23 SDK이다. 패키지와 네임스페이스는 Integration 표기를 사용한다.
 
 검증 기록 갱신: `2026-10-20T02:45:37+09:00`. 변경 전 소스 기준 commit: `6d69f91f6330108f5c92a34a7afbbcd18ff851f8`. 아래 결과는 이번 변경을 포함한 작업 트리의 검증이다.
 
 ## 현재 검증 상태
 
-Release 빌드·실행 검사·설치를 완료하였다. 등록 검사 26개 중 26개 통과, 0개 실패, 0개 skip이다.
+아래 26개 검사 통과 기록은 2026-10-20 소스에 대한 이전 결과다. 2026-10-28 파일 포트 분리 이후 Windows 빌드와 실행은 아직 검증하지 않았다.
 
 ## 이 프로젝트의 의존성과 실행 범위
 
-선행 workspace SDK는 다음과 같다. 각각의 Windows 지침에 따라 실행 검증과 설치를 완료한 뒤 진행한다.
+카메라 SDK 본체는 다른 SDK를 필요로 하지 않는다. 다음 모듈은 별도로 구성하는 소비자에서 사용한다.
 
-- [iiFileProvider](../../../SDK/iiFileProvider/docs/WindowsBuildAndRun.md)
-- [iiGraphicAdjust](../../../SDK/iiGraphicAdjust/docs/WindowsBuildAndRun.md) — ImageProcessing 옵션을 켤 때 사용
+- [iiFileProvider](../../../SDK/iiFileProvider/docs/WindowsBuildAndRun.md) — 별도 Media 소비자의 파일 생성·게시
+- [iiGraphicAdjust](../../../SDK/iiGraphicAdjust/docs/WindowsBuildAndRun.md) — 별도 ImageProcessing 소비자에서 사용
 
-- iiFileProvider Native와 Windows 네이티브 카메라 API, pkg-config 및 FFmpeg 개발 헤더·라이브러리가 필요하다.
+- 본체에는 Windows 네이티브 카메라 API, pkg-config 및 FFmpeg 개발 헤더·라이브러리가 필요하다. iiFileProvider Native는 Media 소비자에만 필요하다.
 - `Tools/FFmpeg/SDK9`의 LGPL shared FFmpeg SDK는 MSVC용 import library를 갖춘 설치본이다. 테스트 영상 생성은 libx264를 제공하는 `Tools/FFmpeg/ffmpeg-9.0.2-essentials_build/bin/ffmpeg.exe`를 사용한다.
-- iiGraphicAdjust는 선택적인 ImageProcessing 구성에서 필요하다. 아래 검증 구성은 해당 구성을 끈 상태이다.
+- iiGraphicAdjust는 별도로 구성하는 ImageProcessing 소비자에만 필요하다. 아래 구성은 카메라 SDK 본체이다.
 
 프로젝트별 Windows 조건은 다음과 같다.
 
@@ -40,7 +40,7 @@ $python = (Join-Path $workspace 'Tools/Python314/tools/python.exe').Replace('\',
 $compiler = (Get-Command cl.exe -ErrorAction Stop).Source.Replace('\', '/')
 $toolchain = (Join-Path $workspace 'Tools/vcpkg/scripts/buildsystems/vcpkg.cmake').Replace('\', '/')
 $msvcInclude = (Join-Path $workspace 'SDK/Windows/WindowsMsvcPrefix.cmake').Replace('\', '/')
-$prefix = (Join-Path $env:USERPROFILE '.local/SDK/iiCameraIntergration').Replace('\', '/')
+$prefix = (Join-Path $env:USERPROFILE '.local/SDK/iiCameraIntegration').Replace('\', '/')
 ```
 
 `Enter-DevEnvironment.ps1`은 Qt MSVC kit, vcpkg, 설치된 SDK의 검색 경로와 UTF-8 설정을 준비한다. `CMAKE_PREFIX_PATH`의 디렉터리 존재만으로 의존성 검증을 대신하지 않는다. 선행 SDK의 실행 검사와 설치를 먼저 완료해야 한다.
@@ -65,7 +65,7 @@ $configure = @(
     '-DIICAMERA_WITH_FFMPEG=ON'
     '-DIICAMERA_WITH_NATIVE=ON'
     '-DIICAMERA_WITH_IMAGE_PROCESSING=OFF'
-    '-DIICAMERA_BUILD_TOOLS=ON'
+    '-DIICAMERA_BUILD_TOOLS=OFF'
     "-DIICAMERA_FFMPEG_EXECUTABLE=$($workspace.Replace('\', '/'))/Tools/FFmpeg/ffmpeg-9.0.2-essentials_build/bin/ffmpeg.exe"
 )
 & cmake @configure
@@ -86,7 +86,7 @@ if ($LASTEXITCODE -ne 0) { throw '빌드 실패' }
 
 ## 실행과 확인
 
-기능 JSON, 장치 수명, FFmpeg 미디어 인식과 CLI를 검증한다.
+본체의 기능 JSON과 장치 수명을 검증한다. 미디어 저장 및 CLI는 별도 Media 소비자에서 검증한다.
 
 ```powershell
 $dllDirectories = @(Get-ChildItem -LiteralPath build -Recurse -Filter '*.dll' -File |
@@ -102,7 +102,12 @@ if ($LASTEXITCODE -ne 0) { throw '전체 실행 검사 실패' }
 추가 수동 실행은 다음과 같다. 앞의 DLL 검색 환경을 유지한다.
 
 ```powershell
-& ./build/iicamera-inspect.exe --help
+cmake --install build --prefix $prefix
+cmake -S example/Media -B build/media-consumer -G Ninja `
+    "-DiiCameraIntegration_DIR=$prefix/lib/cmake/iiCameraIntegration" `
+    "-DiiFileProviderNative_DIR=$env:USERPROFILE/.local/SDK/iiFileProvider/lib/cmake/iiFileProviderNative"
+cmake --build build/media-consumer --config Release
+& ./build/media-consumer/iicamera-inspect.exe --help
 if ($LASTEXITCODE -ne 0) { throw 'Camera CLI 실행 실패' }
 ```
 

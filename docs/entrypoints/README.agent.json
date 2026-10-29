@@ -1,0 +1,1019 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:128f3ad08cc900d7cc645d60d5913f5bba140b0643dc14f2a4c9a7107fce08b0",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "README.md",
+    "sha256": "8a193cb64877efe39e8359a7d40ba719cf5f46c181f6542f531aef4860ece853",
+    "bytes": 11837,
+    "line_count": 223,
+    "encoding": "utf-8",
+    "language": "en"
+  },
+  "document": {
+    "title": "iiCameraIntegration",
+    "role": "overview",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# iiCameraIntegration\n",
+      "level": 1,
+      "title": "iiCameraIntegration"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 3,
+      "raw": "[Windows build and execution](docs/WindowsBuildAndRun.md)\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 4,
+      "end_line": 4,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 5,
+      "end_line": 7,
+      "raw": "Package release: **0.4.1** (2026-10-19). This patch packages the current\nsource snapshot; build, test and installation evidence is recorded in the SDK\npatch-release report. Earlier versioned feature notes remain historical.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 8,
+      "end_line": 9,
+      "raw": "\n\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 10,
+      "end_line": 16,
+      "raw": "Version **0.4.1**. A C++23 camera integration SDK for camera metadata, capability-aware optical\ncontrols, media capture, and codec/container identification. The package and\nnamespace are both named **iiCameraIntegration**. See the\n[package naming contract](docs/PackageName.md) for headers, exports and rebuilding\nexisting consumers after the spelling correction.\nThe public API uses standard C++ values and `std::expected`; it has no Qt dependency.\nNative platform code is isolated in an optional adapter.\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 17,
+      "end_line": 17,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "table",
+      "start_line": 18,
+      "end_line": 25,
+      "raw": "| Requirement | API | Implemented behavior |\n| --- | --- | --- |\n| Camera metadata | `CameraInfo`, `SensorInfo`, `LensInfo`, `CameraFormat` | Device identity, sensor/lens fields, format/frame-rate capabilities, active format, controls, and provider extension metadata. Unknown measurements remain optional. |\n| Bulk feature inspection | `ControlPort::queryAll`, `CameraDeviceSystem::features`, `NativeCameraSystem::features`, `CameraPairing::features` | Single-device or all-device reports with capabilities, current values, native/vendor features and per-item errors; metadata-only mode avoids current-value reads. |\n| Lens, field of view, variable aperture | `ControlPort`, `ControlCapability`, `ControlCommand` | Typed read/write commands with supported units, ranges, steps, modes, and identifiers. Rejects unsupported/read-only controls before dispatch. Includes rectilinear optical conversion functions. |\n| Camera media capture | `PacketCapture`, `decodeRgbFrame`, `recordMedia` | FFmpeg device/file/network input, timestamped stream packets, decoded RGB still frames, and bounded recordings by remuxing compatible streams. |\n| Codec/format recognition | `codecCatalog`, `formatCatalog`, `probeMedia`, `probeMediaBytes` | All codec descriptors and input/output formats registered in the linked FFmpeg build. Content probing identifies container and each stream codec independently of its extension; codec identity is separate from decoder/encoder availability. |\n| Hardware discovery and pairing | `CameraDeviceSystem`, `CameraPairing`, `NativeCameraSystem::devices/pair` | Validated discovery snapshots, exact-ID session pairing, ready/disconnected/unpaired status, revocable controls and explicit/RAII release. Apple pairing attaches actual camera input to a stopped session; hardware authentication requires a separate provider. |\n",
+      "columns": [
+        "Requirement",
+        "API",
+        "Implemented behavior"
+      ],
+      "rows": [
+        [
+          "Camera metadata",
+          "`CameraInfo`, `SensorInfo`, `LensInfo`, `CameraFormat`",
+          "Device identity, sensor/lens fields, format/frame-rate capabilities, active format, controls, and provider extension metadata. Unknown measurements remain optional."
+        ],
+        [
+          "Bulk feature inspection",
+          "`ControlPort::queryAll`, `CameraDeviceSystem::features`, `NativeCameraSystem::features`, `CameraPairing::features`",
+          "Single-device or all-device reports with capabilities, current values, native/vendor features and per-item errors; metadata-only mode avoids current-value reads."
+        ],
+        [
+          "Lens, field of view, variable aperture",
+          "`ControlPort`, `ControlCapability`, `ControlCommand`",
+          "Typed read/write commands with supported units, ranges, steps, modes, and identifiers. Rejects unsupported/read-only controls before dispatch. Includes rectilinear optical conversion functions."
+        ],
+        [
+          "Camera media capture",
+          "`PacketCapture`, `decodeRgbFrame`, `recordMedia`",
+          "FFmpeg device/file/network input, timestamped stream packets, decoded RGB still frames, and bounded recordings by remuxing compatible streams."
+        ],
+        [
+          "Codec/format recognition",
+          "`codecCatalog`, `formatCatalog`, `probeMedia`, `probeMediaBytes`",
+          "All codec descriptors and input/output formats registered in the linked FFmpeg build. Content probing identifies container and each stream codec independently of its extension; codec identity is separate from decoder/encoder availability."
+        ],
+        [
+          "Hardware discovery and pairing",
+          "`CameraDeviceSystem`, `CameraPairing`, `NativeCameraSystem::devices/pair`",
+          "Validated discovery snapshots, exact-ID session pairing, ready/disconnected/unpaired status, revocable controls and explicit/RAII release. Apple pairing attaches actual camera input to a stopped session; hardware authentication requires a separate provider."
+        ]
+      ]
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 26,
+      "end_line": 26,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 27,
+      "end_line": 37,
+      "raw": "`NativeCameraSystem` selects AVFoundation on Apple platforms, V4L2 on Linux,\nMedia Foundation on Windows and Camera2 NDK on Android API 24+. This covers\nOS-visible built-in, USB/UVC, capture-card, external and virtual cameras where\nthe platform driver exposes them. Android reports every static metadata tag;\nits live request/result controls remain owned by the host capture session.\nSee [compatibility and complete inspection](docs/Features.md).\nVendor providers use the same callback APIs without leaking native types.\nFFmpeg supplies device/network capture independently, including RTSP/HTTP\nsources and `avfoundation`, `dshow`, `v4l2`, and `lavfi` when enabled in its build.\nNetwork URLs are explicit `MediaSource` inputs; PTP-only cameras and proprietary\nauthentication require a corresponding provider.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 38,
+      "end_line": 38,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 39,
+      "end_line": 42,
+      "raw": "The new callback fields change public object layouts. Consumers must rebuild\nagainst 0.4; CMake same-minor compatibility prevents linking 0.3 consumers to\nthis ABI. Existing aggregate callback source usage remains valid because the\nnew fields are optional and appended.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 43,
+      "end_line": 43,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "paragraph",
+      "start_line": 44,
+      "end_line": 48,
+      "raw": "No API promises access to metadata that firmware or the OS hides. Unknown,\nproprietary, future, and disabled codecs are not universally recognizable.\nThe catalog describes the connected build, including recognized identities without\nan available encoder/decoder. Recording preserves the original codec; conversion\nto a different codec is outside the current recording API.\n"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 49,
+      "end_line": 49,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "heading",
+      "start_line": 50,
+      "end_line": 50,
+      "raw": "## Build and verify\n",
+      "level": 2,
+      "title": "Build and verify"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 51,
+      "end_line": 51,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 52,
+      "end_line": 54,
+      "raw": "Requires CMake 3.24+, a C++23 compiler supporting `std::expected`, and (by default)\nFFmpeg development libraries discoverable through pkg-config: `libavformat`,\n`libavcodec`, `libavdevice`, `libavutil`, and `libswscale`.\n"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 55,
+      "end_line": 55,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "fenced_code",
+      "start_line": 56,
+      "end_line": 61,
+      "raw": "```sh\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release\ncmake --build build --parallel 2\nctest --test-dir build --output-on-failure\ncmake --install build --prefix \"$PWD/build/install\"\n```\n",
+      "language": "sh",
+      "code": "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release\ncmake --build build --parallel 2\nctest --test-dir build --output-on-failure\ncmake --install build --prefix \"$PWD/build/install\"\n",
+      "closed": true
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 62,
+      "end_line": 62,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "paragraph",
+      "start_line": 63,
+      "end_line": 68,
+      "raw": "For the repeatable shared/static/core package-consumer verification, run\n`tools/verify.sh`. Use `tools/verify.sh --sanitize` to also run an ASan/UBSan\nconfiguration with a compatible Clang compiler.\nUse `tools/verify.sh --photo --sanitize` to build the sibling `iiGraphicAdjust`\nsource and verify the optional photo component, both SDKs and their installed\nconsumers. Every generated file and staging prefix stays under `build/`.\n"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 69,
+      "end_line": 69,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "paragraph",
+      "start_line": 70,
+      "end_line": 75,
+      "raw": "For a standard-library-only build, use\n`-DIICAMERA_WITH_FFMPEG=OFF -DIICAMERA_WITH_NATIVE=OFF`; metadata, validation,\noptics, and custom control ports remain usable. Media/native functions explicitly\nreturn unavailable. Shared and static builds are supported. Build variants and\npackage consumer builds remain under `build/`; the Media consumer's temporary\nruntime fixtures are created under its `resources/` directory and cleaned up.\n"
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 76,
+      "end_line": 76,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 77,
+      "end_line": 79,
+      "raw": "The default installation prefix is `~/.local/SDK/iiCameraIntegration`. The\nverification workflow stages the package inside `build/install` so all task\noutputs remain in the Workspace. No third-party dependency is downloaded.\n"
+    },
+    {
+      "id": "b000028",
+      "kind": "blank",
+      "start_line": 80,
+      "end_line": 80,
+      "raw": "\n"
+    },
+    {
+      "id": "b000029",
+      "kind": "heading",
+      "start_line": 81,
+      "end_line": 81,
+      "raw": "## Consume\n",
+      "level": 2,
+      "title": "Consume"
+    },
+    {
+      "id": "b000030",
+      "kind": "blank",
+      "start_line": 82,
+      "end_line": 82,
+      "raw": "\n"
+    },
+    {
+      "id": "b000031",
+      "kind": "fenced_code",
+      "start_line": 83,
+      "end_line": 86,
+      "raw": "```cmake\nfind_package(iiCameraIntegration 0.4 CONFIG REQUIRED)\ntarget_link_libraries(my_app PRIVATE iiCameraIntegration::iiCameraIntegration)\n```\n",
+      "language": "cmake",
+      "code": "find_package(iiCameraIntegration 0.4 CONFIG REQUIRED)\ntarget_link_libraries(my_app PRIVATE iiCameraIntegration::iiCameraIntegration)\n",
+      "closed": true
+    },
+    {
+      "id": "b000032",
+      "kind": "blank",
+      "start_line": 87,
+      "end_line": 87,
+      "raw": "\n"
+    },
+    {
+      "id": "b000033",
+      "kind": "fenced_code",
+      "start_line": 88,
+      "end_line": 103,
+      "raw": "```cpp\n#include <iiCameraIntegration/iiCameraIntegration.h>\nusing namespace iiCameraIntegration;\n\nauto cameras = NativeCameraSystem{}.cameras();\nauto optics = rectilinearFieldOfView(36.0, 24.0, 50.0);\nauto info = probeMedia(MediaSource{\"footage.mov\"});\nauto frame = decodeRgbFrame(MediaSource{\"footage.mov\"});\n\nauto camera = PacketCapture::open(MediaSource{\n    .location = \"0:none\", .inputFormat = \"avfoundation\"\n});\nif (camera) {\n    auto packet = camera->read(); // payload, stream index, PTS/DTS and time base\n}\n```\n",
+      "language": "cpp",
+      "code": "#include <iiCameraIntegration/iiCameraIntegration.h>\nusing namespace iiCameraIntegration;\n\nauto cameras = NativeCameraSystem{}.cameras();\nauto optics = rectilinearFieldOfView(36.0, 24.0, 50.0);\nauto info = probeMedia(MediaSource{\"footage.mov\"});\nauto frame = decodeRgbFrame(MediaSource{\"footage.mov\"});\n\nauto camera = PacketCapture::open(MediaSource{\n    .location = \"0:none\", .inputFormat = \"avfoundation\"\n});\nif (camera) {\n    auto packet = camera->read(); // payload, stream index, PTS/DTS and time base\n}\n",
+      "closed": true
+    },
+    {
+      "id": "b000034",
+      "kind": "blank",
+      "start_line": 104,
+      "end_line": 104,
+      "raw": "\n"
+    },
+    {
+      "id": "b000035",
+      "kind": "paragraph",
+      "start_line": 105,
+      "end_line": 109,
+      "raw": "Device addresses, permissions, and supported pixel formats are provider-specific.\nThe host application owns privacy prompts and must supply its platform camera\nusage descriptions. Enumeration does not request permission or start a session.\nSee [Native adapter](docs/Native.md) and [Media API](docs/Media.md) for platform,\nthreading, and cancellation details.\n"
+    },
+    {
+      "id": "b000036",
+      "kind": "blank",
+      "start_line": 110,
+      "end_line": 110,
+      "raw": "\n"
+    },
+    {
+      "id": "b000037",
+      "kind": "heading",
+      "start_line": 111,
+      "end_line": 111,
+      "raw": "## Hardware discovery and pairing\n",
+      "level": 2,
+      "title": "Hardware discovery and pairing"
+    },
+    {
+      "id": "b000038",
+      "kind": "blank",
+      "start_line": 112,
+      "end_line": 112,
+      "raw": "\n"
+    },
+    {
+      "id": "b000039",
+      "kind": "fenced_code",
+      "start_line": 113,
+      "end_line": 125,
+      "raw": "```cpp\nauto devices = NativeCameraSystem{}.devices();\nauto found = devices.discover();\nif (found && !found->empty()) {\n    auto paired = devices.pair(found->front().id);\n    if (paired) {\n        auto current = paired->status();\n        auto controls = paired->controls();\n        auto released = paired->unpair();\n        // Check every result. Otherwise destruction attempts resource release.\n    }\n}\n```\n",
+      "language": "cpp",
+      "code": "auto devices = NativeCameraSystem{}.devices();\nauto found = devices.discover();\nif (found && !found->empty()) {\n    auto paired = devices.pair(found->front().id);\n    if (paired) {\n        auto current = paired->status();\n        auto controls = paired->controls();\n        auto released = paired->unpair();\n        // Check every result. Otherwise destruction attempts resource release.\n    }\n}\n",
+      "closed": true
+    },
+    {
+      "id": "b000040",
+      "kind": "blank",
+      "start_line": 126,
+      "end_line": 126,
+      "raw": "\n"
+    },
+    {
+      "id": "b000041",
+      "kind": "paragraph",
+      "start_line": 127,
+      "end_line": 132,
+      "raw": "Native session pairing requires existing camera authorization and does not start\ncapture. Device authentication/bonding is a distinct requested method; AVFoundation\nreturns `Unsupported` for it. The move-only owner revokes issued control ports\nwhen released, and physical disconnection requires a new pairing. Custom hardware\nproviders use `DeviceCallbacks`. See [Devices](docs/Devices.md) and the current\n[device verification](docs/DeviceVerification.md).\n"
+    },
+    {
+      "id": "b000042",
+      "kind": "blank",
+      "start_line": 133,
+      "end_line": 133,
+      "raw": "\n"
+    },
+    {
+      "id": "b000043",
+      "kind": "heading",
+      "start_line": 134,
+      "end_line": 134,
+      "raw": "## Photograph processing component\n",
+      "level": 2,
+      "title": "Photograph processing component"
+    },
+    {
+      "id": "b000044",
+      "kind": "blank",
+      "start_line": 135,
+      "end_line": 135,
+      "raw": "\n"
+    },
+    {
+      "id": "b000045",
+      "kind": "paragraph",
+      "start_line": 136,
+      "end_line": 142,
+      "raw": "The separately configured application adapter in `example/ImageProcessing` composes\ncamera core with iiGraphicAdjust 0.6.x. It imports RGB24 with a verified color interpretation, applies EXIF orientation,\ninteger crop, existing development stages, existing resamplers, and histograms.\nUnknown color tags require an explicit source interpretation. Known conflicting\ntransfer/primary tags, ICC input, wide-gamut and HDR transfers are rejected.\nThe FFmpeg decoder now applies supported YUV matrices and full/limited ranges;\nit retains transfer/primary tags rather than silently interpreting every frame as sRGB.\n"
+    },
+    {
+      "id": "b000046",
+      "kind": "blank",
+      "start_line": 143,
+      "end_line": 143,
+      "raw": "\n"
+    },
+    {
+      "id": "b000047",
+      "kind": "fenced_code",
+      "start_line": 144,
+      "end_line": 148,
+      "raw": "```sh\ncmake -S example/ImageProcessing -B build/image-consumer \\\n  '-DCMAKE_PREFIX_PATH=/path/to/iiCameraIntegration;/path/to/iiGraphicAdjust;/path/to/iiFileProvider'\ncmake --build build/image-consumer --parallel 3\n```\n",
+      "language": "sh",
+      "code": "cmake -S example/ImageProcessing -B build/image-consumer \\\n  '-DCMAKE_PREFIX_PATH=/path/to/iiCameraIntegration;/path/to/iiGraphicAdjust;/path/to/iiFileProvider'\ncmake --build build/image-consumer --parallel 3\n",
+      "closed": true
+    },
+    {
+      "id": "b000048",
+      "kind": "blank",
+      "start_line": 149,
+      "end_line": 149,
+      "raw": "\n"
+    },
+    {
+      "id": "b000049",
+      "kind": "fenced_code",
+      "start_line": 150,
+      "end_line": 153,
+      "raw": "```cmake\nfind_package(iiCameraImageProcessing 0.4 CONFIG REQUIRED)\ntarget_link_libraries(my_app PRIVATE iiCameraIntegration::ImageProcessing)\n```\n",
+      "language": "cmake",
+      "code": "find_package(iiCameraImageProcessing 0.4 CONFIG REQUIRED)\ntarget_link_libraries(my_app PRIVATE iiCameraIntegration::ImageProcessing)\n",
+      "closed": true
+    },
+    {
+      "id": "b000050",
+      "kind": "blank",
+      "start_line": 154,
+      "end_line": 154,
+      "raw": "\n"
+    },
+    {
+      "id": "b000051",
+      "kind": "paragraph",
+      "start_line": 155,
+      "end_line": 160,
+      "raw": "The former `IICAMERA_WITH_IMAGE_PROCESSING=ON` option and camera package\ncomponent are no longer supported. Existing users must configure the adapter\nseparately and rebuild. Recording similarly accepts a caller-provided\n`RecordingFilePort`; the separate `example/Media` application composes the\ncamera SDK with iiFileProvider. The old `recordMedia(source, path, options)`\nsignature was removed; consumers must supply a port and rebuild.\n"
+    },
+    {
+      "id": "b000052",
+      "kind": "blank",
+      "start_line": 161,
+      "end_line": 161,
+      "raw": "\n"
+    },
+    {
+      "id": "b000053",
+      "kind": "paragraph",
+      "start_line": 162,
+      "end_line": 162,
+      "raw": "For a synthetic photo processing example with an explicit sRGB interpretation:\n"
+    },
+    {
+      "id": "b000054",
+      "kind": "blank",
+      "start_line": 163,
+      "end_line": 163,
+      "raw": "\n"
+    },
+    {
+      "id": "b000055",
+      "kind": "fenced_code",
+      "start_line": 164,
+      "end_line": 167,
+      "raw": "```sh\nbuild/image-consumer/iicamera-process lavfi 'color=c=0x404040:size=16x16:rate=10:duration=0.2' \\\n  resources/developed.ppm srgb 1\n```\n",
+      "language": "sh",
+      "code": "build/image-consumer/iicamera-process lavfi 'color=c=0x404040:size=16x16:rate=10:duration=0.2' \\\n  resources/developed.ppm srgb 1\n",
+      "closed": true
+    },
+    {
+      "id": "b000056",
+      "kind": "blank",
+      "start_line": 168,
+      "end_line": 168,
+      "raw": "\n"
+    },
+    {
+      "id": "b000057",
+      "kind": "paragraph",
+      "start_line": 169,
+      "end_line": 174,
+      "raw": "The output is a real processed PPM frame; it is not evidence of physical photography.\n`iiGraphicAdjust::developRaw()` supplies the separate caller-decoded Bayer sensor\npath with linear-light headroom. See [Image processing](docs/ImageProcessing.md)\nand [photo prerequisite audit](docs/PhotoAudit.md). RAW container decoding,\nphysical RAW capture, ICC conversion and general still-image encoding remain outside\nthis component. The example writes PPM; it does not add a photo encoder to the SDK.\n"
+    },
+    {
+      "id": "b000058",
+      "kind": "blank",
+      "start_line": 175,
+      "end_line": 175,
+      "raw": "\n"
+    },
+    {
+      "id": "b000059",
+      "kind": "heading",
+      "start_line": 176,
+      "end_line": 176,
+      "raw": "## Inspection tool\n",
+      "level": 2,
+      "title": "Inspection tool"
+    },
+    {
+      "id": "b000060",
+      "kind": "blank",
+      "start_line": 177,
+      "end_line": 177,
+      "raw": "\n"
+    },
+    {
+      "id": "b000061",
+      "kind": "paragraph",
+      "start_line": 178,
+      "end_line": 179,
+      "raw": "Configure the inspection tool as a separate consumer against the installed\ncamera and iiFileProvider packages:\n"
+    },
+    {
+      "id": "b000062",
+      "kind": "blank",
+      "start_line": 180,
+      "end_line": 180,
+      "raw": "\n"
+    },
+    {
+      "id": "b000063",
+      "kind": "fenced_code",
+      "start_line": 181,
+      "end_line": 189,
+      "raw": "```sh\ncmake -S example/Media -B build/media-consumer -G Ninja \\\n  '-DCMAKE_PREFIX_PATH=/path/to/iiCameraIntegration;/path/to/iiFileProvider'\ncmake --build build/media-consumer --parallel 2\nbuild/media-consumer/iicamera-inspect --catalog\nbuild/media-consumer/iicamera-inspect --cameras\nbuild/media-consumer/iicamera-inspect --probe resources/input.mkv\nbuild/media-consumer/iicamera-inspect --capture avfoundation '0:none' resources/camera.nut nut\n```\n",
+      "language": "sh",
+      "code": "cmake -S example/Media -B build/media-consumer -G Ninja \\\n  '-DCMAKE_PREFIX_PATH=/path/to/iiCameraIntegration;/path/to/iiFileProvider'\ncmake --build build/media-consumer --parallel 2\nbuild/media-consumer/iicamera-inspect --catalog\nbuild/media-consumer/iicamera-inspect --cameras\nbuild/media-consumer/iicamera-inspect --probe resources/input.mkv\nbuild/media-consumer/iicamera-inspect --capture avfoundation '0:none' resources/camera.nut nut\n",
+      "closed": true
+    },
+    {
+      "id": "b000064",
+      "kind": "blank",
+      "start_line": 190,
+      "end_line": 190,
+      "raw": "\n"
+    },
+    {
+      "id": "b000065",
+      "kind": "paragraph",
+      "start_line": 191,
+      "end_line": 195,
+      "raw": "For an entirely synthetic still capture, use `--frame lavfi\n\"testsrc=size=64x48:rate=10:duration=0.2\" resources/test-pattern.ppm`. This decodes\na real generated frame but provides no physical-camera evidence. `--capture`\nrequires streams that the destination container can remux; pointer-based native\nframe packets such as FFmpeg `wrapped_avframe` require decoding first.\n"
+    },
+    {
+      "id": "b000066",
+      "kind": "blank",
+      "start_line": 196,
+      "end_line": 196,
+      "raw": "\n"
+    },
+    {
+      "id": "b000067",
+      "kind": "heading",
+      "start_line": 197,
+      "end_line": 197,
+      "raw": "## Distribution\n",
+      "level": 2,
+      "title": "Distribution"
+    },
+    {
+      "id": "b000068",
+      "kind": "blank",
+      "start_line": 198,
+      "end_line": 198,
+      "raw": "\n"
+    },
+    {
+      "id": "b000069",
+      "kind": "paragraph",
+      "start_line": 199,
+      "end_line": 203,
+      "raw": "FFmpeg is an external dependency; its enabled libraries and license are returned\nby `mediaBackendInfo()`. The current host dependency configuration is recorded in\n[Verification](docs/Verification.md). A consumer's distribution must account for\nthe linked dependency configuration. Consult the primary [FFmpeg license\ninformation](https://ffmpeg.org/legal.html). This package does not bundle FFmpeg.\n"
+    },
+    {
+      "id": "b000070",
+      "kind": "blank",
+      "start_line": 204,
+      "end_line": 204,
+      "raw": "\n"
+    },
+    {
+      "id": "b000071",
+      "kind": "paragraph",
+      "start_line": 205,
+      "end_line": 206,
+      "raw": "See [Architecture](docs/Architecture.md), [Media API](docs/Media.md),\n[Native adapter](docs/Native.md), and [Verification](docs/Verification.md).\n"
+    },
+    {
+      "id": "b000072",
+      "kind": "blank",
+      "start_line": 207,
+      "end_line": 207,
+      "raw": "\n"
+    },
+    {
+      "id": "b000073",
+      "kind": "heading",
+      "start_line": 208,
+      "end_line": 208,
+      "raw": "## License\n",
+      "level": 2,
+      "title": "License"
+    },
+    {
+      "id": "b000074",
+      "kind": "blank",
+      "start_line": 209,
+      "end_line": 209,
+      "raw": "\n"
+    },
+    {
+      "id": "b000075",
+      "kind": "paragraph",
+      "start_line": 210,
+      "end_line": 210,
+      "raw": "SPDX-License-Identifier: MIT\n"
+    },
+    {
+      "id": "b000076",
+      "kind": "blank",
+      "start_line": 211,
+      "end_line": 211,
+      "raw": "\n"
+    },
+    {
+      "id": "b000077",
+      "kind": "paragraph",
+      "start_line": 212,
+      "end_line": 214,
+      "raw": "The original code and documentation in this repository are licensed under the\n[MIT License](LICENSE). Third-party code, libraries, fonts, tools, and model\nweights retain their respective licenses.\n"
+    },
+    {
+      "id": "b000078",
+      "kind": "blank",
+      "start_line": 215,
+      "end_line": 215,
+      "raw": "\n"
+    },
+    {
+      "id": "b000079",
+      "kind": "html",
+      "start_line": 216,
+      "end_line": 216,
+      "raw": "<!-- workspace-docs:readme:start -->\n"
+    },
+    {
+      "id": "b000080",
+      "kind": "heading",
+      "start_line": 217,
+      "end_line": 217,
+      "raw": "## Documentation entry points\n",
+      "level": 2,
+      "title": "Documentation entry points"
+    },
+    {
+      "id": "b000081",
+      "kind": "blank",
+      "start_line": 218,
+      "end_line": 218,
+      "raw": "\n"
+    },
+    {
+      "id": "b000082",
+      "kind": "list",
+      "start_line": 219,
+      "end_line": 222,
+      "raw": "- Human overview: this English `README.md`.\n- Agent instructions: [AGENT.md](AGENT.md).\n- Human documentation: [documentation index](docs/README.md).\n- Structured agent documentation: [agent index](docs/agent-index.json).\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "Human overview: this English `README.md`.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "Agent instructions: [AGENT.md](AGENT.md).",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "Human documentation: [documentation index](docs/README.md).",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "Structured agent documentation: [agent index](docs/agent-index.json).",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000083",
+      "kind": "html",
+      "start_line": 223,
+      "end_line": 223,
+      "raw": "<!-- workspace-docs:readme:end -->\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "iiCameraIntegration",
+      "anchor": "iicameraintegration",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000017",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Build and verify",
+      "anchor": "build-and-verify",
+      "start_line": 50
+    },
+    {
+      "block_id": "b000029",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Consume",
+      "anchor": "consume",
+      "start_line": 81
+    },
+    {
+      "block_id": "b000037",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Hardware discovery and pairing",
+      "anchor": "hardware-discovery-and-pairing",
+      "start_line": 111
+    },
+    {
+      "block_id": "b000043",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Photograph processing component",
+      "anchor": "photograph-processing-component",
+      "start_line": 134
+    },
+    {
+      "block_id": "b000059",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Inspection tool",
+      "anchor": "inspection-tool",
+      "start_line": 176
+    },
+    {
+      "block_id": "b000067",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Distribution",
+      "anchor": "distribution",
+      "start_line": 197
+    },
+    {
+      "block_id": "b000073",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "License",
+      "anchor": "license",
+      "start_line": 208
+    },
+    {
+      "block_id": "b000080",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Documentation entry points",
+      "anchor": "documentation-entry-points",
+      "start_line": 217
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000013",
+        "line": 39,
+        "text": "The new callback fields change public object layouts. Consumers must rebuild",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000035",
+        "line": 106,
+        "text": "The host application owns privacy prompts and must supply its platform camera",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000051",
+        "line": 156,
+        "text": "component are no longer supported. Existing users must configure the adapter",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000051",
+        "line": 160,
+        "text": "signature was removed; consumers must supply a port and rebuild.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000069",
+        "line": 201,
+        "text": "[Verification](docs/Verification.md). A consumer's distribution must account for",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [
+      {
+        "block_id": "b000021",
+        "language": "sh",
+        "code": "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release\ncmake --build build --parallel 2\nctest --test-dir build --output-on-failure\ncmake --install build --prefix \"$PWD/build/install\"\n"
+      },
+      {
+        "block_id": "b000047",
+        "language": "sh",
+        "code": "cmake -S example/ImageProcessing -B build/image-consumer \\\n  '-DCMAKE_PREFIX_PATH=/path/to/iiCameraIntegration;/path/to/iiGraphicAdjust;/path/to/iiFileProvider'\ncmake --build build/image-consumer --parallel 3\n"
+      },
+      {
+        "block_id": "b000055",
+        "language": "sh",
+        "code": "build/image-consumer/iicamera-process lavfi 'color=c=0x404040:size=16x16:rate=10:duration=0.2' \\\n  resources/developed.ppm srgb 1\n"
+      },
+      {
+        "block_id": "b000063",
+        "language": "sh",
+        "code": "cmake -S example/Media -B build/media-consumer -G Ninja \\\n  '-DCMAKE_PREFIX_PATH=/path/to/iiCameraIntegration;/path/to/iiFileProvider'\ncmake --build build/media-consumer --parallel 2\nbuild/media-consumer/iicamera-inspect --catalog\nbuild/media-consumer/iicamera-inspect --cameras\nbuild/media-consumer/iicamera-inspect --probe resources/input.mkv\nbuild/media-consumer/iicamera-inspect --capture avfoundation '0:none' resources/camera.nut nut\n"
+      }
+    ],
+    "links": [
+      {
+        "block_id": "b000003",
+        "label": "Windows build and execution",
+        "target": "docs/WindowsBuildAndRun.md",
+        "kind": "relative",
+        "line": 3
+      },
+      {
+        "block_id": "b000007",
+        "label": "package naming contract",
+        "target": "docs/PackageName.md",
+        "kind": "relative",
+        "line": 13
+      },
+      {
+        "block_id": "b000011",
+        "label": "compatibility and complete inspection",
+        "target": "docs/Features.md",
+        "kind": "relative",
+        "line": 32
+      },
+      {
+        "block_id": "b000035",
+        "label": "Native adapter",
+        "target": "docs/Native.md",
+        "kind": "relative",
+        "line": 108
+      },
+      {
+        "block_id": "b000035",
+        "label": "Media API",
+        "target": "docs/Media.md",
+        "kind": "relative",
+        "line": 108
+      },
+      {
+        "block_id": "b000041",
+        "label": "Devices",
+        "target": "docs/Devices.md",
+        "kind": "relative",
+        "line": 131
+      },
+      {
+        "block_id": "b000041",
+        "label": "device verification",
+        "target": "docs/DeviceVerification.md",
+        "kind": "relative",
+        "line": 132
+      },
+      {
+        "block_id": "b000057",
+        "label": "Image processing",
+        "target": "docs/ImageProcessing.md",
+        "kind": "relative",
+        "line": 171
+      },
+      {
+        "block_id": "b000057",
+        "label": "photo prerequisite audit",
+        "target": "docs/PhotoAudit.md",
+        "kind": "relative",
+        "line": 172
+      },
+      {
+        "block_id": "b000069",
+        "label": "Verification",
+        "target": "docs/Verification.md",
+        "kind": "relative",
+        "line": 201
+      },
+      {
+        "block_id": "b000071",
+        "label": "Architecture",
+        "target": "docs/Architecture.md",
+        "kind": "relative",
+        "line": 205
+      },
+      {
+        "block_id": "b000071",
+        "label": "Media API",
+        "target": "docs/Media.md",
+        "kind": "relative",
+        "line": 205
+      },
+      {
+        "block_id": "b000071",
+        "label": "Native adapter",
+        "target": "docs/Native.md",
+        "kind": "relative",
+        "line": 206
+      },
+      {
+        "block_id": "b000071",
+        "label": "Verification",
+        "target": "docs/Verification.md",
+        "kind": "relative",
+        "line": 206
+      },
+      {
+        "block_id": "b000077",
+        "label": "MIT License",
+        "target": "LICENSE",
+        "kind": "relative",
+        "line": 213
+      },
+      {
+        "block_id": "b000082",
+        "label": "AGENT.md",
+        "target": "AGENT.md",
+        "kind": "relative",
+        "line": 220
+      },
+      {
+        "block_id": "b000082",
+        "label": "documentation index",
+        "target": "docs/README.md",
+        "kind": "relative",
+        "line": 221
+      },
+      {
+        "block_id": "b000082",
+        "label": "agent index",
+        "target": "docs/agent-index.json",
+        "kind": "relative",
+        "line": 222
+      }
+    ],
+    "tables": [
+      {
+        "block_id": "b000009",
+        "columns": [
+          "Requirement",
+          "API",
+          "Implemented behavior"
+        ],
+        "rows": [
+          [
+            "Camera metadata",
+            "`CameraInfo`, `SensorInfo`, `LensInfo`, `CameraFormat`",
+            "Device identity, sensor/lens fields, format/frame-rate capabilities, active format, controls, and provider extension metadata. Unknown measurements remain optional."
+          ],
+          [
+            "Bulk feature inspection",
+            "`ControlPort::queryAll`, `CameraDeviceSystem::features`, `NativeCameraSystem::features`, `CameraPairing::features`",
+            "Single-device or all-device reports with capabilities, current values, native/vendor features and per-item errors; metadata-only mode avoids current-value reads."
+          ],
+          [
+            "Lens, field of view, variable aperture",
+            "`ControlPort`, `ControlCapability`, `ControlCommand`",
+            "Typed read/write commands with supported units, ranges, steps, modes, and identifiers. Rejects unsupported/read-only controls before dispatch. Includes rectilinear optical conversion functions."
+          ],
+          [
+            "Camera media capture",
+            "`PacketCapture`, `decodeRgbFrame`, `recordMedia`",
+            "FFmpeg device/file/network input, timestamped stream packets, decoded RGB still frames, and bounded recordings by remuxing compatible streams."
+          ],
+          [
+            "Codec/format recognition",
+            "`codecCatalog`, `formatCatalog`, `probeMedia`, `probeMediaBytes`",
+            "All codec descriptors and input/output formats registered in the linked FFmpeg build. Content probing identifies container and each stream codec independently of its extension; codec identity is separate from decoder/encoder availability."
+          ],
+          [
+            "Hardware discovery and pairing",
+            "`CameraDeviceSystem`, `CameraPairing`, `NativeCameraSystem::devices/pair`",
+            "Validated discovery snapshots, exact-ID session pairing, ready/disconnected/unpaired status, revocable controls and explicit/RAII release. Apple pairing attaches actual camera input to a stopped session; hardware authentication requires a separate provider."
+          ]
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

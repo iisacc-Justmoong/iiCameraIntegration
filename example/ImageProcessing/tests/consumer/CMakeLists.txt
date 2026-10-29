@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.24)
+project(iiCameraImageProcessingConsumer LANGUAGES CXX)
+find_package(iiCameraImageProcessing 0.4 CONFIG REQUIRED)
+add_executable(consumer main.cpp)
+target_compile_features(consumer PRIVATE cxx_std_23)
+target_link_libraries(consumer PRIVATE iiCameraIntegration::ImageProcessing)
+enable_testing()
+add_test(NAME iiCamera.processing.installed_consumer COMMAND consumer)

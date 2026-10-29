@@ -1,0 +1,605 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:5e73560b11914d12c681138d32b7251dc15351f99d9606a3a7b0029a0d1c1f6c",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/Features.md",
+    "sha256": "ffe6287d4b9cd78db1103067693353b8ffe44e61b9949360d33bb15f73b69dd3",
+    "bytes": 8960,
+    "line_count": 139,
+    "encoding": "utf-8",
+    "language": "en"
+  },
+  "document": {
+    "title": "Device compatibility and bulk feature inspection",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Device compatibility and bulk feature inspection\n",
+      "level": 1,
+      "title": "Device compatibility and bulk feature inspection"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 5,
+      "raw": "All adapters and the public core use C++23 without Qt. A feature report describes\nwhat a connected camera, its driver and its platform API expose. It cannot promise\naccess to hidden firmware functions or universal compatibility with every model.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 6,
+      "end_line": 6,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "heading",
+      "start_line": 7,
+      "end_line": 7,
+      "raw": "## Native compatibility\n",
+      "level": 2,
+      "title": "Native compatibility"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 8,
+      "end_line": 8,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "table",
+      "start_line": 9,
+      "end_line": 16,
+      "raw": "| Platform | Adapter | Reported capabilities | Session and controls |\n| --- | --- | --- | --- |\n| macOS | AVFoundation | OS-visible built-in, external/USB, virtual, Continuity and Desk View cameras; formats/rates, color spaces, autofocus systems, photo dimensions, flash/torch and focus/exposure-point support | Input attached to a stopped session; supported focus/exposure/white-balance modes and torch |\n| iOS / Mac Catalyst / tvOS | AVFoundation | Wide/ultrawide/telephoto, TrueDepth, dual/triple, LiDAR and external devices where exposed; mobile depth, HDR, stabilization and constituent metadata | Device-supported zoom, lens position, aperture, ISO, exposure duration/compensation; capture not started |\n| Linux | V4L2 | Capture and multi-planar nodes: USB/UVC, platform/CSI, capture cards, loopback; formats/sizes/rates, driver/bus identity, active format and standard/private/compound controls | Open descriptor without streaming; current ranges/steps/flags and standard control read/write mappings |\n| Windows desktop | Media Foundation | Symbolic links, all exposed video media types and presentation/stream/media-type attributes; all seven IAMCameraControl and ten IAMVideoProcAmp properties where supported | Unstarted media source; owned COM MTA worker accepts calls from STA and other threads |\n| Android API 24+ | Camera2 NDK | IDs, lens/sensor characteristics, output formats and every static tag returned by the NDK, including vendor tags | Open device without a capture session; live request/result controls belong to the host capture session |\n| Other / native disabled | Explicit fallback | Unavailable | Unavailable |\n",
+      "columns": [
+        "Platform",
+        "Adapter",
+        "Reported capabilities",
+        "Session and controls"
+      ],
+      "rows": [
+        [
+          "macOS",
+          "AVFoundation",
+          "OS-visible built-in, external/USB, virtual, Continuity and Desk View cameras; formats/rates, color spaces, autofocus systems, photo dimensions, flash/torch and focus/exposure-point support",
+          "Input attached to a stopped session; supported focus/exposure/white-balance modes and torch"
+        ],
+        [
+          "iOS / Mac Catalyst / tvOS",
+          "AVFoundation",
+          "Wide/ultrawide/telephoto, TrueDepth, dual/triple, LiDAR and external devices where exposed; mobile depth, HDR, stabilization and constituent metadata",
+          "Device-supported zoom, lens position, aperture, ISO, exposure duration/compensation; capture not started"
+        ],
+        [
+          "Linux",
+          "V4L2",
+          "Capture and multi-planar nodes: USB/UVC, platform/CSI, capture cards, loopback; formats/sizes/rates, driver/bus identity, active format and standard/private/compound controls",
+          "Open descriptor without streaming; current ranges/steps/flags and standard control read/write mappings"
+        ],
+        [
+          "Windows desktop",
+          "Media Foundation",
+          "Symbolic links, all exposed video media types and presentation/stream/media-type attributes; all seven IAMCameraControl and ten IAMVideoProcAmp properties where supported",
+          "Unstarted media source; owned COM MTA worker accepts calls from STA and other threads"
+        ],
+        [
+          "Android API 24+",
+          "Camera2 NDK",
+          "IDs, lens/sensor characteristics, output formats and every static tag returned by the NDK, including vendor tags",
+          "Open device without a capture session; live request/result controls belong to the host capture session"
+        ],
+        [
+          "Other / native disabled",
+          "Explicit fallback",
+          "Unavailable",
+          "Unavailable"
+        ]
+      ]
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 17,
+      "end_line": 17,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 18,
+      "end_line": 23,
+      "raw": "An installed backend is not evidence that a particular physical device or OS was\ntested. Discovery never requests permission. Linux query opens a descriptor;\nWindows feature queries activate an unstarted source; Apple/Android metadata\nqueries do not create capture sessions. No feature query starts streaming or\nchanges settings. Linux/Windows/Android global permission status is NotDetermined;\nactual device operations retain PermissionDenied or Busy errors.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 24,
+      "end_line": 24,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 25,
+      "end_line": 29,
+      "raw": "FFmpeg supports explicit device/network MediaSource inputs, including RTSP/HTTP\nwhen its build provides those protocols. Network URLs are not automatically\nincluded in native discovery. DSLR/mirrorless devices in webcam/UVC mode use\ntheir OS drivers. PTP-only cameras, ONVIF configuration and proprietary vendor\nauthentication require a corresponding callback provider.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 30,
+      "end_line": 30,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "heading",
+      "start_line": 31,
+      "end_line": 31,
+      "raw": "## Public API\n",
+      "level": 2,
+      "title": "Public API"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 32,
+      "end_line": 32,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "fenced_code",
+      "start_line": 33,
+      "end_line": 53,
+      "raw": "```cpp\n#include <iiCameraIntegration/iiCameraIntegration.h>\nusing namespace iiCameraIntegration;\nNativeCameraSystem system;\nauto all = system.features();\nif (all) {\n    for (const auto& item : *all) {\n        if (!item.features) continue; // Per-camera failure; other entries survive.\n        const auto& report = *item.features;\n        for (const auto& reading : report.controls) {\n            if (!reading.value) continue; // Per-control Error is preserved.\n            // reading.capability and *reading.value describe this control.\n        }\n        // report.camera preserves all formats, lenses, sensor and metadata.\n        // report.nativeFeatures preserves native/vendor IDs, types and values.\n    }\n}\nauto metadata = system.features(FeatureQueryOptions{false});\n// auto one = system.features(exactDeviceId);\n// auto paired = pairing.features();\n```\n",
+      "language": "cpp",
+      "code": "#include <iiCameraIntegration/iiCameraIntegration.h>\nusing namespace iiCameraIntegration;\nNativeCameraSystem system;\nauto all = system.features();\nif (all) {\n    for (const auto& item : *all) {\n        if (!item.features) continue; // Per-camera failure; other entries survive.\n        const auto& report = *item.features;\n        for (const auto& reading : report.controls) {\n            if (!reading.value) continue; // Per-control Error is preserved.\n            // reading.capability and *reading.value describe this control.\n        }\n        // report.camera preserves all formats, lenses, sensor and metadata.\n        // report.nativeFeatures preserves native/vendor IDs, types and values.\n    }\n}\nauto metadata = system.features(FeatureQueryOptions{false});\n// auto one = system.features(exactDeviceId);\n// auto paired = pairing.features();\n",
+      "closed": true
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 54,
+      "end_line": 54,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "paragraph",
+      "start_line": 55,
+      "end_line": 59,
+      "raw": "ControlPort::queryAll visits every advertised capability in order. Read-only\ncontrols remain queryable; write-only controls yield Unsupported without a query\ncallback. Exceptions and malformed returned values become per-item BackendFailure.\nA control absent from capabilities is not exposed by this provider. Snapshots are\nnot frame-synchronized atomic measurements; refresh after format changes/unplug.\n"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 60,
+      "end_line": 60,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 61,
+      "end_line": 66,
+      "raw": "CameraFeatures contains complete CameraInfo, ControlReading entries and\nNativeFeature entries. NativeFeature retains backend ID/name, FeatureType,\nreadable/writable flags, optional range, menu choices, optional value/error and\nnamespaced metadata. FeatureValue supports int64, double, bool, string, byte\npayloads and integer/number arrays. Native writable means backend support;\nControlPort exposes standard mutations, not arbitrary vendor-payload writes.\n"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 67,
+      "end_line": 67,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 68,
+      "end_line": 71,
+      "raw": "With includeCurrentValues=false, standard readings are omitted and native current\ncontrol values remain unset. Static Camera2 characteristics, AVFoundation flags\nand MF attributes stay present. NativeFeature::value distinguishes unqueried,\nsuccessful and failed values; no failure is replaced by a default value.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 72,
+      "end_line": 72,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "paragraph",
+      "start_line": 73,
+      "end_line": 77,
+      "raw": "Outer batch errors represent discovery failure. After discovery each camera gets\nits own Result<CameraFeatures>. A failed control port is retained per readable\ncontrol while metadata survives. Provider-level failures become camera error\nentries. Callback batches discover once; adapters may re-resolve exact IDs to\ncheck hot unplug.\n"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 78,
+      "end_line": 78,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "heading",
+      "start_line": 79,
+      "end_line": 79,
+      "raw": "## Provider and ownership contracts\n",
+      "level": 2,
+      "title": "Provider and ownership contracts"
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 80,
+      "end_line": 80,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 81,
+      "end_line": 86,
+      "raw": "DeviceCallbacks appends optional controls(id) and features(id, options) callbacks.\nProviders can implement full native reports or use queryCameraFeatures to assemble\nstandard reports. Missing control providers yield per-item Unavailable; metadata\nqueries still work. Callback exceptions, wrong IDs, invalid metadata and duplicate\nnative IDs are rejected. New fields are optional and preserve aggregate source\nusage; object layout changes require a 0.4 consumer rebuild.\n"
+    },
+    {
+      "id": "b000028",
+      "kind": "blank",
+      "start_line": 87,
+      "end_line": 87,
+      "raw": "\n"
+    },
+    {
+      "id": "b000029",
+      "kind": "paragraph",
+      "start_line": 88,
+      "end_line": 92,
+      "raw": "PairingCallbacks appends features(options). The pairing holds its existing\nrevocable gate for the entire batch; unpair cannot release resources mid-query.\nReleased, moved or disconnected handles cannot invoke feature providers. Fallback\nqueries use the provider port directly under the gate without reentering a guarded\nwrapper. Callbacks must not reenter their own pairing.\n"
+    },
+    {
+      "id": "b000030",
+      "kind": "blank",
+      "start_line": 93,
+      "end_line": 93,
+      "raw": "\n"
+    },
+    {
+      "id": "b000031",
+      "kind": "heading",
+      "start_line": 94,
+      "end_line": 94,
+      "raw": "## Platform units and full native data\n",
+      "level": 2,
+      "title": "Platform units and full native data"
+    },
+    {
+      "id": "b000032",
+      "kind": "blank",
+      "start_line": 95,
+      "end_line": 95,
+      "raw": "\n"
+    },
+    {
+      "id": "b000033",
+      "kind": "paragraph",
+      "start_line": 96,
+      "end_line": 105,
+      "raw": "V4L2 exposure units convert from 100 microseconds to seconds; pan/tilt convert from\narcseconds to degrees. Unknown physical focus/zoom units remain native features.\nEnumeration uses NEXT_CTRL | NEXT_COMPOUND, followed by QUERYCTRL and legacy\nuser/camera/private fallbacks. Disabled controls are skipped and menu holes remain\nexcluded. Integer64/string/compound values use G_EXT_CTRLS, with G_CTRL fallback\nfor compatible legacy scalars. Native integer64/payload values remain lossless.\nPayloads are bounded at 16 MiB and control/menu enumeration at 65,536 entries;\nlimits/errors remain observable in metadata. Stepwise frame-interval steps are\nretained as rational metadata; reciprocal FPS bounds do not promise uniform FPS\nsteps or all stream combinations.\n"
+    },
+    {
+      "id": "b000034",
+      "kind": "blank",
+      "start_line": 106,
+      "end_line": 106,
+      "raw": "\n"
+    },
+    {
+      "id": "b000035",
+      "kind": "paragraph",
+      "start_line": 107,
+      "end_line": 111,
+      "raw": "Windows exposure converts log2 seconds to an explicit discrete seconds list.\nFocus converts millimeters to meters; iris converts f-stop times ten to f-number;\ndocumented camera zoom is focal length in millimeters. Commands refresh driver\ncapabilities before writing. Native properties retain raw values/defaults/flags.\nGUID media subtypes are not guessed to be recording codecs or pixel formats.\n"
+    },
+    {
+      "id": "b000036",
+      "kind": "blank",
+      "start_line": 112,
+      "end_line": 112,
+      "raw": "\n"
+    },
+    {
+      "id": "b000037",
+      "kind": "paragraph",
+      "start_line": 113,
+      "end_line": 116,
+      "raw": "Android rational tags retain numerator/denominator pairs. Aperture/focal-length\nlists describe static support, not current values. Minimum frame duration remains\nper-format metadata without inferred FPS/request/stream combinations. Capture\nrequest/result controls and vendor tag names are not invented.\n"
+    },
+    {
+      "id": "b000038",
+      "kind": "blank",
+      "start_line": 117,
+      "end_line": 117,
+      "raw": "\n"
+    },
+    {
+      "id": "b000039",
+      "kind": "heading",
+      "start_line": 118,
+      "end_line": 118,
+      "raw": "## CLI\n",
+      "level": 2,
+      "title": "CLI"
+    },
+    {
+      "id": "b000040",
+      "kind": "blank",
+      "start_line": 119,
+      "end_line": 119,
+      "raw": "\n"
+    },
+    {
+      "id": "b000041",
+      "kind": "fenced_code",
+      "start_line": 120,
+      "end_line": 124,
+      "raw": "```sh\niicamera-inspect --features\niicamera-inspect --features DEVICE_ID\niicamera-inspect --features --metadata-only\n```\n",
+      "language": "sh",
+      "code": "iicamera-inspect --features\niicamera-inspect --features DEVICE_ID\niicamera-inspect --features --metadata-only\n",
+      "closed": true
+    },
+    {
+      "id": "b000042",
+      "kind": "blank",
+      "start_line": 125,
+      "end_line": 125,
+      "raw": "\n"
+    },
+    {
+      "id": "b000043",
+      "kind": "paragraph",
+      "start_line": 126,
+      "end_line": 131,
+      "raw": "Output is JSON with schemaVersion: 1 and devices. Device, standard control and\nnative feature errors remain at their respective levels. Camera objects include\nevery public field and nested metadata map. A failed device returns exit 1 after\nemitting the batch; per-control errors remain within a successful report. Invalid\noptions/extra IDs are rejected. Public batch APIs remain in core-only builds.\nUse find_package(iiCameraIntegration 0.4 CONFIG REQUIRED) and rebuild consumers.\n"
+    },
+    {
+      "id": "b000044",
+      "kind": "blank",
+      "start_line": 132,
+      "end_line": 132,
+      "raw": "\n"
+    },
+    {
+      "id": "b000045",
+      "kind": "paragraph",
+      "start_line": 133,
+      "end_line": 139,
+      "raw": "Primary contracts: [V4L2 enumeration](https://cdn.kernel.org/doc/html/latest/userspace-api/media/v4l/vidioc-queryctrl.html),\n[V4L2 camera units](https://cdn.kernel.org/doc/html/latest/userspace-api/media/v4l/ext-ctrls-camera.html),\n[Media Foundation discovery](https://learn.microsoft.com/en-us/windows/win32/medfound/enumerating-video-capture-devices),\n[Windows control units](https://learn.microsoft.com/en-us/windows/win32/api/strmif/ne-strmif-cameracontrolproperty),\n[Microsoft MF controls](https://github.com/microsoft/psi/blob/master/Sources/Media/Microsoft.Psi.Media_Interop.Windows.x64/MediaCaptureDevice.cpp),\n[Camera2 NDK](https://developer.android.com/ndk/reference/group/camera) and\n[AVFoundation](https://developer.apple.com/documentation/avfoundation/avcapturedevice).\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Device compatibility and bulk feature inspection",
+      "anchor": "device-compatibility-and-bulk-feature-inspection",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000005",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Native compatibility",
+      "anchor": "native-compatibility",
+      "start_line": 7
+    },
+    {
+      "block_id": "b000013",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Public API",
+      "anchor": "public-api",
+      "start_line": 31
+    },
+    {
+      "block_id": "b000025",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Provider and ownership contracts",
+      "anchor": "provider-and-ownership-contracts",
+      "start_line": 79
+    },
+    {
+      "block_id": "b000031",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Platform units and full native data",
+      "anchor": "platform-units-and-full-native-data",
+      "start_line": 94
+    },
+    {
+      "block_id": "b000039",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "CLI",
+      "anchor": "cli",
+      "start_line": 118
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000009",
+        "line": 19,
+        "text": "tested. Discovery never requests permission. Linux query opens a descriptor;",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000009",
+        "line": 21,
+        "text": "queries do not create capture sessions. No feature query starts streaming or",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000029",
+        "line": 92,
+        "text": "wrapper. Callbacks must not reenter their own pairing.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000033",
+        "line": 104,
+        "text": "retained as rational metadata; reciprocal FPS bounds do not promise uniform FPS",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000043",
+        "line": 131,
+        "text": "Use find_package(iiCameraIntegration 0.4 CONFIG REQUIRED) and rebuild consumers.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [
+      {
+        "block_id": "b000041",
+        "language": "sh",
+        "code": "iicamera-inspect --features\niicamera-inspect --features DEVICE_ID\niicamera-inspect --features --metadata-only\n"
+      }
+    ],
+    "links": [
+      {
+        "block_id": "b000045",
+        "label": "V4L2 enumeration",
+        "target": "https://cdn.kernel.org/doc/html/latest/userspace-api/media/v4l/vidioc-queryctrl.html",
+        "kind": "external",
+        "line": 133
+      },
+      {
+        "block_id": "b000045",
+        "label": "V4L2 camera units",
+        "target": "https://cdn.kernel.org/doc/html/latest/userspace-api/media/v4l/ext-ctrls-camera.html",
+        "kind": "external",
+        "line": 134
+      },
+      {
+        "block_id": "b000045",
+        "label": "Media Foundation discovery",
+        "target": "https://learn.microsoft.com/en-us/windows/win32/medfound/enumerating-video-capture-devices",
+        "kind": "external",
+        "line": 135
+      },
+      {
+        "block_id": "b000045",
+        "label": "Windows control units",
+        "target": "https://learn.microsoft.com/en-us/windows/win32/api/strmif/ne-strmif-cameracontrolproperty",
+        "kind": "external",
+        "line": 136
+      },
+      {
+        "block_id": "b000045",
+        "label": "Microsoft MF controls",
+        "target": "https://github.com/microsoft/psi/blob/master/Sources/Media/Microsoft.Psi.Media_Interop.Windows.x64/MediaCaptureDevice.cpp",
+        "kind": "external",
+        "line": 137
+      },
+      {
+        "block_id": "b000045",
+        "label": "Camera2 NDK",
+        "target": "https://developer.android.com/ndk/reference/group/camera",
+        "kind": "external",
+        "line": 138
+      },
+      {
+        "block_id": "b000045",
+        "label": "AVFoundation",
+        "target": "https://developer.apple.com/documentation/avfoundation/avcapturedevice",
+        "kind": "external",
+        "line": 139
+      }
+    ],
+    "tables": [
+      {
+        "block_id": "b000007",
+        "columns": [
+          "Platform",
+          "Adapter",
+          "Reported capabilities",
+          "Session and controls"
+        ],
+        "rows": [
+          [
+            "macOS",
+            "AVFoundation",
+            "OS-visible built-in, external/USB, virtual, Continuity and Desk View cameras; formats/rates, color spaces, autofocus systems, photo dimensions, flash/torch and focus/exposure-point support",
+            "Input attached to a stopped session; supported focus/exposure/white-balance modes and torch"
+          ],
+          [
+            "iOS / Mac Catalyst / tvOS",
+            "AVFoundation",
+            "Wide/ultrawide/telephoto, TrueDepth, dual/triple, LiDAR and external devices where exposed; mobile depth, HDR, stabilization and constituent metadata",
+            "Device-supported zoom, lens position, aperture, ISO, exposure duration/compensation; capture not started"
+          ],
+          [
+            "Linux",
+            "V4L2",
+            "Capture and multi-planar nodes: USB/UVC, platform/CSI, capture cards, loopback; formats/sizes/rates, driver/bus identity, active format and standard/private/compound controls",
+            "Open descriptor without streaming; current ranges/steps/flags and standard control read/write mappings"
+          ],
+          [
+            "Windows desktop",
+            "Media Foundation",
+            "Symbolic links, all exposed video media types and presentation/stream/media-type attributes; all seven IAMCameraControl and ten IAMVideoProcAmp properties where supported",
+            "Unstarted media source; owned COM MTA worker accepts calls from STA and other threads"
+          ],
+          [
+            "Android API 24+",
+            "Camera2 NDK",
+            "IDs, lens/sensor characteristics, output formats and every static tag returned by the NDK, including vendor tags",
+            "Open device without a capture session; live request/result controls belong to the host capture session"
+          ],
+          [
+            "Other / native disabled",
+            "Explicit fallback",
+            "Unavailable",
+            "Unavailable"
+          ]
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

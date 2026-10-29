@@ -1,10 +1,10 @@
-#include "iiCameraIntergration/detail/V4L2.h"
+#include "iiCameraIntegration/detail/V4L2.h"
 #include <linux/videodev2.h>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
 
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 namespace {
 #define CHECK(x) do {if(!(x)) throw std::runtime_error(#x);} while(false)
 struct Driver {

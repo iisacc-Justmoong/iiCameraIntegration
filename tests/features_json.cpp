@@ -1,6 +1,6 @@
 #include "../tools/FeatureJson.h"
 #include <iostream>
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 int main() {
     CameraFeatures result;
     result.camera.id="fixture:camera";result.camera.name="Camera \"A\"\n한국어 😀";result.camera.backend="fixture";

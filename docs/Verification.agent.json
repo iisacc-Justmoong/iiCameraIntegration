@@ -1,0 +1,899 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:e56ea5395108bdee0894b5c9a131870c60e5a8a8cd2a697d607b3383784f2d6b",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/Verification.md",
+    "sha256": "461f295f8c9d3b65c201c2fdc4005f9e5d1106adeac39a5cf664cc937f04412e",
+    "bytes": 10848,
+    "line_count": 183,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "Verification",
+    "role": "evidence",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Verification\n",
+      "level": 1,
+      "title": "Verification"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "heading",
+      "start_line": 3,
+      "end_line": 3,
+      "raw": "## 이미지 SDK 경계 이전, 2026-10-28\n",
+      "level": 2,
+      "title": "이미지 SDK 경계 이전, 2026-10-28"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 4,
+      "end_line": 4,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 5,
+      "end_line": 9,
+      "raw": "macOS arm64에서 파일 제공자와 이미지 SDK 검색을 비활성화한 카메라 SDK 빌드가\n성공했고, 핵심 계약과 독립성 경계 검사 8개가 기존 제한 시간 안에 통과했다.\nFFmpeg와 네이티브 장치 구현을 끈 별도 구성의 경계 및 사용 불가 검사 3개도\n통과했다. 설치된 SDK는 두 SDK와 Qt 검색을 끈 소비자에서 컴파일됐으며,\n바이너리 연결 목록에도 두 SDK가 없었다.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 10,
+      "end_line": 10,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 11,
+      "end_line": 15,
+      "raw": "별도 사진 처리 소비자는 합성 RGB·색상·처리·입력 검증·FFmpeg 합성 소스\n검사 5개를 기존 30초 제한 안에 통과했다. 별도 Media 소비자의 합성 미디어\n검사는 녹화·재생용 데이터 확인, 제한·취소, 파일 생성·게시 오류, 기존 파일\n보존과 게시 경합을 통과했다. 실제 오디오 재생은 하지 않았다. 테스트 파일은\n파일 제공자가 `example/Media/resources`의 임시 디렉터리에 만들고 제거했다.\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 16,
+      "end_line": 16,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 17,
+      "end_line": 23,
+      "raw": "FFmpeg가 없는 구성에서도 사진 처리 합성 검사 5개가 통과했고, FFmpeg 전용\nCLI·패키지 검사는 등록되지 않았다. 이 구성의 캡처 검사는 사용 불가 경로를\n확인하므로 실제 영상 캡처 성공을 의미하지 않는다. 실제 카메라, 권한 요청과\n애플리케이션은 실행하지 않았다. 두 CLI와 설치 패키지 실행 검사는 등록했지만\n이번에는 실행하지 않았다. 격리된 설치본에서 임시 파일 제공자 제어 파일과\nFinder 메타데이터의 제외를 검사한다. Windows·Linux 실제 빌드와 실행은 이번에\n확인하지 않았다.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 24,
+      "end_line": 24,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "heading",
+      "start_line": 25,
+      "end_line": 25,
+      "raw": "## Current 0.4.0 compatibility and bulk inspection\n",
+      "level": 2,
+      "title": "Current 0.4.0 compatibility and bulk inspection"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 26,
+      "end_line": 26,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 27,
+      "end_line": 30,
+      "raw": "The 2026-10-13 results, native platform build matrix, 114 passing regression\nexecutions, staged/local consumers and physical-device boundaries are recorded\nin [FeatureVerification](FeatureVerification.md). The public batch API and\ncompatibility contracts are in [Features](Features.md).\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 31,
+      "end_line": 31,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "heading",
+      "start_line": 32,
+      "end_line": 32,
+      "raw": "## Historical 0.3.0 device discovery and pairing\n",
+      "level": 2,
+      "title": "Historical 0.3.0 device discovery and pairing"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 33,
+      "end_line": 33,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "paragraph",
+      "start_line": 34,
+      "end_line": 37,
+      "raw": "The preceding device API and camera regression evidence are recorded in\n[DeviceVerification](DeviceVerification.md). That version added seven\ndevice cases while retaining the preceding media/processing tests. Physical\ncamera and OS authentication evidence remains explicitly separate.\n"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 38,
+      "end_line": 38,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "heading",
+      "start_line": 39,
+      "end_line": 39,
+      "raw": "## Historical 0.2.0 photo processing result\n",
+      "level": 2,
+      "title": "Historical 0.2.0 photo processing result"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 40,
+      "end_line": 40,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 41,
+      "end_line": 44,
+      "raw": "Camera 0.2.0 and iiGraphicAdjust 0.5.0 were built and executed on macOS arm64,\nAppleClang 21.0.0. All new output and staging prefixes remain inside Workspace.\nNo running product was restarted, and the existing `~/.local` SDK installations\nwere not replaced.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 45,
+      "end_line": 45,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "table",
+      "start_line": 46,
+      "end_line": 51,
+      "raw": "| Configuration | Camera CTest | iiGraphicAdjust CTest | Installed consumers |\n| --- | ---: | ---: | --- |\n| Release shared, optional processing enabled | 21/21 | 150/150 | 1/1 each |\n| Release static, optional processing enabled | 21/21 | 150/150 | 1/1 each |\n| Debug shared, ASan + UBSan | 21/21 | 150/150 | 1/1 each |\n| Release static, independent camera core | 9/9 | No dependency | 1/1 |\n",
+      "columns": [
+        "Configuration",
+        "Camera CTest",
+        "iiGraphicAdjust CTest",
+        "Installed consumers"
+      ],
+      "rows": [
+        [
+          "Release shared, optional processing enabled",
+          "21/21",
+          "150/150",
+          "1/1 each"
+        ],
+        [
+          "Release static, optional processing enabled",
+          "21/21",
+          "150/150",
+          "1/1 each"
+        ],
+        [
+          "Debug shared, ASan + UBSan",
+          "21/21",
+          "150/150",
+          "1/1 each"
+        ],
+        [
+          "Release static, independent camera core",
+          "9/9",
+          "No dependency",
+          "1/1"
+        ]
+      ]
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 52,
+      "end_line": 52,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "paragraph",
+      "start_line": 53,
+      "end_line": 62,
+      "raw": "The added color suite checks 26 analytic color cases. Five bridge cases check\nRGB24 stride/padding, source retention, processing order, transfer conversion,\ntag conflicts, malformed input, subquantization alpha rejection and generated\ncapture. CLI tests check actual +1 EV gray pixels and existing-file preservation.\nThe package test installs the built artifacts, executes the installed CLI,\naccepts core and optional requests without the image dependency, and rejects a\nrequired request when that dependency is unavailable. These regressions caught\nand fixed an external dependency runtime-search-path issue and incorrect\n`OPTIONAL_COMPONENTS` handling. Installed-consumer linkage alone would not have\ncaught the CLI loader failure.\n"
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 63,
+      "end_line": 63,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 64,
+      "end_line": 70,
+      "raw": "iiGraphicAdjust adds six independently checked RAW cases and four photographic\nhelper cases; its 140 existing rendered-image suites are retained. Tests verify\nall four Bayer patterns/phase offsets, measured-site and bilinear arithmetic,\ncalibration matrices/black levels/gains, unclipped linear headroom, all eight EXIF\norientations, exact crop and alpha-weighted RGB/linear-luminance statistics.\nThe original test-first missing-implementation failures and the gray-range\nregression are separate from passing final evidence.\n"
+    },
+    {
+      "id": "b000028",
+      "kind": "blank",
+      "start_line": 71,
+      "end_line": 71,
+      "raw": "\n"
+    },
+    {
+      "id": "b000029",
+      "kind": "paragraph",
+      "start_line": 72,
+      "end_line": 77,
+      "raw": "`DYLD_PRINT_LIBRARIES` on the shared consumer confirms the staged camera 0.2.0,\nImageProcessing 0.2.0 and iiGraphicAdjust 0.5.0 dylibs. The installed CLI is\nalso executed directly; shared/static behavior and package dependency tests\ntherefore do not rely on a previously installed SDK. ASan/UBSan instrument both\nSDKs, while FFmpeg/system libraries remain external. LeakSanitizer is unavailable\non this macOS toolchain (`ASAN_OPTIONS=detect_leaks=0`); no leak-proof claim is made.\n"
+    },
+    {
+      "id": "b000030",
+      "kind": "blank",
+      "start_line": 78,
+      "end_line": 78,
+      "raw": "\n"
+    },
+    {
+      "id": "b000031",
+      "kind": "paragraph",
+      "start_line": 79,
+      "end_line": 82,
+      "raw": "Run `tools/verify.sh --photo --sanitize` for the repeatable complete workflow;\n`--help` lists the flags. Without `--photo`, the optional component is explicitly\ndisabled for every variant. The image SDK is resolved from its sibling source,\nnot downloaded. Each variant builds into `build/` and stages independently.\n"
+    },
+    {
+      "id": "b000032",
+      "kind": "blank",
+      "start_line": 83,
+      "end_line": 83,
+      "raw": "\n"
+    },
+    {
+      "id": "b000033",
+      "kind": "paragraph",
+      "start_line": 84,
+      "end_line": 88,
+      "raw": "Evidence includes `build/photo-workflow.log`, `build/photo-verification-report.json`,\nthe per-variant JUnit files, `build/photo-consumer/runtime.log`, and installed CLI\nartifacts under `build/processing-package/`. The public contracts are documented\nin [ImageProcessing](ImageProcessing.md), [PhotoAudit](PhotoAudit.md), and the\niiGraphicAdjust RAW/photo-operation documents.\n"
+    },
+    {
+      "id": "b000034",
+      "kind": "blank",
+      "start_line": 89,
+      "end_line": 89,
+      "raw": "\n"
+    },
+    {
+      "id": "b000035",
+      "kind": "paragraph",
+      "start_line": 90,
+      "end_line": 96,
+      "raw": "This is numerical/host package proof. The connected host still has no physical\ncamera. Native high-quality still capture, physical optical control, encoded RAW\nfile decoding, arbitrary ICC/wide-gamut conversion, profile calibration, EXIF/XMP\nserialization, high-bit-depth photo encoding and device-platform runtime remain\noutside the implemented/verified photo scope. The RGB24 bridge is an SDR\ndevelopment pipeline; the separate unpacked Bayer API preserves linear headroom\nuntil rendering. Neither establishes that all photographic features are complete.\n"
+    },
+    {
+      "id": "b000036",
+      "kind": "blank",
+      "start_line": 97,
+      "end_line": 97,
+      "raw": "\n"
+    },
+    {
+      "id": "b000037",
+      "kind": "heading",
+      "start_line": 98,
+      "end_line": 98,
+      "raw": "## Historical 0.1.0 camera result\n",
+      "level": 2,
+      "title": "Historical 0.1.0 camera result"
+    },
+    {
+      "id": "b000038",
+      "kind": "blank",
+      "start_line": 99,
+      "end_line": 99,
+      "raw": "\n"
+    },
+    {
+      "id": "b000039",
+      "kind": "paragraph",
+      "start_line": 100,
+      "end_line": 103,
+      "raw": "The C++23 library was built and executed on macOS arm64 with AppleClang 21.0.0.\nAll task outputs and installation staging prefixes remain inside the Workspace.\nThe existing SDK aggregate repository had no changes before or after this task.\nThe new module is an independent local Git repository.\n"
+    },
+    {
+      "id": "b000040",
+      "kind": "blank",
+      "start_line": 104,
+      "end_line": 104,
+      "raw": "\n"
+    },
+    {
+      "id": "b000041",
+      "kind": "table",
+      "start_line": 105,
+      "end_line": 110,
+      "raw": "| Configuration | CTest | Staged package consumer |\n| --- | ---: | ---: |\n| Release shared, FFmpeg + Apple native | 13/13 | 1/1 |\n| Release static, FFmpeg + Apple native | 13/13 | 1/1 |\n| Release static, standard C++ core only | 9/9 | 1/1 |\n| Debug shared, ASan + UBSan, FFmpeg + Apple native | 13/13 | Not separately installed |\n",
+      "columns": [
+        "Configuration",
+        "CTest",
+        "Staged package consumer"
+      ],
+      "rows": [
+        [
+          "Release shared, FFmpeg + Apple native",
+          "13/13",
+          "1/1"
+        ],
+        [
+          "Release static, FFmpeg + Apple native",
+          "13/13",
+          "1/1"
+        ],
+        [
+          "Release static, standard C++ core only",
+          "9/9",
+          "1/1"
+        ],
+        [
+          "Debug shared, ASan + UBSan, FFmpeg + Apple native",
+          "13/13",
+          "Not separately installed"
+        ]
+      ]
+    },
+    {
+      "id": "b000042",
+      "kind": "blank",
+      "start_line": 111,
+      "end_line": 111,
+      "raw": "\n"
+    },
+    {
+      "id": "b000043",
+      "kind": "paragraph",
+      "start_line": 112,
+      "end_line": 119,
+      "raw": "The test suite covers metadata extension retention, malformed and inconsistent\nmetadata, numeric range/step/discrete validation, capability-aware control\npreflight and delegation, provider exceptions/lifetime, independent optical\nreference values, native discovery without permission changes, packet EOF/cancel,\nactual RGB pixel patterns, remux reopen/redecode pixel identity, existing-file\npreservation, recording limits and partial-file cleanup, and CLI frame artifacts.\nSanitizers instrument this SDK; external system and FFmpeg libraries are not\nrebuilt with sanitizer instrumentation.\n"
+    },
+    {
+      "id": "b000044",
+      "kind": "blank",
+      "start_line": 120,
+      "end_line": 120,
+      "raw": "\n"
+    },
+    {
+      "id": "b000045",
+      "kind": "paragraph",
+      "start_line": 121,
+      "end_line": 126,
+      "raw": "The format suite checks PNG, JPEG, WAV, FLAC, MP4, WebM, and Matroska via file,\ncaller-owned bytes, and a misleading `.txt` extension (21 recognition cases).\nThe fixtures contain png, mjpeg, pcm_s16le, flac, h264, aac, vp9, opus, and ffv1.\nA signature-only PNG is recognized with incomplete parameters, independently of\nfull media validity. Random input and empty byte input return distinct errors.\nThese are representative content tests, not an exhaustive test of every codec.\n"
+    },
+    {
+      "id": "b000046",
+      "kind": "blank",
+      "start_line": 127,
+      "end_line": 127,
+      "raw": "\n"
+    },
+    {
+      "id": "b000047",
+      "kind": "paragraph",
+      "start_line": 128,
+      "end_line": 130,
+      "raw": "The installed shared CLI identified MP4/H.264/AAC from a generated artifact.\n`DYLD_PRINT_LIBRARIES` confirmed that the consumer loads the staged\n`build/install/lib/libiiCameraIntegration.0.1.0.dylib`.\n"
+    },
+    {
+      "id": "b000048",
+      "kind": "blank",
+      "start_line": 131,
+      "end_line": 131,
+      "raw": "\n"
+    },
+    {
+      "id": "b000049",
+      "kind": "heading",
+      "start_line": 132,
+      "end_line": 132,
+      "raw": "## Connected FFmpeg inventory\n",
+      "level": 2,
+      "title": "Connected FFmpeg inventory"
+    },
+    {
+      "id": "b000050",
+      "kind": "blank",
+      "start_line": 133,
+      "end_line": 133,
+      "raw": "\n"
+    },
+    {
+      "id": "b000051",
+      "kind": "table",
+      "start_line": 134,
+      "end_line": 141,
+      "raw": "| Inventory | Observed count |\n| --- | ---: |\n| Registered codec identities | 539 |\n| Identities with at least one decoder implementation | 498 |\n| Identities with at least one encoder implementation | 175 |\n| Registered format entries | 414 |\n| Input demuxer entries | 361 |\n| Output muxer entries | 184 |\n",
+      "columns": [
+        "Inventory",
+        "Observed count"
+      ],
+      "rows": [
+        [
+          "Registered codec identities",
+          "539"
+        ],
+        [
+          "Identities with at least one decoder implementation",
+          "498"
+        ],
+        [
+          "Identities with at least one encoder implementation",
+          "175"
+        ],
+        [
+          "Registered format entries",
+          "414"
+        ],
+        [
+          "Input demuxer entries",
+          "361"
+        ],
+        [
+          "Output muxer entries",
+          "184"
+        ]
+      ]
+    },
+    {
+      "id": "b000052",
+      "kind": "blank",
+      "start_line": 142,
+      "end_line": 142,
+      "raw": "\n"
+    },
+    {
+      "id": "b000053",
+      "kind": "paragraph",
+      "start_line": 143,
+      "end_line": 148,
+      "raw": "Actual runtime library versions are `libavformat/libavcodec/libavdevice 63.1.102`,\n`libavutil 61.1.102`, and `libswscale 10.1.102`. All five linked Homebrew libraries\nreport **GPL version 3 or later**. This development dependency configuration is\nnot a distribution license decision. The standard-library core has no FFmpeg\nruntime dependency, and another FFmpeg build can expose a different inventory\nand license. See the primary [FFmpeg licensing information](https://ffmpeg.org/legal.html).\n"
+    },
+    {
+      "id": "b000054",
+      "kind": "blank",
+      "start_line": 149,
+      "end_line": 149,
+      "raw": "\n"
+    },
+    {
+      "id": "b000055",
+      "kind": "heading",
+      "start_line": 150,
+      "end_line": 150,
+      "raw": "## Native and target-runtime evidence\n",
+      "level": 2,
+      "title": "Native and target-runtime evidence"
+    },
+    {
+      "id": "b000056",
+      "kind": "blank",
+      "start_line": 151,
+      "end_line": 151,
+      "raw": "\n"
+    },
+    {
+      "id": "b000057",
+      "kind": "paragraph",
+      "start_line": 152,
+      "end_line": 156,
+      "raw": "Final native adapter C++23/ARC checks with warnings treated as errors passed for\nmacOS arm64, iOS 16 arm64 using the installed iOS 27 SDK, and Mac Catalyst 16\narm64. iOS/Mac Catalyst evidence is a compile check of the native adapter, not a\nfull target package build or physical device execution. The variable-aperture\nbranch is SDK/OS availability guarded.\n"
+    },
+    {
+      "id": "b000058",
+      "kind": "blank",
+      "start_line": 157,
+      "end_line": 157,
+      "raw": "\n"
+    },
+    {
+      "id": "b000059",
+      "kind": "paragraph",
+      "start_line": 158,
+      "end_line": 164,
+      "raw": "Host AVFoundation enumeration returned **0 cameras and 0 formats**;\n`system_profiler SPCameraDataType` also returned an empty camera list.\nAuthorization remained NotDetermined. No camera capture session was started.\nPhysical camera discovery metadata, hardware controls, physical media capture,\niOS/Mac Catalyst runtime, and Windows/Linux/Android runtime are unverified.\nWindows/Linux/Android native optical control adapters are not implemented; the\nFFmpeg input formats and custom C++ control port remain the integration boundary.\n"
+    },
+    {
+      "id": "b000060",
+      "kind": "blank",
+      "start_line": 165,
+      "end_line": 165,
+      "raw": "\n"
+    },
+    {
+      "id": "b000061",
+      "kind": "heading",
+      "start_line": 166,
+      "end_line": 166,
+      "raw": "## Reproduce and inspect evidence\n",
+      "level": 2,
+      "title": "Reproduce and inspect evidence"
+    },
+    {
+      "id": "b000062",
+      "kind": "blank",
+      "start_line": 167,
+      "end_line": 167,
+      "raw": "\n"
+    },
+    {
+      "id": "b000063",
+      "kind": "paragraph",
+      "start_line": 168,
+      "end_line": 170,
+      "raw": "Run `tools/verify.sh --sanitize` with the installed FFmpeg development libraries\nand a compatible Clang toolchain. Shared/static/core builds and consumer prefixes\nare created beneath `build/`. To skip the sanitizer configuration, omit the flag.\n"
+    },
+    {
+      "id": "b000064",
+      "kind": "blank",
+      "start_line": 171,
+      "end_line": 171,
+      "raw": "\n"
+    },
+    {
+      "id": "b000065",
+      "kind": "list",
+      "start_line": 172,
+      "end_line": 180,
+      "raw": "- `build/verification.log`: complete shared/static/core/sanitizer workflow output.\n- `build/verification-report.json`: the recorded matrix and evidence boundaries.\n- `build/ctest-results.xml`, variant `ctest-results.xml`: JUnit test results.\n- `build/consumer/runtime.log`: installed shared-library load evidence.\n- `build/catalog-evidence.txt`: registry, versions, and runtime licenses.\n- `build/native-evidence.txt`: installed native enumeration result.\n- `build/installed-probe-evidence.txt`: installed MP4/H.264/AAC content probe.\n- `build/native-compile-{macos,ios,catalyst}.log`: native adapter compile commands.\n- `build/cli/cli-red.ppm`: a synthetic captured-frame artifact.\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "`build/verification.log`: complete shared/static/core/sanitizer workflow output.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`build/verification-report.json`: the recorded matrix and evidence boundaries.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`build/ctest-results.xml`, variant `ctest-results.xml`: JUnit test results.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`build/consumer/runtime.log`: installed shared-library load evidence.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`build/catalog-evidence.txt`: registry, versions, and runtime licenses.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`build/native-evidence.txt`: installed native enumeration result.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`build/installed-probe-evidence.txt`: installed MP4/H.264/AAC content probe.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`build/native-compile-{macos,ios,catalyst}.log`: native adapter compile commands.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`build/cli/cli-red.ppm`: a synthetic captured-frame artifact.",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000066",
+      "kind": "blank",
+      "start_line": 181,
+      "end_line": 181,
+      "raw": "\n"
+    },
+    {
+      "id": "b000067",
+      "kind": "paragraph",
+      "start_line": 182,
+      "end_line": 183,
+      "raw": "This verification installed only into Workspace staging directories.\nThe default `~/.local/SDK/iiCameraIntegration` prefix has not been modified.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Verification",
+      "anchor": "verification",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000003",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "이미지 SDK 경계 이전, 2026-10-28",
+      "anchor": "이미지-sdk-경계-이전-2026-10-28",
+      "start_line": 3
+    },
+    {
+      "block_id": "b000011",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Current 0.4.0 compatibility and bulk inspection",
+      "anchor": "current-040-compatibility-and-bulk-inspection",
+      "start_line": 25
+    },
+    {
+      "block_id": "b000015",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Historical 0.3.0 device discovery and pairing",
+      "anchor": "historical-030-device-discovery-and-pairing",
+      "start_line": 32
+    },
+    {
+      "block_id": "b000019",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Historical 0.2.0 photo processing result",
+      "anchor": "historical-020-photo-processing-result",
+      "start_line": 39
+    },
+    {
+      "block_id": "b000037",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Historical 0.1.0 camera result",
+      "anchor": "historical-010-camera-result",
+      "start_line": 98
+    },
+    {
+      "block_id": "b000049",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Connected FFmpeg inventory",
+      "anchor": "connected-ffmpeg-inventory",
+      "start_line": 132
+    },
+    {
+      "block_id": "b000055",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Native and target-runtime evidence",
+      "anchor": "native-and-target-runtime-evidence",
+      "start_line": 150
+    },
+    {
+      "block_id": "b000061",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Reproduce and inspect evidence",
+      "anchor": "reproduce-and-inspect-evidence",
+      "start_line": 166
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000009",
+        "line": 19,
+        "text": "확인하므로 실제 영상 캡처 성공을 의미하지 않는다. 실제 카메라, 권한 요청과",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000025",
+        "line": 59,
+        "text": "required request when that dependency is unavailable. These regressions caught",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000029",
+        "line": 75,
+        "text": "therefore do not rely on a previously installed SDK. ASan/UBSan instrument both",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000013",
+        "label": "FeatureVerification",
+        "target": "FeatureVerification.md",
+        "kind": "relative",
+        "line": 29
+      },
+      {
+        "block_id": "b000013",
+        "label": "Features",
+        "target": "Features.md",
+        "kind": "relative",
+        "line": 30
+      },
+      {
+        "block_id": "b000017",
+        "label": "DeviceVerification",
+        "target": "DeviceVerification.md",
+        "kind": "relative",
+        "line": 35
+      },
+      {
+        "block_id": "b000033",
+        "label": "ImageProcessing",
+        "target": "ImageProcessing.md",
+        "kind": "relative",
+        "line": 87
+      },
+      {
+        "block_id": "b000033",
+        "label": "PhotoAudit",
+        "target": "PhotoAudit.md",
+        "kind": "relative",
+        "line": 87
+      },
+      {
+        "block_id": "b000053",
+        "label": "FFmpeg licensing information",
+        "target": "https://ffmpeg.org/legal.html",
+        "kind": "external",
+        "line": 148
+      }
+    ],
+    "tables": [
+      {
+        "block_id": "b000023",
+        "columns": [
+          "Configuration",
+          "Camera CTest",
+          "iiGraphicAdjust CTest",
+          "Installed consumers"
+        ],
+        "rows": [
+          [
+            "Release shared, optional processing enabled",
+            "21/21",
+            "150/150",
+            "1/1 each"
+          ],
+          [
+            "Release static, optional processing enabled",
+            "21/21",
+            "150/150",
+            "1/1 each"
+          ],
+          [
+            "Debug shared, ASan + UBSan",
+            "21/21",
+            "150/150",
+            "1/1 each"
+          ],
+          [
+            "Release static, independent camera core",
+            "9/9",
+            "No dependency",
+            "1/1"
+          ]
+        ]
+      },
+      {
+        "block_id": "b000041",
+        "columns": [
+          "Configuration",
+          "CTest",
+          "Staged package consumer"
+        ],
+        "rows": [
+          [
+            "Release shared, FFmpeg + Apple native",
+            "13/13",
+            "1/1"
+          ],
+          [
+            "Release static, FFmpeg + Apple native",
+            "13/13",
+            "1/1"
+          ],
+          [
+            "Release static, standard C++ core only",
+            "9/9",
+            "1/1"
+          ],
+          [
+            "Debug shared, ASan + UBSan, FFmpeg + Apple native",
+            "13/13",
+            "Not separately installed"
+          ]
+        ]
+      },
+      {
+        "block_id": "b000051",
+        "columns": [
+          "Inventory",
+          "Observed count"
+        ],
+        "rows": [
+          [
+            "Registered codec identities",
+            "539"
+          ],
+          [
+            "Identities with at least one decoder implementation",
+            "498"
+          ],
+          [
+            "Identities with at least one encoder implementation",
+            "175"
+          ],
+          [
+            "Registered format entries",
+            "414"
+          ],
+          [
+            "Input demuxer entries",
+            "361"
+          ],
+          [
+            "Output muxer entries",
+            "184"
+          ]
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

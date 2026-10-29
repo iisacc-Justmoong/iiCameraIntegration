@@ -1,0 +1,122 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:d8433fdc5df9e55836eb2570e51304b6c93f5d53cc00cdd88bd8c211b6917967",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "example/README.md",
+    "sha256": "f44a328eac95e0fcccc2730b76e11b645270662cf89950a5095174ad330f7774",
+    "bytes": 862,
+    "line_count": 20,
+    "encoding": "utf-8",
+    "language": "en"
+  },
+  "document": {
+    "title": "Camera integration examples",
+    "role": "overview",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Camera integration examples\n",
+      "level": 1,
+      "title": "Camera integration examples"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 4,
+      "raw": "The installed package is `iiCameraIntegration`; all examples use the C++ namespace\n`iiCameraIntegration` and headers below `iiCameraIntegration/`.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 5,
+      "end_line": 5,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 6,
+      "end_line": 8,
+      "raw": "`tests/consumer/main.cpp` is the standalone C++23 example for optics, an artificial\ncamera provider, pairing, control revocation and optional image processing.\nBuild it against an installation with:\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 9,
+      "end_line": 9,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "fenced_code",
+      "start_line": 10,
+      "end_line": 15,
+      "raw": "```sh\ncmake -S tests/consumer -B build/example -G Ninja \\\n  -DiiCameraIntegration_DIR=\"$HOME/.local/SDK/iiCameraIntegration/lib/cmake/iiCameraIntegration\"\ncmake --build build/example\nctest --test-dir build/example --output-on-failure\n```\n",
+      "language": "sh",
+      "code": "cmake -S tests/consumer -B build/example -G Ninja \\\n  -DiiCameraIntegration_DIR=\"$HOME/.local/SDK/iiCameraIntegration/lib/cmake/iiCameraIntegration\"\ncmake --build build/example\nctest --test-dir build/example --output-on-failure\n",
+      "closed": true
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 16,
+      "end_line": 16,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 17,
+      "end_line": 20,
+      "raw": "`Media` is a separately configured camera and file-provider consumer with a\ncommand-line example. `iicamera-inspect --help`\nlists operations; the synthetic `lavfi` frame examples in the main README need\nno physical camera or permission prompt.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Camera integration examples",
+      "anchor": "camera-integration-examples",
+      "start_line": 1
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [],
+    "commands": [
+      {
+        "block_id": "b000007",
+        "language": "sh",
+        "code": "cmake -S tests/consumer -B build/example -G Ninja \\\n  -DiiCameraIntegration_DIR=\"$HOME/.local/SDK/iiCameraIntegration/lib/cmake/iiCameraIntegration\"\ncmake --build build/example\nctest --test-dir build/example --output-on-failure\n"
+      }
+    ],
+    "links": [],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

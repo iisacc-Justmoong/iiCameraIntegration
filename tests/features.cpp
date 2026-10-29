@@ -1,5 +1,5 @@
-#include <iiCameraIntergration/Devices.h>
-#include <iiCameraIntergration/NativeCamera.h>
+#include <iiCameraIntegration/Devices.h>
+#include <iiCameraIntegration/NativeCamera.h>
 
 #include <iostream>
 #include <stdexcept>
@@ -8,7 +8,7 @@
 #include <thread>
 #include <atomic>
 
-using namespace iiCameraIntergration;
+using namespace iiCameraIntegration;
 namespace {
 #define CHECK(x) do { if (!(x)) throw std::runtime_error(#x); } while (false)
 CameraInfo fixture(std::string id = "fixture:camera") {

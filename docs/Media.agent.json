@@ -1,0 +1,546 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:0c9fbfc18cbded0ea3e822510cc57993c64497c5406cde26c9ca8a021d85dbef",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/Media.md",
+    "sha256": "bae8bbe8573d4d86e77f783cf2c1b8c189827f9441b698fc95e3df1d08ea16a5",
+    "bytes": 11182,
+    "line_count": 180,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "Media recognition and capture",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Media recognition and capture\n",
+      "level": 1,
+      "title": "Media recognition and capture"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 5,
+      "raw": "The optional FFmpeg adapter provides actual demuxing, byte-content recognition,\ncompressed packet capture, one decoded RGB still frame, and bounded recording by\nremuxing. The public header contains no FFmpeg types and requires only C++23.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 6,
+      "end_line": 6,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "heading",
+      "start_line": 7,
+      "end_line": 7,
+      "raw": "## Recognition and availability\n",
+      "level": 2,
+      "title": "Recognition and availability"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 8,
+      "end_line": 8,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 9,
+      "end_line": 15,
+      "raw": "`codecCatalog()` enumerates FFmpeg's codec **descriptors**, including identities\nthat this build cannot decode or encode. Each `CodecInfo` separately lists the\ninstalled decoder and encoder implementations. An empty list means that the\nidentity is recognized but that operation is unavailable. `formatCatalog()`\nenumerates the installed demuxers and muxers with separate availability flags.\nFormat names can contain comma-separated FFmpeg aliases. This is a catalog of the\nlinked backend, not a claim that every codec or format ever created is supported.\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 16,
+      "end_line": 16,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 17,
+      "end_line": 24,
+      "raw": "`probeMedia()` opens the source and inspects its streams. Its default file path\nmode uses FFmpeg's content probing; extensions are only hints. `probeMediaBytes()`\nuses a seekable custom byte input without any filename or extension hint. It\nreads the supplied span synchronously and does not retain it. Unknown, malformed,\nencrypted, incomplete, or unsupported input can fail with an explicit error.\nHeaderless raw streams and devices need `inputFormat` and appropriate options.\nUnknown input options are returned in `MediaInfo::unusedInputOptions`, preserving\nprovider-specific keys rather than silently treating them as applied.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 25,
+      "end_line": 25,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 26,
+      "end_line": 33,
+      "raw": "`MediaInfo` exposes the container, metadata dictionary, duration if present, and\nstream identities, codec IDs, codec tags, time bases, video dimensions, pixel\nformats, color range/space/transfer/primaries, sample aspect ratio, codec\ninitialization bytes, audio sample formats, rates and channel layouts. The\n`codecExtraData` bytes allow an external decoder to reconstruct configuration\nrecords that are not present in every compressed packet. Missing or unknown\nnative properties remain empty or absent. Private vendor metadata is retained\nonly when FFmpeg exposes it; this API does not manufacture missing metadata.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 34,
+      "end_line": 34,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 35,
+      "end_line": 42,
+      "raw": "`StreamInfo::parametersComplete` checks that a codec identity is present, that a\nvideo stream has positive dimensions, and that an audio stream has a positive\nsample rate and channel count. `MediaInfo::streamParametersComplete` requires at\nleast one stream and complete parameters for every stream. These flags establish\nparameter presence, not media integrity or decodability. A truncated image\nsignature can therefore have a recognized codec with incomplete parameters;\ndecode success must be established separately. Codec initialization blobs larger\nthan 16 MiB are rejected as invalid media.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 43,
+      "end_line": 43,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "heading",
+      "start_line": 44,
+      "end_line": 44,
+      "raw": "## Packet capture\n",
+      "level": 2,
+      "title": "Packet capture"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 45,
+      "end_line": 45,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "fenced_code",
+      "start_line": 46,
+      "end_line": 65,
+      "raw": "```cpp\n#include <iiCameraIntegration/Media.h>\n\niiCameraIntegration::MediaSource source;\nsource.location = \"/path/to/capture.mkv\";\nauto capture = iiCameraIntegration::PacketCapture::open(source);\nif (!capture) {\n    // Inspect capture.error().code/message/nativeCode.\n    return;\n}\nfor (;;) {\n    auto packet = capture->read();\n    if (!packet) {\n        // EndOfStream is the normal termination of finite input.\n        break;\n    }\n    // packet owns its compressed payload. Stream metadata is capture->metadata().\n    // A timestamp in seconds is timestamp * packet->timeBase.value().\n}\n```\n",
+      "language": "cpp",
+      "code": "#include <iiCameraIntegration/Media.h>\n\niiCameraIntegration::MediaSource source;\nsource.location = \"/path/to/capture.mkv\";\nauto capture = iiCameraIntegration::PacketCapture::open(source);\nif (!capture) {\n    // Inspect capture.error().code/message/nativeCode.\n    return;\n}\nfor (;;) {\n    auto packet = capture->read();\n    if (!packet) {\n        // EndOfStream is the normal termination of finite input.\n        break;\n    }\n    // packet owns its compressed payload. Stream metadata is capture->metadata().\n    // A timestamp in seconds is timestamp * packet->timeBase.value().\n}\n",
+      "closed": true
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 66,
+      "end_line": 66,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 67,
+      "end_line": 71,
+      "raw": "Sources can be files, URLs, or FFmpeg device input formats such as `avfoundation`,\n`v4l2`, or `dshow` when the linked FFmpeg build and target OS supply them. The SDK\npasses arbitrary backend options through as strings; the application chooses the\ndevice address and options for its platform. `lavfi` is a synthetic test source\nand proves generated media processing, not physical camera operation.\n"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 72,
+      "end_line": 72,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 73,
+      "end_line": 99,
+      "raw": "Packets preserve stream indices, optional PTS/DTS, duration, keyframe state and\nthe stream time base. A packet contains encoded media bytes, not an RGB image.\nThe public packet currently omits FFmpeg packet side-data. Stream codec\ninitialization bytes are a snapshot taken when opening the source; midstream\nconfiguration changes and packet-specific HDR/other side-data are not transported\nby this packet API. A decoder needing those features should use the native\nbackend or a dedicated media adapter.\nFFmpeg's `wrapped_avframe` packet representation contains native pointers rather\nthan a portable media bitstream. `PacketCapture::read()` explicitly returns\n`Unsupported` for such packets; it never copies dangling pointer-bearing packet\nstructures into the public payload. Use `decodeRgbFrame()` to obtain owned pixels\nfrom these inputs. Newer FFmpeg builds can produce `wrapped_avframe` for lavfi\nsources; a generated-source catalog entry does not imply remux compatibility.\n`decodeRgbFrame()` selects the first available video stream by default, decodes\nits first frame, and converts it to tightly packed RGB24. `DecodeOptions` can\nselect a stream and bound pixel count, packet count and total elapsed time.\nHardware decoding, exposure correction, rotation application and color-managed\nHDR display are outside this helper's contract. RGB conversion does not promise\nbit-identical output across different FFmpeg versions or pixel-conversion builds.\nThe returned `RgbFrame` is full-range RGB24 (`gbr`, `pc`), with source transfer and\nprimaries retained. YUV matrices/ranges are resolved from the decoded frame, then\ncodec parameters; absent matrix/range information uses documented assumptions.\nUnsupported transforms are rejected. ICC presence is reported without retaining\nor applying the profile. Eight-bit conversion does not preserve HDR precision.\nSee [the decoded-color contract and numeric tests](PhotoAudit.md) and the optional\n[photo processing component](ImageProcessing.md) before interpreting pixels as\nsRGB.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 100,
+      "end_line": 100,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "paragraph",
+      "start_line": 101,
+      "end_line": 104,
+      "raw": "The move-only `PacketCapture` session owns its input. Serialize `read()`,\n`metadata()`, destruction and move operations on the caller side. `cancel()` can\nbe called concurrently with `read()` while the object's lifetime remains valid.\nCancellation is permanent. Reading a moved-from session returns `InvalidArgument`.\n"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 105,
+      "end_line": 105,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "heading",
+      "start_line": 106,
+      "end_line": 106,
+      "raw": "## Recording\n",
+      "level": 2,
+      "title": "Recording"
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 107,
+      "end_line": 107,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 108,
+      "end_line": 114,
+      "raw": "`recordMedia(source, destination, files, options)` remuxes compatible video, audio and\nsubtitle streams into a local single-file container. It copies compressed media\nwithout encoding or changing the codec. Data/attachment streams are skipped.\nAn incompatible container is an error; no transcoding is silently attempted.\nMulti-file/segmented muxers are rejected because they cannot meet this function's\nexclusive single-file output contract. Unknown output options appear in the\nreturned `unusedOutputOptions` dictionary.\n"
+    },
+    {
+      "id": "b000028",
+      "kind": "blank",
+      "start_line": 115,
+      "end_line": 115,
+      "raw": "\n"
+    },
+    {
+      "id": "b000029",
+      "kind": "paragraph",
+      "start_line": 116,
+      "end_line": 126,
+      "raw": "`RecordingFilePort`는 호출자가 제공하는 세 연산이다. `createExclusive`는 기존\n대상을 덮어쓰지 않는 탐색 가능한 바이너리 스트림을 반환하고, 생성에 실패하거나\n예외가 발생하면 스스로 확보한 자원을 정리해야 한다. 성공한 스트림의 소유권은\n동기 호출 동안 카메라 SDK에 이전되며 SDK가 닫는다. SDK는 성공 시 스트림을 닫은\n뒤 `publishExclusive`로 덮어쓰기 없는 게시를 요청하고, 실패 시에는\n`removeIncomplete`로 미완성 출력을 정리하도록 요청한다. 생성·게시 예외는 I/O\n오류로 변환하고 정리 콜백의 예외는 호출 밖으로 전달하지 않는다.\n`example/Media`는 iiFileProvider의 임시 파일을 사용하고 대상이 이미 있거나 게시\n중 다른 파일이 생기면 덮어쓰지 않는다. POSIX에서는 하드 링크가 가능한 파일\n시스템이어야 한다. SDK 자체는 파일 제공자나 다른 SDK를 검색·링크하지 않는다.\n기존 경로만 받는 `recordMedia` 호출자는 포트를 제공하도록 수정하고 다시 빌드한다.\n"
+    },
+    {
+      "id": "b000030",
+      "kind": "blank",
+      "start_line": 127,
+      "end_line": 127,
+      "raw": "\n"
+    },
+    {
+      "id": "b000031",
+      "kind": "paragraph",
+      "start_line": 128,
+      "end_line": 132,
+      "raw": "호출자는 출력 크기, 압축 페이로드 바이트, 패킷 수와 종료 이유를 받는다.\nCancellation, decode/mux/IO failure, or an empty recording requests cleanup\nthrough the supplied port. A successfully finalized bounded recording is returned when its\npacket, payload or duration limit is reached. Payload limits do not include\ncontainer overhead, and packet-count limits count only streams written.\n"
+    },
+    {
+      "id": "b000032",
+      "kind": "blank",
+      "start_line": 133,
+      "end_line": 133,
+      "raw": "\n"
+    },
+    {
+      "id": "b000033",
+      "kind": "paragraph",
+      "start_line": 134,
+      "end_line": 145,
+      "raw": "Duration is bounded by both source timestamps and elapsed capture time, so fast\nfile remuxing and real-time device inputs are both bounded. Timestamp absence,\nreordering, nonzero starts and discontinuities remain properties of the source.\nPacket timestamps are rescaled to the output time bases, and the selected muxer\ncan apply its own timestamp shifting policy. A limit can end a GOP before its natural end,\nso downstream display behavior still depends on the codec and container.\nThe read interrupt deadline also includes the capture duration boundary. If that\nboundary interrupts input after packets have been written, the file is finalized\nand returned with `DurationLimit`. A limit reached before any writable packet\nreturns `InvalidMedia` and removes the empty partial file. Source timeout or total\noperation timeout returns `Timeout`; trailer writing remains subject to the total\noperation timeout rather than the elapsed capture-duration boundary.\n"
+    },
+    {
+      "id": "b000034",
+      "kind": "blank",
+      "start_line": 146,
+      "end_line": 146,
+      "raw": "\n"
+    },
+    {
+      "id": "b000035",
+      "kind": "paragraph",
+      "start_line": 147,
+      "end_line": 153,
+      "raw": "Timeouts and cancellation use FFmpeg's cooperative interruption mechanism and\nchecks between packet/decode/mux operations. Device drivers, third-party\nprotocols, decoding calls or blocked filesystem writes that do not honor\ninterruption cannot be forcibly terminated by this SDK. A caller requiring a hard\nwall-clock termination boundary should run the operation in a managed worker\nprocess. A cancellation callback must be cheap and must not re-enter the session.\nIf it throws, the operation returns `BackendFailure` and cleans up its output.\n"
+    },
+    {
+      "id": "b000036",
+      "kind": "blank",
+      "start_line": 154,
+      "end_line": 154,
+      "raw": "\n"
+    },
+    {
+      "id": "b000037",
+      "kind": "heading",
+      "start_line": 155,
+      "end_line": 155,
+      "raw": "## Build and licensing\n",
+      "level": 2,
+      "title": "Build and licensing"
+    },
+    {
+      "id": "b000038",
+      "kind": "blank",
+      "start_line": 156,
+      "end_line": 156,
+      "raw": "\n"
+    },
+    {
+      "id": "b000039",
+      "kind": "paragraph",
+      "start_line": 157,
+      "end_line": 160,
+      "raw": "Build with `IICAMERA_WITH_FFMPEG=ON` to link `libavformat`, `libavcodec`,\n`libavdevice`, `libavutil`, and `libswscale` through pkg-config. With the option\ndisabled, the same public API remains available and returns `Unavailable` for\nmedia operations and catalogs. This is deliberate capability reporting.\n"
+    },
+    {
+      "id": "b000040",
+      "kind": "blank",
+      "start_line": 161,
+      "end_line": 161,
+      "raw": "\n"
+    },
+    {
+      "id": "b000041",
+      "kind": "paragraph",
+      "start_line": 162,
+      "end_line": 167,
+      "raw": "`mediaBackendInfo()` reports the loaded libraries' actual versions, license\nstrings and codec configuration. FFmpeg licensing depends on its build options\nand linked external libraries. A GPL-enabled Homebrew build makes the adapter's\nredistribution obligations different from a minimal LGPL build. The SDK's own\nlicense cannot override those dependencies, codec patents, or third-party terms.\nChoose and audit the FFmpeg build used in every distributed product.\n"
+    },
+    {
+      "id": "b000042",
+      "kind": "blank",
+      "start_line": 168,
+      "end_line": 168,
+      "raw": "\n"
+    },
+    {
+      "id": "b000043",
+      "kind": "paragraph",
+      "start_line": 169,
+      "end_line": 174,
+      "raw": "The media test generates a 64x48 FFV1 video with mono PCM audio, verifies content\nrecognition without trustworthy extensions, reads both packet streams, decodes\nreal patterned pixels, reopens and decodes remuxed output, checks file preservation\nand cancellation cleanup, and decodes a red synthetic lavfi frame. Physical\ncamera permission, capture, lens control and target-device runtime require\nseparate platform/hardware verification.\n"
+    },
+    {
+      "id": "b000044",
+      "kind": "blank",
+      "start_line": 175,
+      "end_line": 175,
+      "raw": "\n"
+    },
+    {
+      "id": "b000045",
+      "kind": "paragraph",
+      "start_line": 176,
+      "end_line": 176,
+      "raw": "Official references:\n"
+    },
+    {
+      "id": "b000046",
+      "kind": "blank",
+      "start_line": 177,
+      "end_line": 177,
+      "raw": "\n"
+    },
+    {
+      "id": "b000047",
+      "kind": "list",
+      "start_line": 178,
+      "end_line": 180,
+      "raw": "- [FFmpeg demuxing and custom IO](https://ffmpeg.org/doxygen/trunk/group__lavf__decoding.html)\n- [FFmpeg codec descriptors and codec iteration](https://ffmpeg.org/doxygen/trunk/group__lavc__core.html)\n- [FFmpeg licensing and legal considerations](https://ffmpeg.org/legal.html)\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "[FFmpeg demuxing and custom IO](https://ffmpeg.org/doxygen/trunk/group__lavf__decoding.html)",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "[FFmpeg codec descriptors and codec iteration](https://ffmpeg.org/doxygen/trunk/group__lavc__core.html)",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "[FFmpeg licensing and legal considerations](https://ffmpeg.org/legal.html)",
+          "checked": null
+        }
+      ]
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Media recognition and capture",
+      "anchor": "media-recognition-and-capture",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000005",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Recognition and availability",
+      "anchor": "recognition-and-availability",
+      "start_line": 7
+    },
+    {
+      "block_id": "b000015",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Packet capture",
+      "anchor": "packet-capture",
+      "start_line": 44
+    },
+    {
+      "block_id": "b000025",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Recording",
+      "anchor": "recording",
+      "start_line": 106
+    },
+    {
+      "block_id": "b000037",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Build and licensing",
+      "anchor": "build-and-licensing",
+      "start_line": 155
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000013",
+        "line": 41,
+        "text": "decode success must be established separately. Codec initialization blobs larger",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000021",
+        "line": 78,
+        "text": "by this packet API. A decoder needing those features should use the native",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000021",
+        "line": 82,
+        "text": "`Unsupported` for such packets; it never copies dangling pointer-bearing packet",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000029",
+        "line": 118,
+        "text": "예외가 발생하면 스스로 확보한 자원을 정리해야 한다. 성공한 스트림의 소유권은",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000029",
+        "line": 122,
+        "text": "오류로 변환하고 정리 콜백의 예외는 호출 밖으로 전달하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000029",
+        "line": 125,
+        "text": "시스템이어야 한다. SDK 자체는 파일 제공자나 다른 SDK를 검색·링크하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000031",
+        "line": 131,
+        "text": "packet, payload or duration limit is reached. Payload limits do not include",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000035",
+        "line": 149,
+        "text": "protocols, decoding calls or blocked filesystem writes that do not honor",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000035",
+        "line": 151,
+        "text": "wall-clock termination boundary should run the operation in a managed worker",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000035",
+        "line": 152,
+        "text": "process. A cancellation callback must be cheap and must not re-enter the session.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000021",
+        "label": "the decoded-color contract and numeric tests",
+        "target": "PhotoAudit.md",
+        "kind": "relative",
+        "line": 97
+      },
+      {
+        "block_id": "b000021",
+        "label": "photo processing component",
+        "target": "ImageProcessing.md",
+        "kind": "relative",
+        "line": 98
+      },
+      {
+        "block_id": "b000047",
+        "label": "FFmpeg demuxing and custom IO",
+        "target": "https://ffmpeg.org/doxygen/trunk/group__lavf__decoding.html",
+        "kind": "external",
+        "line": 178
+      },
+      {
+        "block_id": "b000047",
+        "label": "FFmpeg codec descriptors and codec iteration",
+        "target": "https://ffmpeg.org/doxygen/trunk/group__lavc__core.html",
+        "kind": "external",
+        "line": 179
+      },
+      {
+        "block_id": "b000047",
+        "label": "FFmpeg licensing and legal considerations",
+        "target": "https://ffmpeg.org/legal.html",
+        "kind": "external",
+        "line": 180
+      }
+    ],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

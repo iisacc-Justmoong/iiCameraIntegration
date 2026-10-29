@@ -1,0 +1,21 @@
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+
+
+
+
+
+
+find_dependency(Threads)
+if(NOT @BUILD_SHARED_LIBS@ AND @IICAMERA_WITH_FFMPEG@)
+    find_dependency(PkgConfig)
+    pkg_check_modules(IICameraFFmpeg REQUIRED IMPORTED_TARGET libavformat libavcodec libavdevice libavutil libswscale)
+endif()
+include("${CMAKE_CURRENT_LIST_DIR}/iiCameraIntegrationTargets.cmake")
+set(iiCameraIntegration_WITH_FFMPEG @IICAMERA_WITH_FFMPEG@)
+set(iiCameraIntegration_Core_FOUND TRUE)
+if("ImageProcessing" IN_LIST iiCameraIntegration_FIND_COMPONENTS)
+    set(iiCameraIntegration_ImageProcessing_FOUND FALSE)
+    set(iiCameraIntegration_NOT_FOUND_MESSAGE "ImageProcessing moved to the separately configured example/ImageProcessing consumer")
+endif()
+check_required_components(iiCameraIntegration)

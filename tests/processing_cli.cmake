@@ -1,3 +1,5 @@
+# Historical pre-migration check. The active CLI contract is in
+# example/ImageProcessing/tests/cli.py and uses provider-owned temporary resources.
 file(MAKE_DIRECTORY "${OUTPUT}")
 set(image "${OUTPUT}/developed-gray.ppm")
 file(REMOVE "${image}")

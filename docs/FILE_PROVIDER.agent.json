@@ -1,0 +1,146 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:e895fc2c1e3c9993535141a813e76cbd86c322e35ad1c765c7dd62a5f3fda98e",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/FILE_PROVIDER.md",
+    "sha256": "da5d9279c564a528cf7a09bd468a4a15df08a7215c233132586dbd23edc81039",
+    "bytes": 1225,
+    "line_count": 20,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "File creation ownership in iiCameraIntegration",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# File creation ownership in iiCameraIntegration\n",
+      "level": 1,
+      "title": "File creation ownership in iiCameraIntegration"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 8,
+      "raw": "카메라 SDK는 파일을 생성하지 않는다. `recordMedia`는 호출자가 제공하는\n`RecordingFilePort`로 스트림 생성, 덮어쓰기 없는 게시와 실패 시 정리를 요청한다.\n`example/Media`는 이 포트를 iiFileProvider Native에 연결하고 검사 도구의 프레임\n출력도 파일 제공자로 생성한다. 캡처·제어·메타데이터·카메라 권한은 SDK가 담당한다.\n성공적으로 게시된 녹화와 프레임은 파일 제공자에 프리뷰 처리를 요청한다. 요청은\n프리뷰 생성이 완료되었다는 증거가 아니다.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 9,
+      "end_line": 9,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 10,
+      "end_line": 13,
+      "raw": "The common [ownership contract](../../iiFileProvider/docs/FILE_OWNERSHIP.md) defines stream, staging, control-file and\ninstalled-package rules. Source regression tests remain with this module; the\nworkspace creation audit also checks these boundaries. Build/deployment and target\nruntime validation are separate evidence.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 14,
+      "end_line": 14,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 15,
+      "end_line": 15,
+      "raw": "Changed boundaries:\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 16,
+      "end_line": 17,
+      "raw": "\n\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "list",
+      "start_line": 18,
+      "end_line": 20,
+      "raw": "- `src/iiCameraIntegration/Media.h`와 `Media.cpp`: 모듈 독립 녹화 계약\n- `example/Media/App/FileProviderPort.h`: 파일 제공자 조합\n- `example/Media/App/inspect.cpp`와 `example/ImageProcessing/App/process.cpp`: 별도 도구\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "`src/iiCameraIntegration/Media.h`와 `Media.cpp`: 모듈 독립 녹화 계약",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`example/Media/App/FileProviderPort.h`: 파일 제공자 조합",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`example/Media/App/inspect.cpp`와 `example/ImageProcessing/App/process.cpp`: 별도 도구",
+          "checked": null
+        }
+      ]
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "File creation ownership in iiCameraIntegration",
+      "anchor": "file-creation-ownership-in-iicameraintegration",
+      "start_line": 1
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000003",
+        "line": 3,
+        "text": "카메라 SDK는 파일을 생성하지 않는다. `recordMedia`는 호출자가 제공하는",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000005",
+        "label": "ownership contract",
+        "target": "../../iiFileProvider/docs/FILE_OWNERSHIP.md",
+        "kind": "relative",
+        "line": 10
+      }
+    ],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

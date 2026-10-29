@@ -1,0 +1,355 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:c184d8398d725fa229fc1f74e96529c28203ef9b0784867adb69322430235c0d",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/ImageProcessing.md",
+    "sha256": "633f192fe92c17fbf0115a0e25b95b01e644d5608b07272bae4877c6b956dc47",
+    "bytes": 5028,
+    "line_count": 75,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "Captured photograph processing",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Captured photograph processing\n",
+      "level": 1,
+      "title": "Captured photograph processing"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 5,
+      "raw": "독립적으로 구성하는 `example/ImageProcessing` 소비자가 카메라 코어와\n`iiGraphicAdjust` 0.6.x를 조합한다. 두 SDK는 서로를 검색하거나 링크하지 않는다.\n카메라 코어는 어댑터나 iiGraphicAdjust 없이 사용할 수 있다.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 6,
+      "end_line": 6,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 7,
+      "end_line": 9,
+      "raw": "`processPhoto(RgbFrame, PhotoProcessingOptions)` returns a detached normalized\nsRGB `Image`, an `ImageHistogram`, original frame metadata as provenance, source\nPTS/time base, and processing metadata. Stages run in this order:\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 10,
+      "end_line": 10,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "list",
+      "start_line": 11,
+      "end_line": 17,
+      "raw": "1. Validate RGB24 dimensions/stride/buffer and source color interpretation.\n2. Convert sRGB, Rec.709, or linear-sRGB code values to the existing sRGB pixel contract.\n3. Apply one of the eight explicit EXIF orientations.\n4. Apply an optional integer crop in the oriented image's coordinates.\n5. Run the existing `iiGraphicAdjust::develop` SDR stages.\n6. Apply optional Box/Bilinear/Mitchell/Lanczos3 resizing.\n7. Calculate encoded RGB and linear-luminance histograms/statistics.\n",
+      "items": [
+        {
+          "marker": "1.",
+          "text": "Validate RGB24 dimensions/stride/buffer and source color interpretation.",
+          "checked": null
+        },
+        {
+          "marker": "2.",
+          "text": "Convert sRGB, Rec.709, or linear-sRGB code values to the existing sRGB pixel contract.",
+          "checked": null
+        },
+        {
+          "marker": "3.",
+          "text": "Apply one of the eight explicit EXIF orientations.",
+          "checked": null
+        },
+        {
+          "marker": "4.",
+          "text": "Apply an optional integer crop in the oriented image's coordinates.",
+          "checked": null
+        },
+        {
+          "marker": "5.",
+          "text": "Run the existing `iiGraphicAdjust::develop` SDR stages.",
+          "checked": null
+        },
+        {
+          "marker": "6.",
+          "text": "Apply optional Box/Bilinear/Mitchell/Lanczos3 resizing.",
+          "checked": null
+        },
+        {
+          "marker": "7.",
+          "text": "Calculate encoded RGB and linear-luminance histograms/statistics.",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 18,
+      "end_line": 18,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 19,
+      "end_line": 25,
+      "raw": "The default `FrameEncoding::Metadata` requires a supported transfer tag and\nRec.709 primaries. Explicit `Srgb`, `Rec709`, or `LinearSrgb` interpretation fills\nmissing information only. It cannot override known conflicting tags. Unknown\nsource YUV matrix/range assumptions remain observable in frame provenance; they\nare not physical calibration proof. ICC-bearing, wide-gamut, unsupported-transfer,\nPQ and HLG frames need caller color normalization and are rejected here.\nThe decoder's 8-bit RGB conversion cannot retain arbitrary RAW/HDR precision.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 26,
+      "end_line": 26,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 27,
+      "end_line": 31,
+      "raw": "`captureAndProcessPhoto` composes first-frame decode with `processPhoto`.\nIt does not invoke a native high-quality photo output session, discover EXIF\norientation automatically, capture Bayer RAW, or return camera-profile calibration.\nThe caller supplies orientation explicitly. Cancellation/timeouts bound decoding;\nCPU processing afterward is synchronous and has no separate hard time limit.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 32,
+      "end_line": 32,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 33,
+      "end_line": 39,
+      "raw": "`photoFrame` exports opaque sRGB results as packed RGB24. Any alpha below one is\nrejected **before quantization**, including .999, so conversion cannot silently\nremove partial transparency. Source metadata is copied with the\n`iiCamera.photo.source.` prefix. Original orientation/dimensions therefore remain\nprovenance and cannot masquerade as output encoding tags. Output processing\norientation is always 1 after the selected operation. This SDK does not serialize\nthese dictionaries into EXIF/ICC/XMP bytes.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 40,
+      "end_line": 40,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "paragraph",
+      "start_line": 41,
+      "end_line": 43,
+      "raw": "The `iicamera-process` example writes a PPM image exclusively, preserves an\nexisting file, and demonstrates real capture/decode/development pixels. It assumes\nonly the explicit color interpretation given in its command arguments.\n"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 44,
+      "end_line": 44,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "paragraph",
+      "start_line": 45,
+      "end_line": 50,
+      "raw": "설치된 카메라와 iiGraphicAdjust 패키지를 사용해 `example/ImageProcessing`을\n별도로 구성한다. 설치 패키지명은 `iiCameraImageProcessing`이며, 이를 찾은 뒤 기존\n`iiCameraIntegration::ImageProcessing` 타깃을 링크한다. 이전 루트 옵션\n`IICAMERA_WITH_IMAGE_PROCESSING=ON`은 이전 안내와 함께 실패한다. 카메라 패키지에\n`ImageProcessing`을 필수로 요청하면 실패하고 선택 요청은 사용할 수 없는 상태다.\n기존 호출자는 새 패키지를 사용하도록 변경하고 다시 빌드해야 한다.\n"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 51,
+      "end_line": 51,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 52,
+      "end_line": 55,
+      "raw": "FFmpeg·도구·테스트를 켜면 `iiCamera.processing.package`는 어댑터를 build에 설치하고\n의존성이 없는 경우의 동작을 확인한 뒤 선택한 iiGraphicAdjust 패키지로 독립 C++23\n소비자를 빌드·실행한다. 소비자는 처리된 RGB 픽셀·히스토그램·RAW 현상을 검사한다.\n이때 카메라 SDK는 iiGraphicAdjust를 검색하지 않는다.\n"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 56,
+      "end_line": 56,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 57,
+      "end_line": 59,
+      "raw": "카메라 패키지가 공개하는 `iiCameraIntegration_WITH_FFMPEG` 값으로 CLI 및 패키지\n실행 검사 등록 여부를 판단한다. FFmpeg가 없는 구성에서도 합성 이미지 처리 검사는\n유지하며 FFmpeg가 필요한 CLI 실행 검사는 등록하지 않는다.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 60,
+      "end_line": 60,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "paragraph",
+      "start_line": 61,
+      "end_line": 66,
+      "raw": "The installed processing library/tool use their own library directory as a runtime\nsearch path and include external linked-library directories. When iiGraphicAdjust\nis staged in a separate prefix, that prefix must remain available at runtime. A\ncommon prefix permits the relative library path to resolve both SDKs. Deployment\nmust supply the appropriate FFmpeg and iiGraphicAdjust binaries as well as camera\nbinaries; this SDK does not bundle or license those dependencies automatically.\n"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 67,
+      "end_line": 67,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "paragraph",
+      "start_line": 68,
+      "end_line": 71,
+      "raw": "`tools/verify.sh --photo --sanitize` verifies both SDKs, shared/static/sanitized\ninstalled consumers, the independent core, the installed processing CLI, and the\noptional/required dependency behavior. [Verification](Verification.md) records\nthe actual host evidence and the remaining photographic features.\n"
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 72,
+      "end_line": 72,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 73,
+      "end_line": 75,
+      "raw": "The encoding formulas follow the familiar piecewise sRGB transfer and Rec.709\ninverse transfer. Primary references are [W3C color conversion documentation](https://www.w3.org/TR/css-color-4/#color-conversion-code)\nand [ITU-R BT.709](https://www.itu.int/rec/R-REC-BT.709).\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Captured photograph processing",
+      "anchor": "captured-photograph-processing",
+      "start_line": 1
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000003",
+        "line": 4,
+        "text": "`iiGraphicAdjust` 0.6.x를 조합한다. 두 SDK는 서로를 검색하거나 링크하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000017",
+        "line": 49,
+        "text": "`ImageProcessing`을 필수로 요청하면 실패하고 선택 요청은 사용할 수 없는 상태다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000017",
+        "line": 50,
+        "text": "기존 호출자는 새 패키지를 사용하도록 변경하고 다시 빌드해야 한다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000019",
+        "line": 55,
+        "text": "이때 카메라 SDK는 iiGraphicAdjust를 검색하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000021",
+        "line": 59,
+        "text": "유지하며 FFmpeg가 필요한 CLI 실행 검사는 등록하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000023",
+        "line": 63,
+        "text": "is staged in a separate prefix, that prefix must remain available at runtime. A",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000023",
+        "line": 65,
+        "text": "must supply the appropriate FFmpeg and iiGraphicAdjust binaries as well as camera",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000025",
+        "line": 70,
+        "text": "optional/required dependency behavior. [Verification](Verification.md) records",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000025",
+        "label": "Verification",
+        "target": "Verification.md",
+        "kind": "relative",
+        "line": 70
+      },
+      {
+        "block_id": "b000027",
+        "label": "W3C color conversion documentation",
+        "target": "https://www.w3.org/TR/css-color-4/#color-conversion-code",
+        "kind": "external",
+        "line": 74
+      },
+      {
+        "block_id": "b000027",
+        "label": "ITU-R BT.709",
+        "target": "https://www.itu.int/rec/R-REC-BT.709",
+        "kind": "external",
+        "line": 75
+      }
+    ],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

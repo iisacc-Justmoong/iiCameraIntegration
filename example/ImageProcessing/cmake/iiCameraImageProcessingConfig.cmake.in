@@ -1,0 +1,6 @@
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+find_dependency(iiCameraIntegration 0.4 CONFIG COMPONENTS Core)
+find_dependency(iiGraphicAdjust 0.6 CONFIG)
+include("${CMAKE_CURRENT_LIST_DIR}/iiCameraImageProcessingTargets.cmake")
+check_required_components(iiCameraImageProcessing)

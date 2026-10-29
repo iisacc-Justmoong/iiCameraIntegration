@@ -1,6 +1,6 @@
-# iiCameraIntergration
+# iiCameraIntegration
 
-[Windows 빌드 및 실행](docs/WindowsBuildAndRun.md)
+[Windows build and execution](docs/WindowsBuildAndRun.md)
 
 Package release: **0.4.1** (2026-10-19). This patch packages the current
 source snapshot; build, test and installation evidence is recorded in the SDK
@@ -9,7 +9,9 @@ patch-release report. Earlier versioned feature notes remain historical.
 
 Version **0.4.1**. A C++23 camera integration SDK for camera metadata, capability-aware optical
 controls, media capture, and codec/container identification. The package and
-namespace preserve the requested spelling **iiCameraIntergration**.
+namespace are both named **iiCameraIntegration**. See the
+[package naming contract](docs/PackageName.md) for headers, exports and rebuilding
+existing consumers after the spelling correction.
 The public API uses standard C++ values and `std::expected`; it has no Qt dependency.
 Native platform code is isolated in an optional adapter.
 
@@ -68,23 +70,24 @@ consumers. Every generated file and staging prefix stays under `build/`.
 For a standard-library-only build, use
 `-DIICAMERA_WITH_FFMPEG=OFF -DIICAMERA_WITH_NATIVE=OFF`; metadata, validation,
 optics, and custom control ports remain usable. Media/native functions explicitly
-return unavailable. Shared and static builds are supported. All build variants,
-fixtures, and package consumer builds must remain under `build/`.
+return unavailable. Shared and static builds are supported. Build variants and
+package consumer builds remain under `build/`; the Media consumer's temporary
+runtime fixtures are created under its `resources/` directory and cleaned up.
 
-The default installation prefix is `~/.local/SDK/iiCameraIntergration`. The
+The default installation prefix is `~/.local/SDK/iiCameraIntegration`. The
 verification workflow stages the package inside `build/install` so all task
 outputs remain in the Workspace. No third-party dependency is downloaded.
 
 ## Consume
 
 ```cmake
-find_package(iiCameraIntergration 0.4 CONFIG REQUIRED)
-target_link_libraries(my_app PRIVATE iiCameraIntergration::iiCameraIntergration)
+find_package(iiCameraIntegration 0.4 CONFIG REQUIRED)
+target_link_libraries(my_app PRIVATE iiCameraIntegration::iiCameraIntegration)
 ```
 
 ```cpp
-#include <iiCameraIntergration/iiCameraIntergration.h>
-using namespace iiCameraIntergration;
+#include <iiCameraIntegration/iiCameraIntegration.h>
+using namespace iiCameraIntegration;
 
 auto cameras = NativeCameraSystem{}.cameras();
 auto optics = rectilinearFieldOfView(36.0, 24.0, 50.0);
@@ -130,8 +133,8 @@ providers use `DeviceCallbacks`. See [Devices](docs/Devices.md) and the current
 
 ## Photograph processing component
 
-An optional `iiCameraIntergration::ImageProcessing` target links to iiGraphicAdjust
-0.6.x. It imports RGB24 with a verified color interpretation, applies EXIF orientation,
+The separately configured application adapter in `example/ImageProcessing` composes
+camera core with iiGraphicAdjust 0.6.x. It imports RGB24 with a verified color interpretation, applies EXIF orientation,
 integer crop, existing development stages, existing resamplers, and histograms.
 Unknown color tags require an explicit source interpretation. Known conflicting
 transfer/primary tags, ICC input, wide-gamut and HDR transfers are rejected.
@@ -139,21 +142,28 @@ The FFmpeg decoder now applies supported YUV matrices and full/limited ranges;
 it retains transfer/primary tags rather than silently interpreting every frame as sRGB.
 
 ```sh
-cmake -S . -B build -DIICAMERA_WITH_IMAGE_PROCESSING=ON \
-  -DiiGraphicAdjust_DIR=/path/to/iiGraphicAdjust/lib/cmake/iiGraphicAdjust
-cmake --build build --parallel 3
+cmake -S example/ImageProcessing -B build/image-consumer \
+  '-DCMAKE_PREFIX_PATH=/path/to/iiCameraIntegration;/path/to/iiGraphicAdjust;/path/to/iiFileProvider'
+cmake --build build/image-consumer --parallel 3
 ```
 
 ```cmake
-find_package(iiCameraIntergration 0.4 CONFIG REQUIRED COMPONENTS ImageProcessing)
-target_link_libraries(my_app PRIVATE iiCameraIntergration::ImageProcessing)
+find_package(iiCameraImageProcessing 0.4 CONFIG REQUIRED)
+target_link_libraries(my_app PRIVATE iiCameraIntegration::ImageProcessing)
 ```
+
+The former `IICAMERA_WITH_IMAGE_PROCESSING=ON` option and camera package
+component are no longer supported. Existing users must configure the adapter
+separately and rebuild. Recording similarly accepts a caller-provided
+`RecordingFilePort`; the separate `example/Media` application composes the
+camera SDK with iiFileProvider. The old `recordMedia(source, path, options)`
+signature was removed; consumers must supply a port and rebuild.
 
 For a synthetic photo processing example with an explicit sRGB interpretation:
 
 ```sh
-build/iicamera-process lavfi 'color=c=0x404040:size=16x16:rate=10:duration=0.2' \
-  build/developed.ppm srgb 1
+build/image-consumer/iicamera-process lavfi 'color=c=0x404040:size=16x16:rate=10:duration=0.2' \
+  resources/developed.ppm srgb 1
 ```
 
 The output is a real processed PPM frame; it is not evidence of physical photography.
@@ -165,15 +175,21 @@ this component. The example writes PPM; it does not add a photo encoder to the S
 
 ## Inspection tool
 
+Configure the inspection tool as a separate consumer against the installed
+camera and iiFileProvider packages:
+
 ```sh
-build/iicamera-inspect --catalog
-build/iicamera-inspect --cameras
-build/iicamera-inspect --probe build/fixtures/capture.mkv
-build/iicamera-inspect --capture avfoundation '0:none' build/camera.nut nut
+cmake -S example/Media -B build/media-consumer -G Ninja \
+  '-DCMAKE_PREFIX_PATH=/path/to/iiCameraIntegration;/path/to/iiFileProvider'
+cmake --build build/media-consumer --parallel 2
+build/media-consumer/iicamera-inspect --catalog
+build/media-consumer/iicamera-inspect --cameras
+build/media-consumer/iicamera-inspect --probe resources/input.mkv
+build/media-consumer/iicamera-inspect --capture avfoundation '0:none' resources/camera.nut nut
 ```
 
 For an entirely synthetic still capture, use `--frame lavfi
-"testsrc=size=64x48:rate=10:duration=0.2" build/test-pattern.ppm`. This decodes
+"testsrc=size=64x48:rate=10:duration=0.2" resources/test-pattern.ppm`. This decodes
 a real generated frame but provides no physical-camera evidence. `--capture`
 requires streams that the destination container can remux; pointer-based native
 frame packets such as FFmpeg `wrapped_avframe` require decoding first.
@@ -196,3 +212,12 @@ SPDX-License-Identifier: MIT
 The original code and documentation in this repository are licensed under the
 [MIT License](LICENSE). Third-party code, libraries, fonts, tools, and model
 weights retain their respective licenses.
+
+<!-- workspace-docs:readme:start -->
+## Documentation entry points
+
+- Human overview: this English `README.md`.
+- Agent instructions: [AGENT.md](AGENT.md).
+- Human documentation: [documentation index](docs/README.md).
+- Structured agent documentation: [agent index](docs/agent-index.json).
+<!-- workspace-docs:readme:end -->

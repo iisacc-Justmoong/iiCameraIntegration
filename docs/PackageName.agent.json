@@ -1,0 +1,184 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:4d7e0079572c6925ee80e1b7ecb3f4f1def9d5c9a84ff2824bda587f61d45108",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiCameraIntegration",
+    "name": "iiCameraIntegration",
+    "root": "SDK/iiCameraIntegration",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/PackageName.md",
+    "sha256": "2449a8d4ba25d97c22a282ea17a51940d416a698f50411aa422c07cf61412652",
+    "bytes": 2511,
+    "line_count": 35,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "패키지와 네임스페이스의 표준 이름",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# 패키지와 네임스페이스의 표준 이름\n",
+      "level": 1,
+      "title": "패키지와 네임스페이스의 표준 이름"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 6,
+      "raw": "모듈 이름은 `iiCameraIntegration`이다. 체크아웃은 `SDK/iiCameraIntegration`,\n설치 경로는 `~/.local/SDK/iiCameraIntegration`, 공개 헤더 접두사는\n`iiCameraIntegration/`이다. 통합 헤더는\n`iiCameraIntegration/iiCameraIntegration.h`이다.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 7,
+      "end_line": 7,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 8,
+      "end_line": 12,
+      "raw": "`find_package(iiCameraIntegration 0.4 CONFIG REQUIRED)`와\n`iiCameraIntegration::iiCameraIntegration`를 사용한다. 선택적인 사진 처리\n컴포넌트는 `iiCameraIntegration::ImageProcessing`이다. C++ 네임스페이스는\n`iiCameraIntegration`, 생성된 내보내기 매크로는 `IICAMERAINTEGRATION_EXPORT`,\n정적 링크 정의는 `IICAMERAINTEGRATION_STATIC_DEFINE`이다.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 13,
+      "end_line": 13,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 14,
+      "end_line": 18,
+      "raw": "네임스페이스도 교정되었으므로 이전 바이너리를 새 라이브러리에 그대로 연결하지\n않는다. 소비자의 헤더·네임스페이스·타깃 참조를 수정하고 다시 빌드한다.\n체크아웃을 옮긴 후에는 이전 절대 경로가 저장된 CMake 캐시를 새로 구성한다.\n카메라 공급자, 장치 수명, 메타데이터 계약은 유지한다. 녹화 호출은 파일 포트를\n명시적으로 전달하는 새 서명으로 변경되었으므로 소비자를 수정하고 다시 빌드한다.\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 19,
+      "end_line": 19,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 20,
+      "end_line": 24,
+      "raw": "`iiCamera.installed_package`는 설치 디렉터리를 이동한 뒤 새 패키지 이름만으로\n별도의 C++23 소비자를 빌드·실행한다. Qt 탐색을 비활성화하며 Core와 선택적\nImageProcessing의 설치 계약을 검증한다. 장치 탐색은 권한을 요청하거나 캡처를\n시작하지 않는다. 공급자 수명과 미디어 검사는 기존 테스트가 담당한다.\n검사 도구는 이제 별도 `example/Media` 소비자에서 구성한다.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 25,
+      "end_line": 25,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 26,
+      "end_line": 28,
+      "raw": "사진 처리 패키지 검사는 자체 소비자 캐시를 새로 구성한다. 체크아웃 이동이나\n패키지명 교정 후에도 이전 소스의 절대 경로를 재사용하지 않으며, 필수·선택\n컴포넌트의 성공·실패 조건과 기존 제한 시간은 유지한다.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 29,
+      "end_line": 29,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 30,
+      "end_line": 32,
+      "raw": "`install.sh`는 카메라 SDK만 구성하며 다른 SDK의 설치 순서를 요구하지 않는다.\n파일 제공자와의 조합은 별도 `example/Media` 애플리케이션을 구성할 때 명시한다.\nmacOS 검사 도구는 실제 링크된 SDK의 런타임 경로를 설치 RPATH에 포함한다.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 33,
+      "end_line": 33,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "paragraph",
+      "start_line": 34,
+      "end_line": 35,
+      "raw": "워크스페이스의 `SDK/tests/test_module_names.py`는 디렉터리, 공개 헤더,\nWindows 빌드 목록, 동기화 URL 및 관련 제품의 이름 일치를 검사한다.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "패키지와 네임스페이스의 표준 이름",
+      "anchor": "패키지와-네임스페이스의-표준-이름",
+      "start_line": 1
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000005",
+        "line": 8,
+        "text": "`find_package(iiCameraIntegration 0.4 CONFIG REQUIRED)`와",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000009",
+        "line": 23,
+        "text": "시작하지 않는다. 공급자 수명과 미디어 검사는 기존 테스트가 담당한다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000011",
+        "line": 27,
+        "text": "패키지명 교정 후에도 이전 소스의 절대 경로를 재사용하지 않으며, 필수·선택",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000013",
+        "line": 30,
+        "text": "`install.sh`는 카메라 SDK만 구성하며 다른 SDK의 설치 순서를 요구하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}
