@@ -1,0 +1,8 @@
+include("${CMAKE_CURRENT_LIST_DIR}/output_layout.cmake")
+if(ACTION STREQUAL "setup")
+    file(MAKE_DIRECTORY "${OUTPUT_DIR}")
+elseif(ACTION STREQUAL "cleanup")
+    file(REMOVE_RECURSE "${OUTPUT_DIR}")
+else()
+    message(FATAL_ERROR "Unknown camera fixture action")
+endif()

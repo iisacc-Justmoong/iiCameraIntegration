@@ -10,8 +10,8 @@
   },
   "source": {
     "path": "docs/FeatureVerification.md",
-    "sha256": "0f6222fceed8ceba7719fe17f89926754df16c38266253461aa96d88767e9d39",
-    "bytes": 5225,
+    "sha256": "46c8d1bde684c9511db2a1d4885abc416c32c37523be27ccb18c93582cbfdf81",
+    "bytes": 5301,
     "line_count": 73,
     "encoding": "utf-8",
     "language": "en"
@@ -238,7 +238,7 @@
       "kind": "paragraph",
       "start_line": 67,
       "end_line": 73,
-      "raw": "Use tools/verify-compatibility.sh [all|static|core|sanitized] to reproduce the Core\nhost workflow and staged consumers. Optional fixture headers are selected with\nIICAMERA_ANDROID_TEST_INCLUDE_DIR and IICAMERA_V4L2_TEST_INCLUDE_DIR. They are not\nSDK dependencies or installed headers. The original tools/verify.sh --photo\n--sanitize remains the full sibling photo-component workflow. Cross toolchain\nfiles and fetched validation headers are retained only under build/toolchains\nand build/android-headers. See [Features](Features.md) for the API and boundaries.\n"
+      "raw": "Use tools/verify-compatibility.sh [all|static|core|sanitized] to reproduce the Core\nhost workflow and staged consumers. Optional fixture headers are selected with\nIICAMERA_ANDROID_TEST_INCLUDE_DIR and IICAMERA_V4L2_TEST_INCLUDE_DIR. They are not\nSDK dependencies or installed headers. The original tools/verify.sh --photo\n--sanitize remains the full sibling photo-component workflow. Cross toolchain\nfiles and fetched validation headers are retained only under resources/.recovery/camera-history-20261030/toolchains\nand resources/.recovery/camera-history-20261030/android-headers. See [Features](Features.md) for the API and boundaries.\n"
     }
   ],
   "outline": [

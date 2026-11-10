@@ -10,9 +10,9 @@
   },
   "source": {
     "path": "docs/Verification.md",
-    "sha256": "461f295f8c9d3b65c201c2fdc4005f9e5d1106adeac39a5cf664cc937f04412e",
-    "bytes": 10848,
-    "line_count": 183,
+    "sha256": "0dd7d6e96ef89f11cc48426cc39b367435c8aea9f5905248fe0f6cc88967ee59",
+    "bytes": 11166,
+    "line_count": 186,
     "encoding": "utf-8",
     "language": "ko"
   },
@@ -644,6 +644,20 @@
       "start_line": 182,
       "end_line": 183,
       "raw": "This verification installed only into Workspace staging directories.\nThe default `~/.local/SDK/iiCameraIntegration` prefix has not been modified.\n"
+    },
+    {
+      "id": "b000068",
+      "kind": "blank",
+      "start_line": 184,
+      "end_line": 185,
+      "raw": "\n\n"
+    },
+    {
+      "id": "b000069",
+      "kind": "paragraph",
+      "start_line": 186,
+      "end_line": 186,
+      "raw": "테스트 미디어는 구성별 `resources/.state/camera-tests-*`에 생성하며 CTest 종료 시 정리한다. 설치 소비자 검증은 고유한 `build/` 임시 디렉터리를 사용하고 완료 또는 명령 실패 시 제거한다. 이전 도구와 작업 원본은 `resources/.recovery/`에 보존한다.\n"
     }
   ],
   "outline": [

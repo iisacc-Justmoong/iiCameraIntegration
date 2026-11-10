@@ -181,3 +181,6 @@ are created beneath `build/`. To skip the sanitizer configuration, omit the flag
 
 This verification installed only into Workspace staging directories.
 The default `~/.local/SDK/iiCameraIntegration` prefix has not been modified.
+
+
+테스트 미디어는 구성별 `resources/.state/camera-tests-*`에 생성하며 CTest 종료 시 정리한다. 설치 소비자 검증은 고유한 `build/` 임시 디렉터리를 사용하고 완료 또는 명령 실패 시 제거한다. 이전 도구와 작업 원본은 `resources/.recovery/`에 보존한다.

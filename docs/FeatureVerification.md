@@ -69,5 +69,5 @@ host workflow and staged consumers. Optional fixture headers are selected with
 IICAMERA_ANDROID_TEST_INCLUDE_DIR and IICAMERA_V4L2_TEST_INCLUDE_DIR. They are not
 SDK dependencies or installed headers. The original tools/verify.sh --photo
 --sanitize remains the full sibling photo-component workflow. Cross toolchain
-files and fetched validation headers are retained only under build/toolchains
-and build/android-headers. See [Features](Features.md) for the API and boundaries.
+files and fetched validation headers are retained only under resources/.recovery/camera-history-20261030/toolchains
+and resources/.recovery/camera-history-20261030/android-headers. See [Features](Features.md) for the API and boundaries.
