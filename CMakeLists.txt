@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 project(iiCameraIntegration VERSION 0.4.1 LANGUAGES CXX)
+set(iiCameraIntegration_SPDX_LICENSE "Apache-2.0")
 
 
 
@@ -119,12 +120,14 @@ install(EXPORT iiCameraIntegrationTargets NAMESPACE iiCameraIntegration:: DESTIN
 configure_package_config_file(cmake/iiCameraIntegrationConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/iiCameraIntegrationConfig.cmake" INSTALL_DESTINATION "${_package_dir}")
 write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/iiCameraIntegrationConfigVersion.cmake" VERSION ${PROJECT_VERSION} COMPATIBILITY SameMinorVersion)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/iiCameraIntegrationConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/iiCameraIntegrationConfigVersion.cmake" DESTINATION "${_package_dir}")
-install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraIntegration)
+install(FILES LICENSE NOTICE README.md DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraIntegration)
 install(DIRECTORY docs/ DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraIntegration/docs
     PATTERN ".*.iisacc-preview" EXCLUDE PATTERN ".iisacc-temporary.lock" EXCLUDE PATTERN ".DS_Store" EXCLUDE)
 install(DIRECTORY example/ DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraIntegration/example
     PATTERN ".*.iisacc-preview" EXCLUDE PATTERN ".iisacc-temporary.lock" EXCLUDE PATTERN ".DS_Store" EXCLUDE)
 if(BUILD_TESTING)
+    add_test(NAME iiCamera.license COMMAND "${CMAKE_COMMAND}"
+        "-DIICAMERA_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/license.cmake")
     add_test(NAME iiCamera.source_layout COMMAND "${CMAKE_COMMAND}"
         "-DIICAMERA_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/source_layout.cmake")
     add_test(NAME iiCamera.graphic_sdk_boundary COMMAND "${CMAKE_COMMAND}"
@@ -135,6 +138,7 @@ if(BUILD_TESTING)
         add_test(NAME iiCamera.installed_package COMMAND "${CMAKE_COMMAND}"
             "-DBUILD=${CMAKE_CURRENT_BINARY_DIR}" "-DSOURCE=${CMAKE_CURRENT_SOURCE_DIR}"
             "-DCONFIG=$<CONFIG>" "-DLIBDIR=${CMAKE_INSTALL_LIBDIR}"
+            "-DDATADIR=${CMAKE_INSTALL_DATADIR}"
             "-DGENERATOR=${CMAKE_GENERATOR}" "-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
             "-DDEPENDENCY_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/installed_package.cmake")

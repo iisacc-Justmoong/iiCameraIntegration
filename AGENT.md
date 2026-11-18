@@ -11,6 +11,14 @@ C++23과 Qt 없는 공개 API를 유지한다. 소스와 동명 헤더는 src/�
 본체에 이미지 SDK 검색·링크를 다시 넣지 않는다. 녹화 파일 생성과 미완성 파일
 정리는 `RecordingFilePort`로 주입하고 `example/Media`에서 파일 제공자와 조합한다.
 
+## 라이선스
+
+이 저장소의 iiSDK 모듈은 Apache License 2.0이다. 자사 모듈, 문서, 도구, 테스트가 포함된다. 저작권 표시는 `Copyright (c) 2026 iisacc`이고 고지는 루트 `NOTICE`에 있다. 사람용 한국어 설명은 [docs/License.md](docs/License.md)이다.
+
+`Product` 아래의 iisacc 제품은 GNU Affero General Public License(AGPL)이다.
+
+제3자와 벤더 코드는 원래 라이선스를 유지한다. 문서 재편 중에도 그 라이선스와 외부 원본은 보존한다.
+
 <!-- workspace-docs:agent:start -->
 ## 문서 구조와 에이전트 탐색
 

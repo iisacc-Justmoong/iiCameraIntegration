@@ -10,9 +10,9 @@
   },
   "source": {
     "path": "README.md",
-    "sha256": "a1aa8bf58a72c48a466742db7c257df42e39cc632353f59e9376114ad4f78fd5",
-    "bytes": 11990,
-    "line_count": 225,
+    "sha256": "9b03246d3d639d40583439bca8bda9d42a8f34f03cc4bddaee6361d39be3b45c",
+    "bytes": 12291,
+    "line_count": 233,
     "encoding": "utf-8",
     "language": "en"
   },
@@ -622,7 +622,7 @@
       "kind": "paragraph",
       "start_line": 212,
       "end_line": 212,
-      "raw": "SPDX-License-Identifier: MIT\n"
+      "raw": "SPDX-License-Identifier: Apache-2.0\n"
     },
     {
       "id": "b000076",
@@ -635,44 +635,72 @@
       "id": "b000077",
       "kind": "paragraph",
       "start_line": 214,
-      "end_line": 216,
-      "raw": "The original code and documentation in this repository are licensed under the\n[MIT License](LICENSE). Third-party code, libraries, fonts, tools, and model\nweights retain their respective licenses.\n"
+      "end_line": 218,
+      "raw": "This iiSDK module is licensed under the\n[Apache License, Version 2.0](LICENSE) (SPDX `Apache-2.0`).\nThe copyright notice is `Copyright (c) 2026 iisacc`. Attribution for this\ndistribution is in [NOTICE](NOTICE). The Korean statement of the same policy\nis [docs/License.md](docs/License.md).\n"
     },
     {
       "id": "b000078",
       "kind": "blank",
-      "start_line": 217,
-      "end_line": 217,
+      "start_line": 219,
+      "end_line": 219,
       "raw": "\n"
     },
     {
       "id": "b000079",
-      "kind": "html",
-      "start_line": 218,
-      "end_line": 218,
-      "raw": "<!-- workspace-docs:readme:start -->\n"
+      "kind": "paragraph",
+      "start_line": 220,
+      "end_line": 221,
+      "raw": "iisacc products under Product are licensed under the GNU Affero General\nPublic License (AGPL).\n"
     },
     {
       "id": "b000080",
+      "kind": "blank",
+      "start_line": 222,
+      "end_line": 222,
+      "raw": "\n"
+    },
+    {
+      "id": "b000081",
+      "kind": "paragraph",
+      "start_line": 223,
+      "end_line": 224,
+      "raw": "Third-party and vendored code, libraries, fonts, tools, and model weights\nkeep their original licenses.\n"
+    },
+    {
+      "id": "b000082",
+      "kind": "blank",
+      "start_line": 225,
+      "end_line": 225,
+      "raw": "\n"
+    },
+    {
+      "id": "b000083",
+      "kind": "html",
+      "start_line": 226,
+      "end_line": 226,
+      "raw": "<!-- workspace-docs:readme:start -->\n"
+    },
+    {
+      "id": "b000084",
       "kind": "heading",
-      "start_line": 219,
-      "end_line": 219,
+      "start_line": 227,
+      "end_line": 227,
       "raw": "## Documentation entry points\n",
       "level": 2,
       "title": "Documentation entry points"
     },
     {
-      "id": "b000081",
+      "id": "b000085",
       "kind": "blank",
-      "start_line": 220,
-      "end_line": 220,
+      "start_line": 228,
+      "end_line": 228,
       "raw": "\n"
     },
     {
-      "id": "b000082",
+      "id": "b000086",
       "kind": "list",
-      "start_line": 221,
-      "end_line": 224,
+      "start_line": 229,
+      "end_line": 232,
       "raw": "- Human overview: this English `README.md`.\n- Agent instructions: [AGENT.md](AGENT.md).\n- Human documentation: [documentation index](docs/README.md).\n- Structured agent documentation: [agent index](docs/agent-index.json).\n",
       "items": [
         {
@@ -698,10 +726,10 @@
       ]
     },
     {
-      "id": "b000083",
+      "id": "b000087",
       "kind": "html",
-      "start_line": 225,
-      "end_line": 225,
+      "start_line": 233,
+      "end_line": 233,
       "raw": "<!-- workspace-docs:readme:end -->\n"
     }
   ],
@@ -771,12 +799,12 @@
       "start_line": 210
     },
     {
-      "block_id": "b000080",
+      "block_id": "b000084",
       "parent_id": "b000001",
       "level": 2,
       "title": "Documentation entry points",
       "anchor": "documentation-entry-points",
-      "start_line": 219
+      "start_line": 227
     }
   ],
   "indexes": {
@@ -940,31 +968,45 @@
       },
       {
         "block_id": "b000077",
-        "label": "MIT License",
+        "label": "Apache License, Version 2.0",
         "target": "LICENSE",
         "kind": "relative",
         "line": 215
       },
       {
-        "block_id": "b000082",
+        "block_id": "b000077",
+        "label": "NOTICE",
+        "target": "NOTICE",
+        "kind": "relative",
+        "line": 217
+      },
+      {
+        "block_id": "b000077",
+        "label": "docs/License.md",
+        "target": "docs/License.md",
+        "kind": "relative",
+        "line": 218
+      },
+      {
+        "block_id": "b000086",
         "label": "AGENT.md",
         "target": "AGENT.md",
         "kind": "relative",
-        "line": 222
+        "line": 230
       },
       {
-        "block_id": "b000082",
+        "block_id": "b000086",
         "label": "documentation index",
         "target": "docs/README.md",
         "kind": "relative",
-        "line": 223
+        "line": 231
       },
       {
-        "block_id": "b000082",
+        "block_id": "b000086",
         "label": "agent index",
         "target": "docs/agent-index.json",
         "kind": "relative",
-        "line": 224
+        "line": 232
       }
     ],
     "tables": [

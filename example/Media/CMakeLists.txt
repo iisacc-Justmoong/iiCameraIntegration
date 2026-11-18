@@ -15,6 +15,8 @@ elseif(UNIX)
     set_target_properties(iiCameraInspect PROPERTIES INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
 endif()
 install(TARGETS iiCameraInspect RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../LICENSE" "${CMAKE_CURRENT_SOURCE_DIR}/../../NOTICE"
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraMediaConsumer)
 if(BUILD_TESTING AND iiCameraIntegration_WITH_FFMPEG)
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
     find_program(IICAMERA_FFMPEG_EXECUTABLE ffmpeg REQUIRED)
