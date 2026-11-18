@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 project(iiCameraIntegration VERSION 0.4.1 LANGUAGES CXX)
+include(./cmake/ModuleImports.cmake)
 
 
 

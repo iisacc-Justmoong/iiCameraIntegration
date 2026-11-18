@@ -1,0 +1,11 @@
+#pragma once
+
+// C++ public entry for iiCameraIntegration; the linked components select the API.
+#include <iiCameraIntegration/Camera.h>
+#include <iiCameraIntegration/Types.h>
+#include <iiCameraIntegration/iiCameraIntegration.h>
+#include <iiCameraIntegration/Devices.h>
+#include <iiCameraIntegration/Features.h>
+#include <iiCameraIntegration/Media.h>
+#include <iiCameraIntegration/NativeCamera.h>
+#include <iiCameraIntegration/Export.h>
