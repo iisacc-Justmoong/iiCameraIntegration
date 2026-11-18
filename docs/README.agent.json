@@ -10,9 +10,9 @@
   },
   "source": {
     "path": "docs/README.md",
-    "sha256": "6a5a4ae8ffb0e990170f3a0fecf9cdbbec78856b6ebfb0c04a66f9a9c76a7db2",
-    "bytes": 1673,
-    "line_count": 27,
+    "sha256": "5f8d4ed464de06507a4bd4955bc5d46ceb1f45834dcec0a0263e6b415f4f5892",
+    "bytes": 1738,
+    "line_count": 28,
     "encoding": "utf-8",
     "language": "en"
   },
@@ -79,8 +79,8 @@
       "id": "b000008",
       "kind": "table",
       "start_line": 8,
-      "end_line": 26,
-      "raw": "| Document | Agent JSON |\n| --- | --- |\n| [`AGENT.md`](../AGENT.md) | [JSON](entrypoints/AGENT.agent.json) |\n| [`README.md`](../README.md) | [JSON](entrypoints/README.agent.json) |\n| [`docs/Architecture.md`](Architecture.md) | [JSON](Architecture.agent.json) |\n| [`docs/DeviceVerification.md`](DeviceVerification.md) | [JSON](DeviceVerification.agent.json) |\n| [`docs/Devices.md`](Devices.md) | [JSON](Devices.agent.json) |\n| [`docs/FILE_PROVIDER.md`](FILE_PROVIDER.md) | [JSON](FILE_PROVIDER.agent.json) |\n| [`docs/FeatureVerification.md`](FeatureVerification.md) | [JSON](FeatureVerification.agent.json) |\n| [`docs/Features.md`](Features.md) | [JSON](Features.agent.json) |\n| [`docs/ImageProcessing.md`](ImageProcessing.md) | [JSON](ImageProcessing.agent.json) |\n| [`docs/Media.md`](Media.md) | [JSON](Media.agent.json) |\n| [`docs/Native.md`](Native.md) | [JSON](Native.agent.json) |\n| [`docs/PackageName.md`](PackageName.md) | [JSON](PackageName.agent.json) |\n| [`docs/PhotoAudit.md`](PhotoAudit.md) | [JSON](PhotoAudit.agent.json) |\n| [`docs/Verification.md`](Verification.md) | [JSON](Verification.agent.json) |\n| [`docs/WindowsBuildAndRun.md`](WindowsBuildAndRun.md) | [JSON](WindowsBuildAndRun.agent.json) |\n| [`docs/documentation-structure.md`](documentation-structure.md) | [JSON](documentation-structure.agent.json) |\n| [`example/README.md`](../example/README.md) | [JSON](mirrors/example/README.agent.json) |\n",
+      "end_line": 27,
+      "raw": "| Document | Agent JSON |\n| --- | --- |\n| [`AGENT.md`](../AGENT.md) | [JSON](entrypoints/AGENT.agent.json) |\n| [`README.md`](../README.md) | [JSON](entrypoints/README.agent.json) |\n| [`docs/Architecture.md`](Architecture.md) | [JSON](Architecture.agent.json) |\n| [`docs/DeviceVerification.md`](DeviceVerification.md) | [JSON](DeviceVerification.agent.json) |\n| [`docs/Devices.md`](Devices.md) | [JSON](Devices.agent.json) |\n| [`docs/FILE_PROVIDER.md`](FILE_PROVIDER.md) | [JSON](FILE_PROVIDER.agent.json) |\n| [`docs/FeatureVerification.md`](FeatureVerification.md) | [JSON](FeatureVerification.agent.json) |\n| [`docs/Features.md`](Features.md) | [JSON](Features.agent.json) |\n| [`docs/ImageProcessing.md`](ImageProcessing.md) | [JSON](ImageProcessing.agent.json) |\n| [`docs/License.md`](License.md) | [JSON](License.agent.json) |\n| [`docs/Media.md`](Media.md) | [JSON](Media.agent.json) |\n| [`docs/Native.md`](Native.md) | [JSON](Native.agent.json) |\n| [`docs/PackageName.md`](PackageName.md) | [JSON](PackageName.agent.json) |\n| [`docs/PhotoAudit.md`](PhotoAudit.md) | [JSON](PhotoAudit.agent.json) |\n| [`docs/Verification.md`](Verification.md) | [JSON](Verification.agent.json) |\n| [`docs/WindowsBuildAndRun.md`](WindowsBuildAndRun.md) | [JSON](WindowsBuildAndRun.agent.json) |\n| [`docs/documentation-structure.md`](documentation-structure.md) | [JSON](documentation-structure.agent.json) |\n| [`example/README.md`](../example/README.md) | [JSON](mirrors/example/README.agent.json) |\n",
       "columns": [
         "Document",
         "Agent JSON"
@@ -123,6 +123,10 @@
           "[JSON](ImageProcessing.agent.json)"
         ],
         [
+          "[`docs/License.md`](License.md)",
+          "[JSON](License.agent.json)"
+        ],
+        [
           "[`docs/Media.md`](Media.md)",
           "[JSON](Media.agent.json)"
         ],
@@ -159,8 +163,8 @@
     {
       "id": "b000009",
       "kind": "html",
-      "start_line": 27,
-      "end_line": 27,
+      "start_line": 28,
+      "end_line": 28,
       "raw": "<!-- workspace-docs:document-map:end -->\n"
     }
   ],
@@ -314,115 +318,129 @@
       },
       {
         "block_id": "b000008",
+        "label": "`docs/License.md`",
+        "target": "License.md",
+        "kind": "relative",
+        "line": 19
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "License.agent.json",
+        "kind": "relative",
+        "line": 19
+      },
+      {
+        "block_id": "b000008",
         "label": "`docs/Media.md`",
         "target": "Media.md",
         "kind": "relative",
-        "line": 19
+        "line": 20
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "Media.agent.json",
         "kind": "relative",
-        "line": 19
+        "line": 20
       },
       {
         "block_id": "b000008",
         "label": "`docs/Native.md`",
         "target": "Native.md",
         "kind": "relative",
-        "line": 20
+        "line": 21
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "Native.agent.json",
         "kind": "relative",
-        "line": 20
+        "line": 21
       },
       {
         "block_id": "b000008",
         "label": "`docs/PackageName.md`",
         "target": "PackageName.md",
         "kind": "relative",
-        "line": 21
+        "line": 22
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "PackageName.agent.json",
         "kind": "relative",
-        "line": 21
+        "line": 22
       },
       {
         "block_id": "b000008",
         "label": "`docs/PhotoAudit.md`",
         "target": "PhotoAudit.md",
         "kind": "relative",
-        "line": 22
+        "line": 23
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "PhotoAudit.agent.json",
         "kind": "relative",
-        "line": 22
+        "line": 23
       },
       {
         "block_id": "b000008",
         "label": "`docs/Verification.md`",
         "target": "Verification.md",
         "kind": "relative",
-        "line": 23
+        "line": 24
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "Verification.agent.json",
         "kind": "relative",
-        "line": 23
+        "line": 24
       },
       {
         "block_id": "b000008",
         "label": "`docs/WindowsBuildAndRun.md`",
         "target": "WindowsBuildAndRun.md",
         "kind": "relative",
-        "line": 24
+        "line": 25
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "WindowsBuildAndRun.agent.json",
         "kind": "relative",
-        "line": 24
+        "line": 25
       },
       {
         "block_id": "b000008",
         "label": "`docs/documentation-structure.md`",
         "target": "documentation-structure.md",
         "kind": "relative",
-        "line": 25
+        "line": 26
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "documentation-structure.agent.json",
         "kind": "relative",
-        "line": 25
+        "line": 26
       },
       {
         "block_id": "b000008",
         "label": "`example/README.md`",
         "target": "../example/README.md",
         "kind": "relative",
-        "line": 26
+        "line": 27
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "mirrors/example/README.agent.json",
         "kind": "relative",
-        "line": 26
+        "line": 27
       }
     ],
     "tables": [
@@ -468,6 +486,10 @@
           [
             "[`docs/ImageProcessing.md`](ImageProcessing.md)",
             "[JSON](ImageProcessing.agent.json)"
+          ],
+          [
+            "[`docs/License.md`](License.md)",
+            "[JSON](License.agent.json)"
           ],
           [
             "[`docs/Media.md`](Media.md)",

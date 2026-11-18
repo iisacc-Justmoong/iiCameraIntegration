@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 # iisdk:consumer-application
 project(iiCameraImageProcessing VERSION 0.4.1 LANGUAGES CXX)
+set(iiCameraImageProcessing_SPDX_LICENSE "Apache-2.0")
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
@@ -85,3 +86,5 @@ write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/iiCameraImageProce
     VERSION ${PROJECT_VERSION} COMPATIBILITY SameMinorVersion)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/iiCameraImageProcessingConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/iiCameraImageProcessingConfigVersion.cmake" DESTINATION "${package_dir}")
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../LICENSE" "${CMAKE_CURRENT_SOURCE_DIR}/../../NOTICE"
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/iiCameraImageProcessing)
