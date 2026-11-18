@@ -15,7 +15,7 @@ function(run_checked)
 endfunction()
 run_checked("${CMAKE_COMMAND}" --install "${BUILD}"
     --prefix "${_work}/original" --config "${CONFIG}")
-run_checked("${CMAKE_COMMAND}" "-DPREFIX=${_work}/original"
+run_checked("${CMAKE_COMMAND}" "-DPREFIX=${_work}/original" "-DDATADIR=${DATADIR}"
     -P "${SOURCE}/tests/verify_install_contents.cmake")
 file(RENAME "${_work}/original" "${_work}/relocated" RESULT _rename_result)
 if(NOT _rename_result STREQUAL "0")
